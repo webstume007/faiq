@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { getCurrentUser, getPortalPath } from '../lib/auth';
+import { getCurrentUserSync, getPortalPath } from '../lib/auth';
 
 const GOLD = '#F2A900';
 const NAVY = '#002147';
@@ -70,7 +70,7 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const user = getCurrentUser();
+    const user = getCurrentUserSync();
     if (user) {
       router.replace(getPortalPath(user.role));
       return;

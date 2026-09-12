@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { getCurrentUser, logout } from '../lib/auth';
+import { getCurrentUser, getCurrentUserSync, logout } from '../lib/auth';
 import * as db from '../lib/db';
 import { QURAN_SURAHS, QURAN_PARAS, formatAyahRange } from '../lib/quranData';
 
@@ -110,7 +110,7 @@ export default function TeacherPortal() {
   const [testMarksMap, setTestMarksMap] = useState({});
 
   useEffect(() => {
-    const u = getCurrentUser();
+    const u = getCurrentUserSync();
     if (!u || u.role !== 'teacher') {
       router.replace('/login');
       return;
@@ -299,7 +299,7 @@ export default function TeacherPortal() {
               <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>Faculty ID: {user.employee_id || 'Scholar'}</div>
             </div>
             <button
-              onClick={() => { logout(); router.push('/login'); }}
+              onClick={() => { logout().then(() => router.push('/login')); }}
               style={{
                 display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px',
                 background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { getCurrentUser, logout } from '../lib/auth';
+import { getCurrentUser, getCurrentUserSync, logout } from '../lib/auth';
 import * as db from '../lib/db';
 import { QURAN_SURAHS, QURAN_PARAS } from '../lib/quranData';
 
@@ -1574,7 +1574,7 @@ export default function AdminPortal() {
   }, []);
 
   useEffect(() => {
-    const u = getCurrentUser();
+    const u = getCurrentUserSync();
     if (!u || u.role !== 'admin') {
       router.replace('/login');
       return;
@@ -1679,7 +1679,7 @@ export default function AdminPortal() {
         <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#fff' }}>{user.first_name} {user.last_name}</div>
         <div style={{ fontSize: '0.72rem', color: GOLD, fontWeight: 600, marginBottom: 12 }}>Administrator</div>
         <button
-          onClick={() => { logout(); router.push('/login'); }}
+          onClick={() => { logout().then(() => router.push('/login')); }}
           style={{
             display: 'flex', alignItems: 'center', gap: 8,
             width: '100%', padding: '9px 12px',

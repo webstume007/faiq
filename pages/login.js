@@ -1,11 +1,23 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { authenticateUser, createUser } from '../lib/users';
-import { login as setSession, getCurrentUser, getPortalPath } from '../lib/auth';
+import { supabase } from '../lib/supabaseClient';
+import { getCurrentUserSync, getCurrentUser, cacheUserProfile, getPortalPath } from '../lib/auth';
 
 // ============================================================
-// SVG ICON LIBRARY (Pure SVG - Clean, Sharp, Reliable)
+// CNIC FORMATTER: #####-#######-#
+// ============================================================
+const formatCNIC = (value) => {
+  const digits = value.replace(/\D/g, '').slice(0, 13);
+  if (digits.length <= 5) return digits;
+  if (digits.length <= 12) return `${digits.slice(0, 5)}-${digits.slice(5)}`;
+  return `${digits.slice(0, 5)}-${digits.slice(5, 12)}-${digits.slice(12)}`;
+};
+
+const isValidCNIC = (cnic) => /^\d{5}-\d{7}-\d{1}$/.test(cnic);
+
+// ============================================================
+// SVG ICON LIBRARY
 // ============================================================
 const Icons = {
   shield: (size = 20, color = 'currentColor') => (
@@ -82,16 +94,9 @@ const Icons = {
       <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
     </svg>
   ),
-  graduationCap: (size = 20, color = 'currentColor') => (
+  key: (size = 20, color = 'currentColor') => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
-      <path d="M12 14l9-5-9-5-9 5 9 5z"/>
-      <path d="M12 14l6.16-3.422a12.083 12.083 0 0 1 .665 6.479A11.952 11.952 0 0 0 12 20.055a11.952 11.952 0 0 0-6.824-2.998 12.078 12.078 0 0 1 .665-6.479L12 14z"/>
-      <path d="M21 9v6"/>
-    </svg>
-  ),
-  sparkle: (size = 14, color = 'currentColor') => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke="none" style={{ display: 'block' }}>
-      <path d="M12 0L14.59 8.41L23 12L14.59 15.59L12 24L9.41 15.59L1 12L9.41 8.41L12 0Z"/>
+      <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
     </svg>
   ),
   plus: (size = 18, color = 'currentColor') => (
@@ -100,53 +105,35 @@ const Icons = {
       <line x1="5" y1="12" x2="19" y2="12"/>
     </svg>
   ),
+  arrowLeft: (size = 18, color = 'currentColor') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
+      <line x1="19" y1="12" x2="5" y2="12"/>
+      <polyline points="12 19 5 12 12 5"/>
+    </svg>
+  ),
 };
 
 // ============================================================
-// CNIC FORMATTER: #####-#######-#
+// BACKGROUND
 // ============================================================
-const formatCNIC = (value) => {
-  const digits = value.replace(/\D/g, '').slice(0, 13);
-  if (digits.length <= 5) return digits;
-  if (digits.length <= 12) return `${digits.slice(0, 5)}-${digits.slice(5)}`;
-  return `${digits.slice(0, 5)}-${digits.slice(5, 12)}-${digits.slice(12)}`;
-};
-
-const isValidCNIC = (cnic) => /^\d{5}-\d{7}-\d{1}$/.test(cnic);
-
-// ============================================================
-// MEMOIZED BACKGROUND PARTICLES (Prevents glitch / re-triggering)
-// ============================================================
-const ParticleBackground = memo(() => {
-  return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-      <div style={{
-        position: 'absolute',
-        width: 350,
-        height: 350,
-        top: '15%',
-        left: '10%',
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(242,169,0,0.12) 0%, transparent 70%)',
-        filter: 'blur(50px)',
-      }} />
-      <div style={{
-        position: 'absolute',
-        width: 450,
-        height: 450,
-        bottom: '10%',
-        right: '10%',
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(0,33,71,0.5) 0%, transparent 70%)',
-        filter: 'blur(60px)',
-      }} />
-    </div>
-  );
-});
+const ParticleBackground = memo(() => (
+  <div style={{ position: 'fixed', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+    <div style={{
+      position: 'absolute', width: 350, height: 350, top: '15%', left: '10%',
+      borderRadius: '50%', background: 'radial-gradient(circle, rgba(242,169,0,0.12) 0%, transparent 70%)',
+      filter: 'blur(50px)',
+    }} />
+    <div style={{
+      position: 'absolute', width: 450, height: 450, bottom: '10%', right: '10%',
+      borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,33,71,0.5) 0%, transparent 70%)',
+      filter: 'blur(60px)',
+    }} />
+  </div>
+));
 ParticleBackground.displayName = 'ParticleBackground';
 
 // ============================================================
-// REUSABLE INPUT FIELD (Isolated component)
+// INPUT FIELD
 // ============================================================
 const InputField = ({ icon, label, type = 'text', value, onChange, placeholder, rightElement, ...rest }) => {
   const [focused, setFocused] = useState(false);
@@ -154,10 +141,7 @@ const InputField = ({ icon, label, type = 'text', value, onChange, placeholder, 
     <div style={{ marginBottom: 18 }}>
       {label && <label style={styles.label}>{label}</label>}
       <div style={styles.inputWrapper}>
-        <span style={{
-          ...styles.inputIcon,
-          color: focused ? '#F2A900' : 'rgba(255,255,255,0.4)'
-        }}>
+        <span style={{ ...styles.inputIcon, color: focused ? '#F2A900' : 'rgba(255,255,255,0.4)' }}>
           {icon}
         </span>
         <input
@@ -181,227 +165,404 @@ const InputField = ({ icon, label, type = 'text', value, onChange, placeholder, 
 };
 
 // ============================================================
-// MAIN LOGIN / SIGNUP PAGE
+// OTP INPUT (6 boxes)
+// ============================================================
+const OtpInput = ({ value, onChange }) => {
+  const inputRefs = useRef([]);
+  const digits = value.split('').concat(Array(6).fill('')).slice(0, 6);
+
+  const handleKeyDown = (idx, e) => {
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      const newVal = digits.map((d, i) => (i === idx ? '' : d)).join('');
+      onChange(newVal);
+      if (idx > 0) inputRefs.current[idx - 1]?.focus();
+    }
+  };
+
+  const handleChange = (idx, e) => {
+    const char = e.target.value.replace(/\D/g, '').slice(-1);
+    const newDigits = [...digits];
+    newDigits[idx] = char;
+    const newVal = newDigits.join('');
+    onChange(newVal);
+    if (char && idx < 5) inputRefs.current[idx + 1]?.focus();
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    onChange(pasted.padEnd(6, '').slice(0, 6));
+    inputRefs.current[Math.min(pasted.length, 5)]?.focus();
+  };
+
+  return (
+    <div style={{ display: 'flex', gap: 10, justifyContent: 'center', margin: '24px 0' }}>
+      {digits.map((d, idx) => (
+        <input
+          key={idx}
+          ref={el => inputRefs.current[idx] = el}
+          type="text"
+          inputMode="numeric"
+          maxLength={1}
+          value={d}
+          onChange={(e) => handleChange(idx, e)}
+          onKeyDown={(e) => handleKeyDown(idx, e)}
+          onPaste={handlePaste}
+          style={styles.otpBox}
+        />
+      ))}
+    </div>
+  );
+};
+
+// ============================================================
+// MAIN LOGIN PAGE
 // ============================================================
 export default function LoginPage() {
   const router = useRouter();
-  const [mode, setMode] = useState('login'); // 'login' | 'signup'
+  // mode: 'login' | 'signup' | 'otp' | 'forgot'
+  const [mode, setMode] = useState('login');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [showPassword, setShowPassword] = useState(false);
 
-  // Login fields
-  const [cnic, setCnic] = useState('');
-  const [password, setPassword] = useState('');
+  // Login
+  const [loginCnic, setLoginCnic] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
 
-  // Signup fields
+  // Signup
   const [signupData, setSignupData] = useState({
-    firstName: '',
-    lastName: '',
-    cnic: '',
-    phone: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    firstName: '', lastName: '', cnic: '', phone: '', email: '', password: '', confirmPassword: '',
   });
 
+  // OTP
+  const [otpCode, setOtpCode] = useState('');
+  const [otpEmail, setOtpEmail] = useState(''); // email used during signup
+
+  // Forgot password
+  const [forgotCnic, setForgotCnic] = useState('');
+  const [forgotSent, setForgotSent] = useState(false);
+
+  // On mount: if already logged in, redirect
   useEffect(() => {
-    const user = getCurrentUser();
-    if (user) {
-      router.replace(getPortalPath(user.role));
+    const cached = getCurrentUserSync();
+    if (cached) {
+      router.replace(getPortalPath(cached.role));
+      return;
     }
+    // Also check live session
+    getCurrentUser().then((user) => {
+      if (user) {
+        cacheUserProfile(user);
+        router.replace(getPortalPath(user.role));
+      }
+    });
   }, []);
 
-  const handleCnicChange = (e, isSignup = false) => {
-    const formatted = formatCNIC(e.target.value);
-    if (isSignup) {
-      setSignupData((prev) => ({ ...prev, cnic: formatted }));
-    } else {
-      setCnic(formatted);
-    }
-  };
+  const setErr = (text) => setMessage({ type: 'error', text });
+  const setSuccess = (text) => setMessage({ type: 'success', text });
+  const clearMsg = () => setMessage({ type: '', text: '' });
 
+  // ------------------------------------------------------------------
+  // LOGIN
+  // ------------------------------------------------------------------
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage({ type: '', text: '' });
+    clearMsg();
 
-    if (!isValidCNIC(cnic)) {
-      setMessage({ type: 'error', text: 'Please enter a valid CNIC (#####-#######-#)' });
+    if (!isValidCNIC(loginCnic)) {
+      setErr('Please enter a valid CNIC (e.g. 35202-1234567-1)');
       setLoading(false);
       return;
     }
 
-    await new Promise((r) => setTimeout(r, 600));
+    // Step 1: Look up email by CNIC
+    const { data: emailResult, error: rpcError } = await supabase
+      .rpc('get_email_by_cnic', { p_cnic: loginCnic });
 
-    const user = await authenticateUser(cnic, password);
-    if (!user) {
-      setMessage({ type: 'error', text: 'Invalid CNIC or password. Please try again.' });
+    if (rpcError || !emailResult) {
+      setErr('No account found for this CNIC. Please sign up or check your CNIC.');
       setLoading(false);
       return;
     }
 
-    setSession(user);
-    setMessage({ type: 'success', text: `Welcome, ${user.first_name}! Redirecting...` });
+    // Step 2: Sign in with email + password
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email: emailResult,
+      password: loginPassword,
+    });
+
+    if (authError) {
+      setErr('Incorrect password. Please try again or use Forgot Password.');
+      setLoading(false);
+      return;
+    }
+
+    // Step 3: Fetch profile from public.users
+    const { data: profile } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', authData.user.id)
+      .single();
+
+    if (!profile) {
+      setErr('Account found but profile is missing. Please contact support.');
+      setLoading(false);
+      return;
+    }
+
+    const { password_hash, ...safeProfile } = profile;
+    cacheUserProfile(safeProfile);
+    setSuccess(`Welcome, ${safeProfile.first_name}! Redirecting...`);
 
     setTimeout(() => {
-      router.push(getPortalPath(user.role));
+      router.push(getPortalPath(safeProfile.role));
     }, 800);
   };
 
+  // ------------------------------------------------------------------
+  // SIGNUP (Guardian self-registration)
+  // ------------------------------------------------------------------
   const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage({ type: '', text: '' });
+    clearMsg();
 
     const { firstName, lastName, cnic, phone, email, password, confirmPassword } = signupData;
 
     if (!isValidCNIC(cnic)) {
-      setMessage({ type: 'error', text: 'Please enter a valid CNIC (#####-#######-#)' });
+      setErr('Please enter a valid CNIC (e.g. 35202-1234567-1)');
       setLoading(false);
       return;
     }
-
-    if (password.length < 6) {
-      setMessage({ type: 'error', text: 'Password must be at least 6 characters' });
+    if (password.length < 8) {
+      setErr('Password must be at least 8 characters');
       setLoading(false);
       return;
     }
-
     if (password !== confirmPassword) {
-      setMessage({ type: 'error', text: 'Passwords do not match' });
+      setErr('Passwords do not match');
       setLoading(false);
       return;
     }
 
-    await new Promise((r) => setTimeout(r, 600));
+    // Check if CNIC already registered
+    const { data: existing } = await supabase.rpc('get_email_by_cnic', { p_cnic: cnic });
+    if (existing) {
+      setErr('An account with this CNIC already exists. Please sign in.');
+      setLoading(false);
+      return;
+    }
 
-    const result = await createUser({
-      firstName,
-      lastName,
-      cnic,
-      phone,
+    // Sign up with Supabase — sends OTP email
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      role: 'guardian',
+      options: {
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          cnic,
+          phone,
+          role: 'guardian',
+        },
+      },
     });
 
-    if (result.error) {
-      setMessage({ type: 'error', text: result.error });
+    if (error) {
+      setErr(error.message);
       setLoading(false);
       return;
     }
 
-    setMessage({
-      type: 'success',
-      text: 'Account created successfully! Switching to sign in...',
-    });
+    setOtpEmail(email);
     setLoading(false);
-
-    setTimeout(() => {
-      setMode('login');
-      setCnic(cnic);
-      setMessage({ type: '', text: '' });
-    }, 1500);
+    setMode('otp');
+    setSuccess('A 6-digit verification code has been sent to your email.');
   };
 
-  const fillTestAccount = (testCnic, testPassword) => {
-    setCnic(testCnic);
-    setPassword(testPassword);
-    setMode('login');
-    setMessage({ type: '', text: '' });
+  // ------------------------------------------------------------------
+  // OTP VERIFICATION
+  // ------------------------------------------------------------------
+  const handleOtpVerify = async (e) => {
+    e.preventDefault();
+    if (otpCode.replace(/\D/g, '').length !== 6) {
+      setErr('Please enter the complete 6-digit code.');
+      return;
+    }
+    setLoading(true);
+    clearMsg();
+
+    const { data, error } = await supabase.auth.verifyOtp({
+      email: otpEmail,
+      token: otpCode,
+      type: 'signup',
+    });
+
+    if (error) {
+      setErr('Invalid or expired code. Please try again or resend.');
+      setLoading(false);
+      return;
+    }
+
+    // Fetch the newly created profile
+    const { data: profile } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', data.user.id)
+      .single();
+
+    if (profile) {
+      const { password_hash, ...safeProfile } = profile;
+      // Also insert into guardians table
+      await supabase.from('guardians').upsert({ id: profile.id }).select();
+      cacheUserProfile(safeProfile);
+      setSuccess('Email verified! Redirecting to your portal...');
+      setTimeout(() => router.push(getPortalPath(safeProfile.role)), 1000);
+    } else {
+      setSuccess('Verified! Please sign in.');
+      setTimeout(() => { setMode('login'); clearMsg(); }, 1500);
+    }
+    setLoading(false);
   };
 
+  const handleResendOtp = async () => {
+    setLoading(true);
+    clearMsg();
+    const { error } = await supabase.auth.resend({ type: 'signup', email: otpEmail });
+    if (error) {
+      setErr('Failed to resend code: ' + error.message);
+    } else {
+      setSuccess('A new code has been sent to your email.');
+    }
+    setLoading(false);
+  };
+
+  // ------------------------------------------------------------------
+  // FORGOT PASSWORD
+  // ------------------------------------------------------------------
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    clearMsg();
+
+    if (!isValidCNIC(forgotCnic)) {
+      setErr('Please enter a valid CNIC.');
+      setLoading(false);
+      return;
+    }
+
+    const { data: email } = await supabase.rpc('get_email_by_cnic', { p_cnic: forgotCnic });
+    if (!email) {
+      setErr('No account found for this CNIC.');
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error) {
+      setErr(error.message);
+    } else {
+      setForgotSent(true);
+      setSuccess(`Password reset link sent to the email associated with this CNIC.`);
+    }
+    setLoading(false);
+  };
+
+  // ------------------------------------------------------------------
+  // RENDER
+  // ------------------------------------------------------------------
   return (
     <>
       <Head>
         <title>Al-Faeq Education System</title>
         <link rel="icon" href="/faeq-logo.png" />
+        <style>{`
+          @keyframes spin { to { transform: rotate(360deg); } }
+          input::placeholder { color: rgba(255,255,255,0.25); }
+          input:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px rgba(18,26,51,0.95) inset !important; -webkit-text-fill-color: #fff !important; }
+        `}</style>
       </Head>
 
       <div style={styles.page}>
         <ParticleBackground />
-
         <div style={styles.container}>
+
           {/* Logo & Header */}
           <div style={styles.logoHeader}>
             <div style={styles.logoBadge}>
-              <img
-                src="/faeq-logo.png"
-                alt="Al-Faeq Logo"
-                style={styles.logoImage}
-              />
+              <img src="/faeq-logo.png" alt="Al-Faeq Logo" style={styles.logoImage} />
             </div>
             <h1 style={styles.title}>Al-Faeq Education System</h1>
-            <p style={styles.subtitle}>Portal Sign In</p>
+            <p style={styles.subtitle}>
+              {mode === 'login'   && 'Portal Sign In'}
+              {mode === 'signup'  && 'Create Account'}
+              {mode === 'otp'     && 'Verify Your Email'}
+              {mode === 'forgot'  && 'Recover Password'}
+            </p>
           </div>
 
           {/* Main Card */}
           <div style={styles.card}>
+
             {/* Status Message */}
             {message.text && (
               <div style={styles.message(message.type)}>
-                {message.type === 'error'
-                  ? Icons.alertCircle(18, '#fca5a5')
-                  : Icons.checkCircle(18, '#86efac')}
+                {message.type === 'error' ? Icons.alertCircle(18, '#fca5a5') : Icons.checkCircle(18, '#86efac')}
                 <span>{message.text}</span>
               </div>
             )}
 
-            {/* LOGIN FORM */}
+            {/* ---- LOGIN ---- */}
             {mode === 'login' && (
               <form onSubmit={handleLogin}>
                 <InputField
                   icon={Icons.idCard(20, 'currentColor')}
                   label="CNIC Number"
-                  value={cnic}
-                  onChange={(e) => handleCnicChange(e)}
+                  value={loginCnic}
+                  onChange={(e) => setLoginCnic(formatCNIC(e.target.value))}
                   placeholder="12345-1234567-1"
                   maxLength={15}
                   required
                 />
-
                 <InputField
                   icon={Icons.lock(20, 'currentColor')}
                   label="Password"
                   type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="Enter your password"
                   required
                   rightElement={
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      style={styles.passwordToggle}
-                      tabIndex={-1}
-                    >
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} style={styles.passwordToggle} tabIndex={-1}>
                       {showPassword ? Icons.eyeOff(18, 'currentColor') : Icons.eye(18, 'currentColor')}
                     </button>
                   }
                 />
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={styles.submitBtn}
-                >
-                  {loading ? (
-                    <>
-                      {Icons.loader(18, '#0a0e1a')}
-                      Authenticating...
-                    </>
-                  ) : (
-                    <>
-                      Sign In
-                      {Icons.arrowRight(18, '#0a0e1a')}
-                    </>
-                  )}
+                {/* Forgot password link */}
+                <div style={{ textAlign: 'right', marginBottom: 16, marginTop: -10 }}>
+                  <button
+                    type="button"
+                    onClick={() => { setMode('forgot'); clearMsg(); }}
+                    style={styles.linkBtn}
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+
+                <button type="submit" disabled={loading} style={styles.submitBtn}>
+                  {loading ? <>{Icons.loader(18, '#0a0e1a')} Authenticating...</> : <>Sign In {Icons.arrowRight(18, '#0a0e1a')}</>}
                 </button>
               </form>
             )}
 
-            {/* SIGNUP FORM */}
+            {/* ---- SIGNUP ---- */}
             {mode === 'signup' && (
               <form onSubmit={handleSignup}>
                 <div style={styles.inputRow}>
@@ -409,7 +570,7 @@ export default function LoginPage() {
                     icon={Icons.user(18, 'currentColor')}
                     label="First Name"
                     value={signupData.firstName}
-                    onChange={(e) => setSignupData((p) => ({ ...p, firstName: e.target.value }))}
+                    onChange={(e) => setSignupData(p => ({ ...p, firstName: e.target.value }))}
                     placeholder="First name"
                     required
                   />
@@ -417,7 +578,7 @@ export default function LoginPage() {
                     icon={Icons.user(18, 'currentColor')}
                     label="Last Name"
                     value={signupData.lastName}
-                    onChange={(e) => setSignupData((p) => ({ ...p, lastName: e.target.value }))}
+                    onChange={(e) => setSignupData(p => ({ ...p, lastName: e.target.value }))}
                     placeholder="Last name"
                     required
                   />
@@ -427,7 +588,7 @@ export default function LoginPage() {
                   icon={Icons.idCard(18, 'currentColor')}
                   label="CNIC Number"
                   value={signupData.cnic}
-                  onChange={(e) => handleCnicChange(e, true)}
+                  onChange={(e) => setSignupData(p => ({ ...p, cnic: formatCNIC(e.target.value) }))}
                   placeholder="12345-1234567-1"
                   maxLength={15}
                   required
@@ -438,7 +599,7 @@ export default function LoginPage() {
                   label="Phone Number"
                   type="tel"
                   value={signupData.phone}
-                  onChange={(e) => setSignupData((p) => ({ ...p, phone: e.target.value }))}
+                  onChange={(e) => setSignupData(p => ({ ...p, phone: e.target.value }))}
                   placeholder="03001234567"
                   required
                 />
@@ -448,7 +609,7 @@ export default function LoginPage() {
                   label="Email Address"
                   type="email"
                   value={signupData.email}
-                  onChange={(e) => setSignupData((p) => ({ ...p, email: e.target.value }))}
+                  onChange={(e) => setSignupData(p => ({ ...p, email: e.target.value }))}
                   placeholder="your@email.com"
                   required
                 />
@@ -458,16 +619,11 @@ export default function LoginPage() {
                   label="Password"
                   type={showPassword ? 'text' : 'password'}
                   value={signupData.password}
-                  onChange={(e) => setSignupData((p) => ({ ...p, password: e.target.value }))}
-                  placeholder="Min 6 characters"
+                  onChange={(e) => setSignupData(p => ({ ...p, password: e.target.value }))}
+                  placeholder="Min 8 characters"
                   required
                   rightElement={
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      style={styles.passwordToggle}
-                      tabIndex={-1}
-                    >
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} style={styles.passwordToggle} tabIndex={-1}>
                       {showPassword ? Icons.eyeOff(18, 'currentColor') : Icons.eye(18, 'currentColor')}
                     </button>
                   }
@@ -478,84 +634,93 @@ export default function LoginPage() {
                   label="Confirm Password"
                   type="password"
                   value={signupData.confirmPassword}
-                  onChange={(e) => setSignupData((p) => ({ ...p, confirmPassword: e.target.value }))}
+                  onChange={(e) => setSignupData(p => ({ ...p, confirmPassword: e.target.value }))}
                   placeholder="Re-enter password"
                   required
                 />
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={styles.submitBtn}
-                >
-                  {loading ? (
-                    <>
-                      {Icons.loader(18, '#0a0e1a')}
-                      Creating Account...
-                    </>
-                  ) : (
-                    <>
-                      Create Account
-                      {Icons.arrowRight(18, '#0a0e1a')}
-                    </>
-                  )}
+                <button type="submit" disabled={loading} style={styles.submitBtn}>
+                  {loading ? <>{Icons.loader(18, '#0a0e1a')} Creating Account...</> : <>Create Account {Icons.arrowRight(18, '#0a0e1a')}</>}
                 </button>
               </form>
             )}
 
-            {/* Toggle Button Below Form */}
+            {/* ---- OTP VERIFICATION ---- */}
+            {mode === 'otp' && (
+              <form onSubmit={handleOtpVerify}>
+                <p style={styles.otpHint}>
+                  Enter the 6-digit code sent to <strong style={{ color: '#F2A900' }}>{otpEmail}</strong>
+                </p>
+
+                <OtpInput value={otpCode} onChange={setOtpCode} />
+
+                <button type="submit" disabled={loading} style={styles.submitBtn}>
+                  {loading ? <>{Icons.loader(18, '#0a0e1a')} Verifying...</> : <>Verify Code {Icons.arrowRight(18, '#0a0e1a')}</>}
+                </button>
+
+                <div style={{ textAlign: 'center', marginTop: 16 }}>
+                  <button type="button" onClick={handleResendOtp} disabled={loading} style={styles.linkBtn}>
+                    Didn&apos;t receive it? Resend code
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* ---- FORGOT PASSWORD ---- */}
+            {mode === 'forgot' && !forgotSent && (
+              <form onSubmit={handleForgotPassword}>
+                <p style={styles.otpHint}>
+                  Enter your CNIC. We&apos;ll send a password reset link to your registered email.
+                </p>
+                <InputField
+                  icon={Icons.idCard(20, 'currentColor')}
+                  label="CNIC Number"
+                  value={forgotCnic}
+                  onChange={(e) => setForgotCnic(formatCNIC(e.target.value))}
+                  placeholder="12345-1234567-1"
+                  maxLength={15}
+                  required
+                />
+                <button type="submit" disabled={loading} style={styles.submitBtn}>
+                  {loading ? <>{Icons.loader(18, '#0a0e1a')} Sending...</> : <>Send Reset Link {Icons.arrowRight(18, '#0a0e1a')}</>}
+                </button>
+              </form>
+            )}
+
+            {/* ---- TOGGLE / BACK BUTTONS ---- */}
             <div style={styles.toggleSection}>
-              {mode === 'login' ? (
+              {mode === 'login' && (
                 <button
                   type="button"
-                  onClick={() => { setMode('signup'); setMessage({ type: '', text: '' }); }}
+                  onClick={() => { setMode('signup'); clearMsg(); }}
                   style={styles.toggleBtn}
                 >
                   {Icons.plus(16, '#F2A900')}
                   Create new account
                 </button>
-              ) : (
+              )}
+              {(mode === 'signup' || mode === 'forgot') && (
                 <button
                   type="button"
-                  onClick={() => { setMode('login'); setMessage({ type: '', text: '' }); }}
+                  onClick={() => { setMode('login'); clearMsg(); setForgotSent(false); }}
                   style={styles.toggleBtn}
                 >
-                  {Icons.user(16, '#F2A900')}
-                  Already have an account? Sign In
+                  {Icons.arrowLeft(16, '#F2A900')}
+                  Back to Sign In
+                </button>
+              )}
+              {mode === 'otp' && (
+                <button
+                  type="button"
+                  onClick={() => { setMode('signup'); clearMsg(); setOtpCode(''); }}
+                  style={styles.toggleBtn}
+                >
+                  {Icons.arrowLeft(16, '#F2A900')}
+                  Back to Signup
                 </button>
               )}
             </div>
           </div>
-
-          {/* Test Accounts Quick Fill */}
-          {mode === 'login' && (
-            <div style={styles.testAccounts}>
-              <div style={styles.testTitle}>
-                {Icons.sparkle(12, '#F2A900')}
-                <span>Quick Demo Login</span>
-              </div>
-              <div style={styles.testGrid}>
-                {[
-                  { role: 'Admin', cnic: '35202-1234567-1', pass: 'admin123', icon: Icons.shield(14, '#F2A900') },
-                  { role: 'Teacher', cnic: '35202-7654321-2', pass: 'teacher123', icon: Icons.graduationCap(14, '#F2A900') },
-                  { role: 'Guardian', cnic: '35202-1111111-3', pass: 'guardian123', icon: Icons.user(14, '#F2A900') },
-                ].map((acc) => (
-                  <button
-                    key={acc.role}
-                    type="button"
-                    style={styles.testCard}
-                    onClick={() => fillTestAccount(acc.cnic, acc.pass)}
-                  >
-                    <span style={styles.testRole}>
-                      {acc.icon}
-                      {acc.role}
-                    </span>
-                    <span style={styles.testCnic}>{acc.cnic}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
 
           <div style={styles.footer}>
             <p>Al-Faeq Education System © 2026</p>
@@ -567,229 +732,86 @@ export default function LoginPage() {
 }
 
 // ============================================================
-// STYLES OBJECT (Clean, crisp, slightly rounded corners)
+// STYLES
 // ============================================================
 const styles = {
   page: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '100vh',
-    padding: '24px 16px',
-    position: 'relative',
-    background: '#0a0e1a',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    minHeight: '100vh', padding: '24px 16px', position: 'relative', background: '#0a0e1a',
   },
-  container: {
-    width: '100%',
-    maxWidth: '430px',
-    position: 'relative',
-    zIndex: 1,
-  },
+  container: { width: '100%', maxWidth: '430px', position: 'relative', zIndex: 1 },
   logoHeader: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginBottom: '28px',
-    textAlign: 'center',
+    display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '28px', textAlign: 'center',
   },
   logoBadge: {
-    width: 72,
-    height: 72,
-    borderRadius: 20,
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(242, 169, 0, 0.3)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-    padding: 10,
+    width: 72, height: 72, borderRadius: 20, background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(242, 169, 0, 0.3)', display: 'flex', alignItems: 'center',
+    justifyContent: 'center', marginBottom: 16, boxShadow: '0 8px 24px rgba(0,0,0,0.3)', padding: 10,
   },
-  logoImage: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'contain',
-  },
-  title: {
-    fontSize: '1.4rem',
-    fontWeight: 800,
-    color: '#ffffff',
-    letterSpacing: '-0.02em',
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: '0.85rem',
-    color: 'rgba(255,255,255,0.45)',
-    fontWeight: 500,
-  },
+  logoImage: { width: '100%', height: '100%', objectFit: 'contain' },
+  title: { fontSize: '1.4rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', marginBottom: 4 },
+  subtitle: { fontSize: '0.85rem', color: 'rgba(255,255,255,0.45)', fontWeight: 500 },
   card: {
-    background: 'rgba(18, 26, 51, 0.75)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    borderRadius: 16,
-    border: '1px solid rgba(255,255,255,0.08)',
-    padding: '32px 28px',
+    background: 'rgba(18, 26, 51, 0.75)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+    borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', padding: '32px 28px',
     boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
   },
   label: {
-    display: 'block',
-    fontSize: '0.76rem',
-    fontWeight: 600,
-    color: 'rgba(255,255,255,0.6)',
-    marginBottom: 6,
-    textTransform: 'uppercase',
-    letterSpacing: '0.06em',
+    display: 'block', fontSize: '0.76rem', fontWeight: 600, color: 'rgba(255,255,255,0.6)',
+    marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em',
   },
-  inputWrapper: {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
-  },
+  inputWrapper: { position: 'relative', display: 'flex', alignItems: 'center' },
   inputIcon: {
-    position: 'absolute',
-    left: 14,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1,
-    pointerEvents: 'none',
+    position: 'absolute', left: 14, display: 'flex', alignItems: 'center',
+    justifyContent: 'center', zIndex: 1, pointerEvents: 'none',
   },
   input: {
-    width: '100%',
-    padding: '13px 14px 13px 44px',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    borderRadius: 10,
-    fontSize: '0.92rem',
-    color: '#ffffff',
-    outline: 'none',
-    boxSizing: 'border-box',
+    width: '100%', padding: '13px 14px 13px 44px', background: 'rgba(255,255,255,0.04)',
+    border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, fontSize: '0.92rem',
+    color: '#ffffff', outline: 'none', boxSizing: 'border-box',
   },
   inputFocus: {
-    borderColor: '#F2A900',
-    background: 'rgba(255,255,255,0.07)',
+    borderColor: '#F2A900', background: 'rgba(255,255,255,0.07)',
     boxShadow: '0 0 0 3px rgba(242, 169, 0, 0.15)',
   },
   passwordToggle: {
-    position: 'absolute',
-    right: 12,
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    color: 'rgba(255,255,255,0.4)',
-    display: 'flex',
-    alignItems: 'center',
-    padding: 4,
-    borderRadius: 6,
+    position: 'absolute', right: 12, background: 'none', border: 'none', cursor: 'pointer',
+    color: 'rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', padding: 4, borderRadius: 6,
   },
   submitBtn: {
-    width: '100%',
-    padding: '14px 20px',
+    width: '100%', padding: '14px 20px',
     background: 'linear-gradient(135deg, #F2A900 0%, #d99600 100%)',
-    border: 'none',
-    borderRadius: 10,
-    fontSize: '0.92rem',
-    fontWeight: 700,
-    color: '#0a0e1a',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 8,
-    boxShadow: '0 4px 16px rgba(242, 169, 0, 0.25)',
+    border: 'none', borderRadius: 10, fontSize: '0.92rem', fontWeight: 700, color: '#0a0e1a',
+    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+    marginTop: 8, boxShadow: '0 4px 16px rgba(242, 169, 0, 0.25)',
   },
   toggleSection: {
-    marginTop: 20,
-    paddingTop: 18,
-    borderTop: '1px solid rgba(255,255,255,0.06)',
-    textAlign: 'center',
+    marginTop: 20, paddingTop: 18, borderTop: '1px solid rgba(255,255,255,0.06)', textAlign: 'center',
   },
   toggleBtn: {
-    background: 'rgba(242, 169, 0, 0.08)',
-    border: '1px solid rgba(242, 169, 0, 0.2)',
-    borderRadius: 10,
-    padding: '11px 20px',
-    fontSize: '0.85rem',
-    fontWeight: 600,
-    color: '#F2A900',
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    width: '100%',
+    background: 'rgba(242, 169, 0, 0.08)', border: '1px solid rgba(242, 169, 0, 0.2)',
+    borderRadius: 10, padding: '11px 20px', fontSize: '0.85rem', fontWeight: 600, color: '#F2A900',
+    cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+    gap: 8, width: '100%',
+  },
+  linkBtn: {
+    background: 'none', border: 'none', color: 'rgba(242,169,0,0.75)', cursor: 'pointer',
+    fontSize: '0.8rem', fontWeight: 500, padding: 0,
+    textDecoration: 'underline', textDecorationStyle: 'dotted',
   },
   message: (type) => ({
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-    padding: '12px 14px',
-    borderRadius: 10,
-    fontSize: '0.84rem',
-    fontWeight: 500,
-    marginBottom: 20,
+    display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px',
+    borderRadius: 10, fontSize: '0.84rem', fontWeight: 500, marginBottom: 20,
     background: type === 'error' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(34, 197, 94, 0.12)',
     border: `1px solid ${type === 'error' ? 'rgba(239, 68, 68, 0.25)' : 'rgba(34, 197, 94, 0.25)'}`,
     color: type === 'error' ? '#fca5a5' : '#86efac',
   }),
-  testAccounts: {
-    marginTop: 20,
-    padding: '16px 18px',
-    background: 'rgba(255,255,255,0.02)',
-    borderRadius: 14,
-    border: '1px solid rgba(255,255,255,0.05)',
+  inputRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
+  otpHint: { textAlign: 'center', fontSize: '0.875rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, marginBottom: 4 },
+  otpBox: {
+    width: 48, height: 56, textAlign: 'center', fontSize: '1.4rem', fontWeight: 700,
+    background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)',
+    borderRadius: 10, color: '#ffffff', outline: 'none', caretColor: '#F2A900',
   },
-  testTitle: {
-    fontSize: '0.74rem',
-    fontWeight: 700,
-    color: 'rgba(255,255,255,0.4)',
-    textTransform: 'uppercase',
-    letterSpacing: '0.08em',
-    marginBottom: 12,
-    display: 'flex',
-    alignItems: 'center',
-    gap: 6,
-  },
-  testGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: 8,
-  },
-  testCard: {
-    background: 'rgba(255,255,255,0.03)',
-    border: '1px solid rgba(255,255,255,0.06)',
-    borderRadius: 8,
-    padding: '10px 8px',
-    textAlign: 'center',
-    cursor: 'pointer',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 4,
-  },
-  testRole: {
-    fontSize: '0.78rem',
-    fontWeight: 600,
-    color: 'rgba(255,255,255,0.8)',
-    display: 'flex',
-    alignItems: 'center',
-    gap: 4,
-  },
-  testCnic: {
-    fontSize: '0.68rem',
-    color: 'rgba(242, 169, 0, 0.7)',
-    fontFamily: 'monospace',
-  },
-  inputRow: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: 12,
-  },
-  footer: {
-    textAlign: 'center',
-    marginTop: 24,
-    fontSize: '0.78rem',
-    color: 'rgba(255,255,255,0.25)',
-  },
+  footer: { textAlign: 'center', marginTop: 24, fontSize: '0.78rem', color: 'rgba(255,255,255,0.25)' },
 };

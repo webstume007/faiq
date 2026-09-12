@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { getCurrentUser, logout } from '../lib/auth';
+import { getCurrentUser, getCurrentUserSync, logout } from '../lib/auth';
 import { getChildData, getAnnouncementsByRole } from '../lib/guardianData';
 import { getStudentsByGuardian, submitChallanPayment, getActiveBankConfig, createAdmission, getActiveSession } from '../lib/db';
 import { QURAN_SURAHS, QURAN_PARAS, formatAyahRange } from '../lib/quranData';
@@ -151,7 +151,7 @@ export default function GuardianPortal() {
   }, []);
 
   useEffect(() => {
-    const currentUser = getCurrentUser();
+    const currentUser = getCurrentUserSync();
     if (!currentUser || currentUser.role !== 'guardian') {
       router.replace('/login');
       return;
@@ -256,7 +256,7 @@ export default function GuardianPortal() {
               <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.4)' }}>CNIC: {user.cnic}</div>
             </div>
             <button
-              onClick={() => { logout(); router.push('/login'); }}
+              onClick={() => { logout().then(() => router.push('/login')); }}
               style={{
                 display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px',
                 background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',

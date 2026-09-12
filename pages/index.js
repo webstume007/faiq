@@ -139,27 +139,18 @@ export default function Home() {
         }}>
           {/* Main Title Section */}
           <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            padding: '10px 16px 4px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+            padding: '12px 16px 2px',
           }}>
-            <img src="/faeq-logo.png" alt="Al-Faeq Logo" style={{ width: 26, height: 26, borderRadius: 8, objectFit: 'cover' }} />
-            <span style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>Al-Faeq Institute</span>
+            <img src="/faeq-logo.png" alt="Al-Faeq Logo" style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'cover' }} />
+            <span style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>Al-Faeq Institute</span>
           </div>
-
-          {/* Narrow Line */}
-          <div style={{
-            height: '1px',
-            width: '70%',
-            maxWidth: '220px',
-            margin: '2px auto 4px',
-            background: 'linear-gradient(90deg, transparent, rgba(242,169,0,0.5) 20%, rgba(242,169,0,0.5) 80%, transparent)',
-          }} />
 
           {/* Islamic Education System */}
           <div style={{
-            fontSize: '0.64rem', color: GOLD, fontWeight: 700,
+            fontSize: '0.75rem', color: GOLD, fontWeight: 700,
             letterSpacing: '0.12em', textTransform: 'uppercase', textAlign: 'center',
-            marginBottom: '6px',
+            marginBottom: '8px', marginTop: '4px'
           }}>
             Islamic Education System
           </div>

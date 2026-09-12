@@ -2,8 +2,5 @@
   "/": "pages/index.js",
   "/_app": "pages/_app.js",
   "/_document": "pages/_document.js",
-  "/admin": "pages/admin.js",
-  "/guardian": "pages/guardian.js",
-  "/login": "pages/login.js",
-  "/teacher": "pages/teacher.js"
+  "/login": "pages/login.js"
 }

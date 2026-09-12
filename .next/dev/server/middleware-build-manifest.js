@@ -1,0 +1,91 @@
+globalThis.__BUILD_MANIFEST = {
+  "pages": {
+    "/": [
+      "static/chunks/node_modules_next_dist_compiled_14ibvna._.js",
+      "static/chunks/node_modules_next_dist_shared_lib_1vsvqbg._.js",
+      "static/chunks/node_modules_next_dist_client_16lnmlo._.js",
+      "static/chunks/node_modules_next_dist_0zk-zb1._.js",
+      "static/chunks/node_modules_next_1m6k6q8._.js",
+      "static/chunks/node_modules_react-dom_0kla17-._.js",
+      "static/chunks/node_modules_1z0m79v._.js",
+      "static/chunks/[root-of-the-server]__0n_wc42._.js",
+      "static/chunks/pages_index_0du2_q-._.js",
+      "static/chunks/turbopack-pages_index_0ywinb7._.js"
+    ],
+    "/_app": [
+      "static/chunks/node_modules_next_dist_compiled_0lyf85n._.js",
+      "static/chunks/node_modules_next_dist_shared_lib_1vsvqbg._.js",
+      "static/chunks/node_modules_next_dist_client_16lnmlo._.js",
+      "static/chunks/node_modules_next_dist_0zk-zb1._.js",
+      "static/chunks/node_modules_next_head_0wi9zur.js",
+      "static/chunks/node_modules_react-dom_0kla17-._.js",
+      "static/chunks/node_modules_1o4479e._.js",
+      "static/chunks/[root-of-the-server]__00my3xu._.js",
+      "static/chunks/pages__app_0du2_q-._.js",
+      "static/chunks/turbopack-pages__app_04u5gqt._.js"
+    ],
+    "/admin": [
+      "static/chunks/[root-of-the-server]__1qx553r._.js",
+      "static/chunks/node_modules_next_dist_compiled_169mqyl._.js",
+      "static/chunks/node_modules_next_dist_shared_lib_1vsvqbg._.js",
+      "static/chunks/node_modules_next_dist_client_16lnmlo._.js",
+      "static/chunks/node_modules_next_dist_0zk-zb1._.js",
+      "static/chunks/node_modules_next_1m6k6q8._.js",
+      "static/chunks/node_modules_react-dom_0kla17-._.js",
+      "static/chunks/node_modules_@supabase_auth-js_dist_module_1truu-x._.js",
+      "static/chunks/node_modules_1ufqr04._.js",
+      "static/chunks/pages_admin_0du2_q-._.js",
+      "static/chunks/turbopack-pages_admin_0xj19e5._.js"
+    ],
+    "/guardian": [
+      "static/chunks/[root-of-the-server]__1ibq8ht._.js",
+      "static/chunks/node_modules_next_dist_compiled_1n82w36._.js",
+      "static/chunks/node_modules_next_dist_shared_lib_1vsvqbg._.js",
+      "static/chunks/node_modules_next_dist_client_16lnmlo._.js",
+      "static/chunks/node_modules_next_dist_0zk-zb1._.js",
+      "static/chunks/node_modules_next_1m6k6q8._.js",
+      "static/chunks/node_modules_react-dom_0kla17-._.js",
+      "static/chunks/node_modules_@supabase_auth-js_dist_module_1truu-x._.js",
+      "static/chunks/node_modules_1f4-tb9._.js",
+      "static/chunks/pages_guardian_0du2_q-._.js",
+      "static/chunks/turbopack-pages_guardian_131_9n8._.js"
+    ],
+    "/login": [
+      "static/chunks/[root-of-the-server]__10-3qz0._.js",
+      "static/chunks/node_modules_next_dist_compiled_1n82w36._.js",
+      "static/chunks/node_modules_next_dist_shared_lib_1vsvqbg._.js",
+      "static/chunks/node_modules_next_dist_client_16lnmlo._.js",
+      "static/chunks/node_modules_next_dist_0zk-zb1._.js",
+      "static/chunks/node_modules_next_1m6k6q8._.js",
+      "static/chunks/node_modules_react-dom_0kla17-._.js",
+      "static/chunks/node_modules_@supabase_auth-js_dist_module_1truu-x._.js",
+      "static/chunks/node_modules_1f4-tb9._.js",
+      "static/chunks/pages_login_0du2_q-._.js",
+      "static/chunks/turbopack-pages_login_1g805-a._.js"
+    ],
+    "/teacher": [
+      "static/chunks/[root-of-the-server]__0ixjd2b._.js",
+      "static/chunks/node_modules_next_dist_compiled_1n82w36._.js",
+      "static/chunks/node_modules_next_dist_shared_lib_1vsvqbg._.js",
+      "static/chunks/node_modules_next_dist_client_16lnmlo._.js",
+      "static/chunks/node_modules_next_dist_0zk-zb1._.js",
+      "static/chunks/node_modules_next_1m6k6q8._.js",
+      "static/chunks/node_modules_react-dom_0kla17-._.js",
+      "static/chunks/node_modules_@supabase_auth-js_dist_module_1truu-x._.js",
+      "static/chunks/node_modules_1f4-tb9._.js",
+      "static/chunks/pages_teacher_0du2_q-._.js",
+      "static/chunks/turbopack-pages_teacher_12u-e68._.js"
+    ]
+  },
+  "devFiles": [],
+  "polyfillFiles": [],
+  "lowPriorityFiles": [
+    "static/development/_buildManifest.js",
+    "static/development/_ssgManifest.js",
+    "static/development/_clientMiddlewareManifest.js"
+  ],
+  "rootMainFiles": [],
+  "rootMainFilesTree": {},
+  "pagesChunkGroupBootstrapParams": {},
+  "chunkLoadingGlobal": "TURBOPACK"
+};

@@ -792,7 +792,7 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
         <Modal title="New Academic Session Wizard" onClose={() => setShowWizard(false)} width={600}>
           {wizardStep === 1 && (
             <div>
-              <InputField label="Session Name" value={wizardData.name} onChange={(e) => setWizardData((p) => ({ ...p, name: e.target.value }))} placeholder="e.g. Fall 2027 / 1448-49 Hijri" required />
+              <InputField label="Session Name" value={wizardData.name} onChange={(e) => setWizardData((p) => ({ ...p, name: e.target.value }))} placeholder="e.g. Dora 2027 (دورہ 2027) / 1448-49 Hijri" required />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
                 <InputField label="Start Date" value={wizardData.start_date} onChange={(e) => setWizardData((p) => ({ ...p, start_date: e.target.value }))} type="date" required />
                 <InputField label="End Date" value={wizardData.end_date} onChange={(e) => setWizardData((p) => ({ ...p, end_date: e.target.value }))} type="date" required />

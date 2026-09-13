@@ -300,12 +300,35 @@ export default function LoginPage() {
       return;
     }
 
-    // Step 3: Fetch profile from public.users
-    const { data: profile } = await supabase
+    // Step 3: Fetch profile from public.users with fallback self-heal
+    let { data: profile } = await supabase
       .from('users')
       .select('*')
       .eq('id', authData.user.id)
-      .single();
+      .maybeSingle();
+
+    if (!profile && authData.user) {
+      const meta = authData.user.user_metadata || {};
+      const newProfile = {
+        id: authData.user.id,
+        email: authData.user.email || emailResult,
+        cnic: meta.cnic || loginCnic,
+        first_name: meta.first_name || 'User',
+        last_name: meta.last_name || '',
+        phone: meta.phone || '',
+        role: meta.role || 'guardian',
+        is_verified: true,
+      };
+      const { data: created } = await supabase
+        .from('users')
+        .upsert(newProfile)
+        .select()
+        .single();
+      profile = created || newProfile;
+      if (profile.role === 'guardian') {
+        await supabase.from('guardians').upsert({ id: profile.id }).select();
+      }
+    }
 
     if (!profile) {
       setErr('Account found but profile is missing. Please contact support.');
@@ -407,20 +430,57 @@ export default function LoginPage() {
       return;
     }
 
-    // Fetch the newly created profile
-    const { data: profile } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', data.user.id)
-      .single();
+    // Fetch the newly created profile with retry
+    let profile = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const { data: p } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', data.user.id)
+        .maybeSingle();
+      if (p) {
+        profile = p;
+        break;
+      }
+      await new Promise((res) => setTimeout(res, 500));
+    }
+
+    // Fallback: if trigger didn't insert profile, insert directly using metadata
+    if (!profile && data.user) {
+      const meta = data.user.user_metadata || {};
+      const newProfile = {
+        id: data.user.id,
+        email: data.user.email || otpEmail,
+        cnic: meta.cnic || 'PENDING-' + data.user.id.substring(0, 8),
+        first_name: meta.first_name || 'Guardian',
+        last_name: meta.last_name || '',
+        phone: meta.phone || '',
+        role: meta.role || 'guardian',
+        is_verified: true,
+      };
+      const { data: inserted } = await supabase
+        .from('users')
+        .upsert(newProfile)
+        .select()
+        .single();
+      profile = inserted || newProfile;
+    } else if (profile) {
+      // Ensure is_verified is updated to true in public.users
+      await supabase
+        .from('users')
+        .update({ is_verified: true })
+        .eq('id', profile.id);
+      profile.is_verified = true;
+    }
+
+    // Always ensure guardians row exists
+    await supabase.from('guardians').upsert({ id: data.user.id }).select();
 
     if (profile) {
       const { password_hash, ...safeProfile } = profile;
-      // Also insert into guardians table
-      await supabase.from('guardians').upsert({ id: profile.id }).select();
       cacheUserProfile(safeProfile);
       setSuccess('Email verified! Redirecting to your portal...');
-      setTimeout(() => router.push(getPortalPath(safeProfile.role)), 1000);
+      setTimeout(() => router.push(getPortalPath(safeProfile.role || 'guardian')), 1000);
     } else {
       setSuccess('Verified! Please sign in.');
       setTimeout(() => { setMode('login'); clearMsg(); }, 1500);

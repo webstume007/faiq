@@ -355,13 +355,11 @@ export default function GuardianPortal() {
       <Head>
         <title>Parent Portal — Al-Faiq Islamic Education System</title>
         <style>{`
-          .desktop-hide-on-mobile { display: flex; }
-          .mobile-show-only { display: none; }
-          .main-content { margin-left: 270px; padding: 24px; max-width: 1100px; }
-          @media (max-width: 959px) {
-            .desktop-hide-on-mobile { display: none !important; }
-            .mobile-show-only { display: flex !important; }
-            .main-content { margin-left: 0px !important; padding: 16px !important; }
+          .mobile-hide { display: flex; }
+          .desktop-hide { display: none; }
+          @media (max-width: 768px) {
+            .mobile-hide { display: none !important; }
+            .desktop-hide { display: flex !important; }
           }
         `}</style>
       </Head>
@@ -455,93 +453,25 @@ export default function GuardianPortal() {
           </div>
         ) : (
           <>
-            {/* Desktop Left Sidebar */}
-            <div className="desktop-hide-on-mobile" style={{
-              width: 270, minHeight: '100vh', background: '#0d111e',
-              borderRight: '1px solid rgba(255,255,255,0.06)', position: 'fixed', left: 0, top: 0, bottom: 0,
-              flexDirection: 'column', zIndex: 100,
+            {/* Global Header */}
+            <header style={{
+              padding: '16px 24px', background: '#0d111e', borderBottom: '1px solid rgba(255,255,255,0.06)',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100,
             }}>
-              {/* Sidebar Content */}
-              <div style={{ padding: '24px 20px 20px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <img src="/faiq-logo.png" alt="Al-Faiq" style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'cover' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <img src="/faiq-logo.png" alt="" style={{ width: 34, height: 34, borderRadius: 10 }} />
                 <div>
-                  <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#fff', lineHeight: 1.1 }}>Al-Faiq Education</div>
-                  <div style={{ fontSize: '0.68rem', color: GOLD, fontWeight: 700, marginTop: 2 }}>Parent / Guardian Portal</div>
+                  <div style={{ fontSize: '0.92rem', fontWeight: 800 }}>Al-Faiq Education</div>
+                  <div style={{ fontSize: '0.68rem', color: GOLD, fontWeight: 700 }}>Parent / Guardian Portal</div>
                 </div>
               </div>
 
-              <div style={{ padding: '20px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 10 }}>
-                {guardianProfile?.profile_picture_url ? (
-                  <img src={guardianProfile.profile_picture_url} style={{ width: 44, height: 44, borderRadius: 22, objectFit: 'cover' }} />
-                ) : (
-                  <div style={{ width: 44, height: 44, borderRadius: 22, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {Icons.user(24, 'rgba(255,255,255,0.6)')}
-                  </div>
-                )}
-                <div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>{user.first_name} {user.last_name}</div>
-                  <div style={{ fontSize: '0.7rem', color: GOLD }}>Edit Profile</div>
+              {/* Desktop User Info & Logout */}
+              <div className="mobile-hide" style={{ alignItems: 'center', gap: 14 }}>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 700 }}>{user.first_name} {user.last_name}</div>
+                  <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.4)' }}>CNIC: {user.cnic}</div>
                 </div>
-              </div>
-
-              <nav style={{ padding: '12px 10px', flex: 1, overflowY: 'auto' }}>
-                {[
-                  { id: 'home', label: 'Home Overview', icon: Icons.home },
-                  ...(currentChild?.programType === 'hifz' ? [{ id: 'hifz', label: 'Hifz Sabaq & Manzil', icon: Icons.book }] : []),
-                  ...(currentChild?.programType !== 'hifz' ? [{ id: 'results', label: 'Test Results', icon: Icons.results }] : []),
-                  { id: 'attendance', label: 'Attendance', icon: Icons.attendance },
-                  { id: 'challans', label: 'Fee Challans', icon: Icons.challan },
-                  { id: 'schedule', label: 'Classes & Scholars', icon: Icons.calendar },
-                ].map((item) => {
-                  const isActive = activeTab === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => setActiveTab(item.id)}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 12,
-                        width: '100%', padding: '11px 14px',
-                        background: isActive ? `${GOLD}15` : 'transparent',
-                        border: 'none', borderRadius: 12,
-                        cursor: 'pointer', marginBottom: 3,
-                        transition: 'all 0.2s ease',
-                        color: isActive ? GOLD : 'rgba(255,255,255,0.5)',
-                        fontSize: '0.84rem', fontWeight: isActive ? 700 : 500,
-                        textAlign: 'left',
-                        position: 'relative',
-                      }}
-                    >
-                      {isActive && <div style={{ position: 'absolute', left: 0, top: '20%', bottom: '20%', width: 3, borderRadius: 2, background: GOLD }} />}
-                      {item.icon(18, isActive ? GOLD : 'rgba(255,255,255,0.4)')}
-                      {item.label}
-                    </button>
-                  );
-                })}
-              </nav>
-
-              <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                <button
-                  onClick={() => { logout().then(() => router.push('/login')); }}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    width: '100%', padding: '9px 12px',
-                    background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
-                    borderRadius: 10, cursor: 'pointer', color: '#fca5a5',
-                    fontSize: '0.8rem', fontWeight: 600,
-                  }}
-                >
-                  {Icons.logOut(16, '#fca5a5')} Sign Out
-                </button>
-              </div>
-            </div>
-
-            {/* Mobile Top Header (Hidden on Desktop) */}
-            <div className="mobile-show-only" style={{
-              alignItems: 'center', justifyContent: 'space-between',
-              padding: '12px 16px', background: '#0d111e', borderBottom: '1px solid rgba(255,255,255,0.06)',
-              position: 'sticky', top: 0, zIndex: 50,
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 {guardianProfile?.profile_picture_url ? (
                   <img src={guardianProfile.profile_picture_url} style={{ width: 36, height: 36, borderRadius: 18, objectFit: 'cover' }} />
                 ) : (
@@ -549,23 +479,126 @@ export default function GuardianPortal() {
                     {Icons.user(18, 'rgba(255,255,255,0.6)')}
                   </div>
                 )}
-                <div>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fff' }}>{user.first_name} {user.last_name}</div>
-                  <div style={{ fontSize: '0.65rem', color: GOLD, fontWeight: 700 }}>Parent Portal</div>
+                <button
+                  onClick={() => { logout().then(() => router.push('/login')); }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', marginLeft: 10,
+                    background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
+                    borderRadius: 8, color: '#fca5a5', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600,
+                  }}
+                >
+                  {Icons.logOut(14, '#fca5a5')} Sign Out
+                </button>
+              </div>
+
+              {/* Mobile Hamburger Menu Icon */}
+              <button 
+                className="desktop-hide" 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}
+              >
+                {Icons.menu(28)}
+              </button>
+            </header>
+
+            {/* Mobile Sidebar Overlay */}
+            {isMobileMenuOpen && (
+              <div style={{
+                position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', justifyContent: 'flex-end'
+              }} onClick={() => setIsMobileMenuOpen(false)}>
+                <div style={{
+                  width: 280, background: '#0d111e', height: '100%', borderLeft: '1px solid rgba(255,255,255,0.1)',
+                  padding: 24, display: 'flex', flexDirection: 'column'
+                }} onClick={(e) => e.stopPropagation()}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      {guardianProfile?.profile_picture_url ? (
+                        <img src={guardianProfile.profile_picture_url} style={{ width: 44, height: 44, borderRadius: 22, objectFit: 'cover' }} />
+                      ) : (
+                        <div style={{ width: 44, height: 44, borderRadius: 22, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {Icons.user(24, 'rgba(255,255,255,0.6)')}
+                        </div>
+                      )}
+                      <div>
+                        <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>{user.first_name} {user.last_name}</div>
+                        <div style={{ fontSize: '0.7rem', color: GOLD }}>Edit Profile</div>
+                      </div>
+                    </div>
+                    <button onClick={() => setIsMobileMenuOpen(false)} style={{ background: 'transparent', border: 'none', color: '#fff' }}>
+                      {Icons.close(24)}
+                    </button>
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+                    {[
+                      { id: 'home', label: 'Home Overview', icon: Icons.home },
+                      ...(currentChild?.programType === 'hifz' ? [{ id: 'hifz', label: 'Hifz Sabaq & Manzil', icon: Icons.book }] : []),
+                      ...(currentChild?.programType !== 'hifz' ? [{ id: 'results', label: 'Test Results', icon: Icons.results }] : []),
+                      { id: 'attendance', label: 'Attendance', icon: Icons.attendance },
+                      { id: 'challans', label: 'Fee Challans', icon: Icons.challan },
+                      { id: 'schedule', label: 'Classes & Scholars', icon: Icons.calendar },
+                    ].map((t) => (
+                      <button
+                        key={t.id}
+                        onClick={() => { setActiveTab(t.id); setIsMobileMenuOpen(false); }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
+                          borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700,
+                          background: activeTab === t.id ? `${GOLD}20` : 'transparent',
+                          color: activeTab === t.id ? GOLD : '#fff',
+                          textAlign: 'left'
+                        }}
+                      >
+                        {t.icon(18, activeTab === t.id ? GOLD : 'rgba(255,255,255,0.6)')}
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => { logout().then(() => router.push('/login')); }}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px',
+                      background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
+                      borderRadius: 10, color: '#fca5a5', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700,
+                      marginTop: 'auto'
+                    }}
+                  >
+                    {Icons.logOut(18, '#fca5a5')} Sign Out
+                  </button>
                 </div>
               </div>
-              <button
-                onClick={() => { logout().then(() => router.push('/login')); }}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px',
-                  background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
-                  borderRadius: 8, color: '#fca5a5', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600,
-                }}
-              >
-                {Icons.logOut(14, '#fca5a5')} Sign Out
-              </button>
-            </div>
+            )}
 
+            {/* Desktop Sub-Header Tabs */}
+            <div className="mobile-hide" style={{
+              display: 'flex', gap: 4, padding: '10px 24px', background: 'rgba(255,255,255,0.02)',
+              borderBottom: '1px solid rgba(255,255,255,0.06)', overflowX: 'auto',
+            }}>
+              {[
+                { id: 'home', label: 'Home Overview', icon: Icons.home },
+                ...(currentChild?.programType === 'hifz' ? [{ id: 'hifz', label: 'Hifz Sabaq & Manzil', icon: Icons.book }] : []),
+                ...(currentChild?.programType !== 'hifz' ? [{ id: 'results', label: 'Test Results', icon: Icons.results }] : []),
+                { id: 'attendance', label: 'Attendance', icon: Icons.attendance },
+                { id: 'challans', label: 'Fee Challans', icon: Icons.challan },
+                { id: 'schedule', label: 'Classes & Scholars', icon: Icons.calendar },
+              ].map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setActiveTab(t.id)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px',
+                    borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 700,
+                    background: activeTab === t.id ? `${GOLD}20` : 'transparent',
+                    color: activeTab === t.id ? GOLD : 'rgba(255,255,255,0.5)',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {t.icon(16, activeTab === t.id ? GOLD : 'rgba(255,255,255,0.4)')}
+                  {t.label}
+                </button>
+              ))}
+            </div>
 
         {/* Toast */}
         {toastMsg && (
@@ -579,7 +612,7 @@ export default function GuardianPortal() {
           </div>
         )}
 
-        <main className="main-content">
+        <main style={{ padding: '24px', maxWidth: 1100, margin: '0 auto' }}>
           {/* Active Absence Escalation Warning Banner */}
           {currentChild?.activeAbsenceFlag && (
             <div style={{

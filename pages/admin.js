@@ -654,8 +654,12 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
   const [wizardStep, setWizardStep] = useState(1);
   const [wizardData, setWizardData] = useState({
     name: '', start_date: '', end_date: '', cloneFrom: '',
-    hifz_fee: 4000, dars_fee: 5000,
+    programs: [], classes: [],
   });
+
+  // Inline Edit states
+  const [editProgramData, setEditProgramData] = useState(null);
+  const [editClassData, setEditClassData] = useState(null);
 
   // Promotion state
   const [showPromotion, setShowPromotion] = useState(false);
@@ -684,7 +688,6 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
         start_date: wizardData.start_date,
         end_date: wizardData.end_date,
         is_active: true,
-        fee_structure: { hifz_monthly: wizardData.hifz_fee, dars_monthly: wizardData.dars_fee },
       }, user.id);
     } else {
       await db.createSession({
@@ -692,10 +695,12 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
         start_date: wizardData.start_date,
         end_date: wizardData.end_date,
         is_active: true,
-        fee_structure: { hifz_monthly: wizardData.hifz_fee, dars_monthly: wizardData.dars_fee },
+        programs: wizardData.programs,
+        classes: wizardData.classes,
       }, user.id);
     }
     setShowWizard(false);
+    setWizardData({ name: '', start_date: '', end_date: '', cloneFrom: '', programs: [], classes: [] });
     loadData();
     onSessionChange && onSessionChange();
   };
@@ -768,6 +773,40 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
       fee_structure: { hifz_monthly: Number(hifz), dars_monthly: Number(dars) }
     }, user.id);
     loadData();
+  };
+
+  const handleSaveProgram = async () => {
+    if (editProgramData.id) {
+      await db.updateCourse(editProgramData.id, { course_name: editProgramData.course_name, course_type: editProgramData.course_type, monthly_fee: editProgramData.monthly_fee }, user.id);
+    } else {
+      await db.createCourse({ session_id: editProgramData.session_id, course_name: editProgramData.course_name, course_code: 'PROG', course_type: editProgramData.course_type, monthly_fee: editProgramData.monthly_fee }, user.id);
+    }
+    setEditProgramData(null);
+    loadData();
+  };
+
+  const handleDeleteProgram = async (id) => {
+    if (confirm('Delete this program? This will fail if classes are enrolled in it.')) {
+      await db.deleteCourse(id, user.id);
+      loadData();
+    }
+  };
+
+  const handleSaveClass = async () => {
+    if (editClassData.id) {
+      await db.updateClass(editClassData.id, { class_name: editClassData.class_name, section: editClassData.section, max_students: editClassData.max_students, course_id: editClassData.course_id }, user.id);
+    } else {
+      await db.createClass({ session_id: editClassData.session_id, course_id: editClassData.course_id, class_name: editClassData.class_name, section: editClassData.section, max_students: editClassData.max_students }, user.id);
+    }
+    setEditClassData(null);
+    loadData();
+  };
+
+  const handleDeleteClass = async (id) => {
+    if (confirm('Delete this class?')) {
+      await db.deleteClass(id, user.id);
+      loadData();
+    }
   };
 
   return (
@@ -844,29 +883,47 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
                 </div>
 
                 {/* Courses / Programs UI Enhancement */}
-                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: GOLD, textTransform: 'uppercase', marginBottom: 10, letterSpacing: '0.08em' }}>
-                  Academic Programs in this Session
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    Academic Programs
+                  </div>
+                  <Button variant="secondary" onClick={() => setEditProgramData({ session_id: session.id, course_name: '', course_type: 'hifz', monthly_fee: 4000 })} style={{ padding: '4px 10px', fontSize: '0.7rem' }}>
+                    {Icons.plus(12)} Add Program
+                  </Button>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12, marginBottom: 24 }}>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12, marginBottom: 24 }}>
                   {sessionCourses.map((c) => (
                     <div key={c.id} style={{
                       background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)',
-                      padding: '12px 14px', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 12
+                      padding: '12px 14px', borderRadius: 10, display: 'flex', flexDirection: 'column', gap: 8
                     }}>
-                      <div style={{ width: 36, height: 36, borderRadius: 8, background: c.course_type === 'hifz' ? `${GOLD}20` : 'rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {Icons.book(18, c.course_type === 'hifz' ? GOLD : '#3b82f6')}
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff' }}>{c.course_name}</div>
-                        <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginTop: 2, textTransform: 'uppercase' }}>{c.course_code} &bull; {c.course_type}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ width: 36, height: 36, borderRadius: 8, background: c.course_type === 'hifz' ? `${GOLD}20` : 'rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {Icons.book(18, c.course_type === 'hifz' ? GOLD : '#3b82f6')}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff' }}>{c.course_name}</div>
+                          <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginTop: 2, textTransform: 'uppercase' }}>{c.course_type} &bull; Fee: Rs {c.monthly_fee || 0}</div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <ActionButton icon={Icons.edit(14)} color="#3b82f6" onClick={() => setEditProgramData(c)} />
+                          <ActionButton icon={Icons.trash(14)} color="#ef4444" onClick={() => handleDeleteProgram(c.id)} />
+                        </div>
                       </div>
                     </div>
                   ))}
+                  {sessionCourses.length === 0 && <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.3)', padding: 10 }}>No programs configured.</div>}
                 </div>
 
                 {/* Classes Table (Responsive) */}
-                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: GOLD, textTransform: 'uppercase', marginBottom: 10, letterSpacing: '0.08em' }}>
-                  Enrolled Classes & Assigned Teachers
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    Enrolled Classes & Sections
+                  </div>
+                  <Button variant="secondary" onClick={() => setEditClassData({ session_id: session.id, course_id: sessionCourses[0]?.id || '', class_name: '', section: 'A', max_students: 30 })} style={{ padding: '4px 10px', fontSize: '0.7rem' }}>
+                    {Icons.plus(12)} Add Class
+                  </Button>
                 </div>
                 
                 <div className="desktop-hide-on-mobile">
@@ -874,9 +931,15 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
                     columns={[
                       { key: 'class_name', label: 'Class / Halqa' },
                       { key: 'section', label: 'Section' },
-                      { key: 'course', label: 'Program', render: (r) => r.course ? `${r.course.course_code} (${r.course.course_type === 'hifz' ? 'Hifz' : 'Dars-e-Nizami'})` : '—' },
-                      { key: 'incharge', label: 'Incharge Scholar', render: (r) => r.incharge?.user ? `${r.incharge.user.first_name} ${r.incharge.user.last_name}` : 'Assigned' },
+                      { key: 'course', label: 'Program', render: (r) => r.course ? `${r.course.course_name} (Rs ${r.course.monthly_fee || 0})` : '—' },
                       { key: 'max_students', label: 'Capacity' },
+                      { key: 'actions', label: '', render: (r) => (
+                          <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                            <ActionButton icon={Icons.edit(14)} color="#3b82f6" onClick={() => setEditClassData(r)} />
+                            <ActionButton icon={Icons.trash(14)} color="#ef4444" onClick={() => handleDeleteClass(r.id)} />
+                          </div>
+                        )
+                      }
                     ]}
                     data={sessionClasses}
                   />
@@ -885,18 +948,22 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
                 <div className="mobile-show-only" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {sessionClasses.map((cl) => (
                     <div key={cl.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: 14 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                        <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>{cl.class_name} <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem' }}>({cl.section})</span></div>
-                        <Badge text={cl.course?.course_type === 'hifz' ? 'Hifz' : 'Dars'} color={cl.course?.course_type === 'hifz' ? GOLD : '#3b82f6'} />
-                      </div>
-                      <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>
-                        <strong>Scholar:</strong> {cl.incharge?.user ? `${cl.incharge.user.first_name} ${cl.incharge.user.last_name}` : 'Pending Assignment'}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                        <div>
+                          <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>{cl.class_name} <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem' }}>({cl.section})</span></div>
+                          <div style={{ fontSize: '0.75rem', color: GOLD, marginTop: 2 }}>{cl.course?.course_name}</div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <ActionButton icon={Icons.edit(14)} color="#3b82f6" onClick={() => setEditClassData(cl)} />
+                          <ActionButton icon={Icons.trash(14)} color="#ef4444" onClick={() => handleDeleteClass(cl.id)} />
+                        </div>
                       </div>
                       <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)' }}>
                         <strong>Capacity:</strong> {cl.max_students} Students
                       </div>
                     </div>
                   ))}
+                  {sessionClasses.length === 0 && <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.3)', padding: 10 }}>No classes configured.</div>}
                 </div>
 
               </div>
@@ -907,9 +974,10 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
 
       {/* New Session Wizard Modal */}
       {showWizard && (
-        <Modal title="New Academic Session Wizard" onClose={() => setShowWizard(false)} width={600}>
+        <Modal title="New Academic Session Wizard" onClose={() => setShowWizard(false)} width={800}>
           {wizardStep === 1 && (
             <div>
+              <h4 style={{ color: GOLD, margin: '0 0 16px 0' }}>Step 1: Session Basics</h4>
               <InputField label="Session Name" value={wizardData.name} onChange={(e) => setWizardData((p) => ({ ...p, name: e.target.value }))} placeholder="e.g. Dora 2027 (دورہ 2027) / 1448-49 Hijri" required />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
                 <InputField label="Start Date" value={wizardData.start_date} onChange={(e) => setWizardData((p) => ({ ...p, start_date: e.target.value }))} type="date" required />
@@ -919,30 +987,122 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
                 label="Clone Structure From Existing Session"
                 value={wizardData.cloneFrom}
                 onChange={(e) => setWizardData((p) => ({ ...p, cloneFrom: e.target.value }))}
-                options={sessions.map((s) => ({ value: s.id, label: `${s.name} (Copies all programs, classes & subjects)` }))}
+                options={[{value: '', label: 'Create from scratch...'}, ...sessions.map((s) => ({ value: s.id, label: `${s.name} (Copies all programs & classes)` }))]}
               />
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
-                <Button onClick={() => setWizardStep(2)}>Next: Fee Structure &rarr;</Button>
+                <Button onClick={() => setWizardStep(wizardData.cloneFrom ? 4 : 2)}>
+                  {wizardData.cloneFrom ? 'Skip to Final Review →' : 'Next: Setup Programs →'}
+                </Button>
               </div>
             </div>
           )}
 
           {wizardStep === 2 && (
             <div>
-              <h4 style={{ color: GOLD, margin: '0 0 12px 0' }}>Configure Monthly Tuition Fees</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
-                <InputField label="Hifz Ul Quran Fee (Rs.)" value={wizardData.hifz_fee} onChange={(e) => setWizardData((p) => ({ ...p, hifz_fee: e.target.value }))} type="number" />
-                <InputField label="Dars-e-Nizami Fee (Rs.)" value={wizardData.dars_fee} onChange={(e) => setWizardData((p) => ({ ...p, dars_fee: e.target.value }))} type="number" />
+              <h4 style={{ color: GOLD, margin: '0 0 16px 0' }}>Step 2: Define Academic Programs</h4>
+              <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginBottom: 12 }}>Add all the programs (e.g., Hifz, Dars-e-Nizami) for this session, along with their specific monthly fee.</p>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+                {wizardData.programs.map((p, idx) => (
+                  <div key={p.tempId} style={{ display: 'flex', gap: 10, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                    <div style={{ flex: '1 1 200px' }}><InputField label="Program Name" value={p.course_name} onChange={(e) => { const np = [...wizardData.programs]; np[idx].course_name = e.target.value; setWizardData({...wizardData, programs: np}) }} placeholder="e.g. Hifz-ul-Quran" /></div>
+                    <div style={{ flex: '1 1 120px' }}><SelectField label="Type" value={p.course_type} onChange={(e) => { const np = [...wizardData.programs]; np[idx].course_type = e.target.value; setWizardData({...wizardData, programs: np}) }} options={[{value:'hifz', label:'Hifz'}, {value:'dars', label:'Dars-e-Nizami'}, {value:'nazra', label:'Nazra'}]} /></div>
+                    <div style={{ flex: '1 1 120px' }}><InputField label="Monthly Fee (Rs)" value={p.monthly_fee} onChange={(e) => { const np = [...wizardData.programs]; np[idx].monthly_fee = Number(e.target.value); setWizardData({...wizardData, programs: np}) }} type="number" /></div>
+                    <Button variant="danger" onClick={() => setWizardData({...wizardData, programs: wizardData.programs.filter((_, i) => i !== idx)})} style={{ marginBottom: 14 }}>{Icons.trash(16)}</Button>
+                  </div>
+                ))}
+                <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 8 }}>
+                  <Button variant="secondary" onClick={() => setWizardData({...wizardData, programs: [...wizardData.programs, { tempId: Date.now().toString(), course_name: '', course_code: 'NEW', course_type: 'hifz', monthly_fee: 0 }]})}>
+                    {Icons.plus(14)} Add Program
+                  </Button>
+                </div>
               </div>
-              <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)' }}>
-                Creating this session will automatically activate it and archive the previous session.
-              </p>
-              <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
+
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'space-between', marginTop: 16 }}>
                 <Button variant="secondary" onClick={() => setWizardStep(1)}>&larr; Back</Button>
+                <Button onClick={() => setWizardStep(3)}>Next: Setup Classes & Sections &rarr;</Button>
+              </div>
+            </div>
+          )}
+
+          {wizardStep === 3 && (
+            <div>
+              <h4 style={{ color: GOLD, margin: '0 0 16px 0' }}>Step 3: Define Classes / Sections</h4>
+              <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginBottom: 12 }}>Create classes (e.g. Class 1A, Ula) and assign them to the programs you just created.</p>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+                {wizardData.classes.map((c, idx) => (
+                  <div key={c.tempId} style={{ display: 'flex', gap: 10, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+                    <div style={{ flex: '1 1 150px' }}><SelectField label="Program" value={c.courseTempId} onChange={(e) => { const nc = [...wizardData.classes]; nc[idx].courseTempId = e.target.value; setWizardData({...wizardData, classes: nc}) }} options={[{value: '', label: 'Select...'}, ...wizardData.programs.map(p => ({value: p.tempId, label: p.course_name}))]} /></div>
+                    <div style={{ flex: '1 1 120px' }}><InputField label="Class Name" value={c.class_name} onChange={(e) => { const nc = [...wizardData.classes]; nc[idx].class_name = e.target.value; setWizardData({...wizardData, classes: nc}) }} placeholder="e.g. Class 1" /></div>
+                    <div style={{ flex: '1 1 80px' }}><InputField label="Section" value={c.section} onChange={(e) => { const nc = [...wizardData.classes]; nc[idx].section = e.target.value; setWizardData({...wizardData, classes: nc}) }} /></div>
+                    <div style={{ flex: '1 1 80px' }}><InputField label="Capacity" value={c.max_students} onChange={(e) => { const nc = [...wizardData.classes]; nc[idx].max_students = Number(e.target.value); setWizardData({...wizardData, classes: nc}) }} type="number" /></div>
+                    <Button variant="danger" onClick={() => setWizardData({...wizardData, classes: wizardData.classes.filter((_, i) => i !== idx)})} style={{ marginBottom: 14 }}>{Icons.trash(16)}</Button>
+                  </div>
+                ))}
+                <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 8 }}>
+                  <Button variant="secondary" onClick={() => setWizardData({...wizardData, classes: [...wizardData.classes, { tempId: Date.now().toString(), courseTempId: wizardData.programs[0]?.tempId || '', class_name: '', section: 'A', max_students: 30 }]})}>
+                    {Icons.plus(14)} Add Class
+                  </Button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'space-between', marginTop: 16 }}>
+                <Button variant="secondary" onClick={() => setWizardStep(2)}>&larr; Back</Button>
+                <Button onClick={() => setWizardStep(4)}>Next: Review &rarr;</Button>
+              </div>
+            </div>
+          )}
+
+          {wizardStep === 4 && (
+            <div>
+              <h4 style={{ color: GOLD, margin: '0 0 16px 0' }}>Step 4: Review & Finalize</h4>
+              <p style={{ fontSize: '0.85rem', color: '#fff', marginBottom: 10 }}>
+                You are about to create session <strong>{wizardData.name}</strong> ({wizardData.start_date} to {wizardData.end_date}).
+              </p>
+              {!wizardData.cloneFrom && (
+                <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginBottom: 20 }}>
+                  It includes {wizardData.programs.length} programs and {wizardData.classes.length} classes.
+                </p>
+              )}
+              {wizardData.cloneFrom && (
+                <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginBottom: 20 }}>
+                  It will automatically clone the complete structure of the selected previous session.
+                </p>
+              )}
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'space-between', marginTop: 16 }}>
+                <Button variant="secondary" onClick={() => setWizardStep(wizardData.cloneFrom ? 1 : 3)}>&larr; Back</Button>
                 <Button onClick={handleCreateSessionWizard}>Create & Activate Session</Button>
               </div>
             </div>
           )}
+        </Modal>
+      )}
+
+      {/* Edit Program Modal */}
+      {editProgramData && (
+        <Modal title={editProgramData.id ? "Edit Program" : "Add Program"} onClose={() => setEditProgramData(null)} width={450}>
+          <InputField label="Program Name" value={editProgramData.course_name} onChange={(e) => setEditProgramData({...editProgramData, course_name: e.target.value})} required />
+          <SelectField label="Type" value={editProgramData.course_type} onChange={(e) => setEditProgramData({...editProgramData, course_type: e.target.value})} options={[{value:'hifz', label:'Hifz'}, {value:'dars', label:'Dars-e-Nizami'}, {value:'nazra', label:'Nazra'}]} required />
+          <InputField label="Monthly Fee (Rs)" value={editProgramData.monthly_fee} onChange={(e) => setEditProgramData({...editProgramData, monthly_fee: Number(e.target.value)})} type="number" required />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16, gap: 12 }}>
+            <Button variant="secondary" onClick={() => setEditProgramData(null)}>Cancel</Button>
+            <Button onClick={handleSaveProgram}>Save Program</Button>
+          </div>
+        </Modal>
+      )}
+
+      {/* Edit Class Modal */}
+      {editClassData && (
+        <Modal title={editClassData.id ? "Edit Class" : "Add Class"} onClose={() => setEditClassData(null)} width={450}>
+          <SelectField label="Program" value={editClassData.course_id} onChange={(e) => setEditClassData({...editClassData, course_id: e.target.value})} options={courses.filter(c => c.session_id === editClassData.session_id).map(c => ({value: c.id, label: c.course_name}))} required />
+          <InputField label="Class Name" value={editClassData.class_name} onChange={(e) => setEditClassData({...editClassData, class_name: e.target.value})} required />
+          <InputField label="Section" value={editClassData.section} onChange={(e) => setEditClassData({...editClassData, section: e.target.value})} required />
+          <InputField label="Capacity" value={editClassData.max_students} onChange={(e) => setEditClassData({...editClassData, max_students: Number(e.target.value)})} type="number" required />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16, gap: 12 }}>
+            <Button variant="secondary" onClick={() => setEditClassData(null)}>Cancel</Button>
+            <Button onClick={handleSaveClass}>Save Class</Button>
+          </div>
         </Modal>
       )}
 

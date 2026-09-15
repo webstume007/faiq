@@ -1251,24 +1251,78 @@ function StudentsSection({ user, activeSession }) {
       </div>
 
       {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)' }}>Loading...</div> : (
-        <Table columns={columns} data={filtered} actions={(row) => (
-          <>
-            {row.program_type === 'hifz' && (
-              <ActionButton icon={Icons.book(14)} title="Hifz Quran Progress" color={GOLD} onClick={() => handleViewHifz(row)} />
-            )}
-            <ActionButton icon={Icons.edit(14)} title="Edit Student" color="#3b82f6" onClick={() => {
-              setEditingStudent(row);
-              setEditForm({
-                first_name: row.first_name,
-                last_name: row.last_name,
-                class_id: row.class_id,
-                b_form_no: row.b_form_no || '',
-                blood_group: row.blood_group || '',
-                status: row.status,
-              });
-            }} />
-          </>
-        )} />
+        <>
+          <div className="desktop-hide-on-mobile">
+            <Table columns={columns} data={filtered} actions={(row) => (
+              <>
+                {row.program_type === 'hifz' && (
+                  <ActionButton icon={Icons.book(14)} title="Hifz Quran Progress" color={GOLD} onClick={() => handleViewHifz(row)} />
+                )}
+                <ActionButton icon={Icons.edit(14)} title="Edit Student" color="#3b82f6" onClick={() => {
+                  setEditingStudent(row);
+                  setEditForm({
+                    first_name: row.first_name,
+                    last_name: row.last_name,
+                    class_id: row.class_id,
+                    b_form_no: row.b_form_no || '',
+                    blood_group: row.blood_group || '',
+                    status: row.status,
+                  });
+                }} />
+              </>
+            )} />
+          </div>
+          
+          <div className="mobile-show-only" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {filtered.map((row) => (
+              <div key={row.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                  <div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff' }}>{row.first_name} {row.last_name}</div>
+                    <div style={{ fontSize: '0.75rem', color: GOLD, marginTop: 4 }}>Roll No: {row.roll_no}</div>
+                  </div>
+                  <Badge text={row.status} color={row.status === 'active' ? '#22c55e' : '#ef4444'} />
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
+                  <div>
+                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Program</div>
+                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.program_type === 'hifz' ? 'Hifz Ul Quran' : 'Dars-e-Nizami'}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Class</div>
+                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.class ? `${row.class.class_name} (${row.class.section})` : '—'}</div>
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Guardian</div>
+                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.guardian?.user ? `${row.guardian.user.first_name} ${row.guardian.user.last_name}` : '—'}</div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: 8, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 12, justifyContent: 'flex-end' }}>
+                  {row.program_type === 'hifz' && (
+                    <Button variant="gold" onClick={() => handleViewHifz(row)} style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
+                      {Icons.book(14)} Progress
+                    </Button>
+                  )}
+                  <Button variant="secondary" onClick={() => {
+                    setEditingStudent(row);
+                    setEditForm({
+                      first_name: row.first_name,
+                      last_name: row.last_name,
+                      class_id: row.class_id,
+                      b_form_no: row.b_form_no || '',
+                      blood_group: row.blood_group || '',
+                      status: row.status,
+                    });
+                  }} style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
+                    {Icons.edit(14)} Edit
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Edit Student Modal */}
@@ -1394,11 +1448,50 @@ function AdmissionsSection({ user, activeSession }) {
     <div>
       <SectionHeader title="Admission Applications" subtitle={`${admissions.filter((a) => a.status === 'pending').length} pending admissions`} />
       {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)' }}>Loading...</div> : (
-        <Table columns={columns} data={admissions} actions={(row) => (
-          <Button variant={row.status === 'pending' ? 'primary' : 'secondary'} onClick={() => { setSelectedApp(row); setSelectedClassId(''); }} style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
-            {row.status === 'pending' ? 'Review & Approve' : 'View Details'}
-          </Button>
-        )} />
+        <>
+          <div className="desktop-hide-on-mobile">
+            <Table columns={columns} data={admissions} actions={(row) => (
+              <Button variant={row.status === 'pending' ? 'primary' : 'secondary'} onClick={() => { setSelectedApp(row); setSelectedClassId(''); }} style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
+                {row.status === 'pending' ? 'Review & Approve' : 'View Details'}
+              </Button>
+            )} />
+          </div>
+
+          <div className="mobile-show-only" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {admissions.map((row) => (
+              <div key={row.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                  <div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff' }}>{row.student_first_name} {row.student_last_name}</div>
+                    <div style={{ fontSize: '0.75rem', color: GOLD, marginTop: 4 }}>Applied: {new Date(row.created_at).toLocaleDateString()}</div>
+                  </div>
+                  <Badge text={row.status} color={row.status === 'pending' ? '#f97316' : (row.status === 'approved' ? '#22c55e' : '#ef4444')} />
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
+                  <div>
+                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Program</div>
+                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.course_type === 'hifz' ? 'Hifz Ul Quran' : (row.desired_course || 'Dars-e-Nizami')}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Contact</div>
+                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.guardian?.user?.phone || '—'}</div>
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Guardian</div>
+                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.guardian?.user ? `${row.guardian.user.first_name} ${row.guardian.user.last_name}` : '—'}</div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: 8, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 12, justifyContent: 'flex-end' }}>
+                  <Button variant={row.status === 'pending' ? 'primary' : 'secondary'} onClick={() => { setSelectedApp(row); setSelectedClassId(''); }} style={{ padding: '6px 12px', fontSize: '0.75rem', width: '100%' }}>
+                    {row.status === 'pending' ? 'Review & Approve' : 'View Details'}
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Review Modal */}
@@ -1463,6 +1556,11 @@ function ChallansSection({ user, activeSession }) {
   const [createForm, setCreateForm] = useState({
     student_id: '', title: '', amount: 4000, due_date: '', month: '',
   });
+  
+  // Edit State
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({});
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -1479,6 +1577,7 @@ function ChallansSection({ user, activeSession }) {
 
   const handleVerify = async (status) => {
     if (!reviewingChallan) return;
+    // For reversals (e.g. Reject / Mark Unpaid), payment may not exist.
     const payment = reviewingChallan.payment?.[0];
     await db.verifyChallanPayment(payment?.id, reviewingChallan.id, status, user.id);
     setReviewingChallan(null);
@@ -1493,6 +1592,19 @@ function ChallansSection({ user, activeSession }) {
       created_by: user.id,
     }, user.id);
     setShowCreate(false);
+    loadData();
+  };
+
+  const handleUpdateChallan = async () => {
+    setSavingEdit(true);
+    await db.updateChallan(reviewingChallan.id, {
+      title: editForm.title,
+      amount: Number(editForm.amount),
+      due_date: editForm.due_date,
+    }, user.id);
+    setSavingEdit(false);
+    setIsEditing(false);
+    setReviewingChallan(null);
     loadData();
   };
 
@@ -1530,12 +1642,12 @@ function ChallansSection({ user, activeSession }) {
       />
 
       {/* Filter Tabs */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 20, flexWrap: 'wrap' }}>
         {[
           { id: 'all', label: 'All Challans' },
           { id: 'pending', label: `Pending Verification (${challans.filter((c) => c.status === 'pending_verification').length})` },
           { id: 'paid', label: 'Paid' },
-          { id: 'compensated', label: 'Compensated / Concession' },
+          { id: 'compensated', label: 'Compensated' },
           { id: 'unpaid', label: 'Unpaid' },
         ].map((t) => (
           <button
@@ -1553,51 +1665,127 @@ function ChallansSection({ user, activeSession }) {
       </div>
 
       {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)' }}>Loading...</div> : (
-        <Table columns={columns} data={filtered} actions={(row) => (
-          <Button variant="secondary" onClick={() => setReviewingChallan(row)} style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
-            {row.status === 'pending_verification' ? 'Review & Verify' : 'View / Override'}
-          </Button>
-        )} />
-      )}
+        <>
+          <div className="desktop-hide-on-mobile">
+            <Table columns={columns} data={filtered} actions={(row) => (
+              <Button variant="secondary" onClick={() => {
+                setReviewingChallan(row);
+                setIsEditing(false);
+              }} style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
+                Review / Override
+              </Button>
+            )} />
+          </div>
 
-      {/* Review / Override Modal */}
-      {reviewingChallan && (
-        <Modal title={`Challan: ${reviewingChallan.challan_no}`} onClose={() => setReviewingChallan(null)} width={600}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
-            {[
-              ['Student', `${reviewingChallan.student?.first_name || ''} ${reviewingChallan.student?.last_name || ''}`],
-              ['Roll No', reviewingChallan.student?.roll_no],
-              ['Amount', `Rs. ${Number(reviewingChallan.amount).toLocaleString()}`],
-              ['Due Date', reviewingChallan.due_date],
-              ['Transaction ID (TID)', reviewingChallan.payment?.[0]?.transaction_id || 'Not Submitted'],
-              ['Payment Channel', reviewingChallan.payment?.[0]?.payment_method?.toUpperCase() || 'Bank Transfer'],
-              ['Current Status', reviewingChallan.status.toUpperCase()],
-              ['Concession Status', reviewingChallan.compensation_status.toUpperCase()],
-            ].map(([l, v]) => (
-              <div key={l}>
-                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700, textTransform: 'uppercase' }}>{l}</div>
-                <div style={{ fontSize: '0.88rem', color: '#fff', marginTop: 2 }}>{v}</div>
+          <div className="mobile-show-only" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {filtered.map((row) => (
+              <div key={row.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                  <div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff' }}>{row.student?.first_name} {row.student?.last_name}</div>
+                    <div style={{ fontSize: '0.75rem', color: GOLD, marginTop: 4 }}>Challan: {row.challan_no}</div>
+                  </div>
+                  {row.compensation_status === 'compensated' ? (
+                    <Badge text="Compensated" color="#a855f7" />
+                  ) : (
+                    <Badge text={row.status?.replace('_', ' ')} color={row.status === 'paid' ? '#22c55e' : (row.status === 'pending_verification' ? '#f97316' : '#ef4444')} />
+                  )}
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
+                  <div>
+                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Amount</div>
+                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>Rs. {Number(row.amount).toLocaleString()}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Due Date</div>
+                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.due_date}</div>
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Title</div>
+                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.title}</div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: 8, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 12, justifyContent: 'flex-end' }}>
+                  <Button variant="secondary" onClick={() => {
+                    setReviewingChallan(row);
+                    setIsEditing(false);
+                  }} style={{ padding: '6px 12px', fontSize: '0.75rem', width: '100%' }}>
+                    Review / Override
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
+        </>
+      )}
 
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 16 }}>
-            <h4 style={{ color: GOLD, margin: '0 0 10px 0', fontSize: '0.85rem' }}>Admin Approval / Concession Actions:</h4>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <Button variant="success" onClick={() => handleVerify('approved')}>
-                {Icons.check(16)} Mark Paid (Approved)
-              </Button>
-              <Button variant="gold" onClick={() => handleVerify('compensated')}>
-                Mark Compensated (Needy/Scholarship)
-              </Button>
-              <Button variant="danger" onClick={() => handleVerify('rejected')}>
-                {Icons.x(16)} Reject / Mark Unpaid
-              </Button>
-            </div>
-            <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', marginTop: 8 }}>
-              Note: Marking as "Compensated" will show up as "Paid" on the Guardian's portal while recorded as a concession in admin reports.
-            </p>
-          </div>
+      {/* Review / Edit Modal */}
+      {reviewingChallan && (
+        <Modal title={`Challan: ${reviewingChallan.challan_no}`} onClose={() => setReviewingChallan(null)} width={600}>
+          {!isEditing ? (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+                {[
+                  ['Student', `${reviewingChallan.student?.first_name || ''} ${reviewingChallan.student?.last_name || ''}`],
+                  ['Roll No', reviewingChallan.student?.roll_no],
+                  ['Title', reviewingChallan.title],
+                  ['Amount', `Rs. ${Number(reviewingChallan.amount).toLocaleString()}`],
+                  ['Due Date', reviewingChallan.due_date],
+                  ['Transaction ID', reviewingChallan.payment?.[0]?.transaction_id || 'Not Submitted'],
+                  ['Payment Channel', reviewingChallan.payment?.[0]?.payment_method?.toUpperCase() || 'Bank Transfer'],
+                  ['Current Status', reviewingChallan.status.toUpperCase()],
+                  ['Concession Status', reviewingChallan.compensation_status.toUpperCase()],
+                ].map(([l, v]) => (
+                  <div key={l}>
+                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700, textTransform: 'uppercase' }}>{l}</div>
+                    <div style={{ fontSize: '0.88rem', color: '#fff', marginTop: 2 }}>{v}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <h4 style={{ color: GOLD, margin: 0, fontSize: '0.85rem' }}>Admin Override & Reversals:</h4>
+                  <Button variant="secondary" onClick={() => {
+                    setEditForm({
+                      title: reviewingChallan.title,
+                      amount: reviewingChallan.amount,
+                      due_date: reviewingChallan.due_date,
+                    });
+                    setIsEditing(true);
+                  }} style={{ padding: '4px 10px', fontSize: '0.75rem' }}>{Icons.edit(14)} Edit Challan</Button>
+                </div>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  <Button variant="success" onClick={() => handleVerify('approved')}>
+                    {Icons.check(16)} Mark Paid (Approve)
+                  </Button>
+                  <Button variant="gold" onClick={() => handleVerify('compensated')}>
+                    Mark Compensated
+                  </Button>
+                  <Button variant="danger" onClick={() => handleVerify('rejected')}>
+                    {Icons.x(16)} Reject / Mark Unpaid
+                  </Button>
+                </div>
+                <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', marginTop: 8 }}>
+                  Note: You can use "Reject / Mark Unpaid" to reverse a previously paid challan back to unpaid status if there was an error.
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <InputField label="Challan Title" value={editForm.title} onChange={(e) => setEditForm(p => ({ ...p, title: e.target.value }))} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
+                <InputField label="Amount (Rs.)" type="number" value={editForm.amount} onChange={(e) => setEditForm(p => ({ ...p, amount: e.target.value }))} />
+                <InputField label="Due Date" type="date" value={editForm.due_date} onChange={(e) => setEditForm(p => ({ ...p, due_date: e.target.value }))} />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 16 }}>
+                <Button variant="secondary" onClick={() => setIsEditing(false)}>Cancel</Button>
+                <Button onClick={handleUpdateChallan} disabled={savingEdit}>{savingEdit ? 'Saving...' : 'Save Changes'}</Button>
+              </div>
+            </>
+          )}
         </Modal>
       )}
 
@@ -1629,18 +1817,44 @@ function ChallansSection({ user, activeSession }) {
 // ============================================================
 // SECTION 7: GUARDIANS
 // ============================================================
-function GuardiansSection() {
+function GuardiansSection({ user }) {
   const [guardians, setGuardians] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editingGuardian, setEditingGuardian] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [savingEdit, setSavingEdit] = useState(false);
 
-  useEffect(() => {
-    db.getAllGuardians().then((data) => {
-      setGuardians(data);
-      setLoading(false);
-    });
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const data = await db.getAllGuardians();
+    setGuardians(data);
+    setLoading(false);
   }, []);
 
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const handleUpdate = async () => {
+    setSavingEdit(true);
+    await db.updateGuardian(
+      editingGuardian.id,
+      editingGuardian.user.id,
+      { phone: editForm.phone, first_name: editForm.first_name, last_name: editForm.last_name },
+      { occupation: editForm.occupation, relation_to_student: editForm.relation_to_student },
+      user.id
+    );
+    setSavingEdit(false);
+    setEditingGuardian(null);
+    loadData();
+  };
+
   const columns = [
+    { key: 'avatar', label: '', render: (r) => {
+        const u = r.user;
+        if (!u) return null;
+        const fallbackUrl = `https://ui-avatars.com/api/?name=${u.first_name}+${u.last_name}&background=F2A900&color=fff`;
+        return <img src={u.avatar_url || fallbackUrl} alt={u.first_name} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />;
+      }
+    },
     { key: 'name', label: 'Guardian Name', render: (r) => r.user ? `${r.user.first_name} ${r.user.last_name}` : '—' },
     { key: 'cnic', label: 'CNIC', render: (r) => r.user?.cnic, nowrap: true },
     { key: 'phone', label: 'Phone', render: (r) => r.user?.phone || '—', nowrap: true },
@@ -1652,7 +1866,90 @@ function GuardiansSection() {
     <div>
       <SectionHeader title="Guardians Roster" subtitle={`${guardians.length} registered guardians`} />
       {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)' }}>Loading...</div> : (
-        <Table columns={columns} data={guardians} />
+        <>
+          <div className="desktop-hide-on-mobile">
+            <Table columns={columns} data={guardians} actions={(row) => (
+              <Button variant="secondary" onClick={() => {
+                setEditingGuardian(row);
+                setEditForm({
+                  first_name: row.user?.first_name || '',
+                  last_name: row.user?.last_name || '',
+                  phone: row.user?.phone || '',
+                  occupation: row.occupation || '',
+                  relation_to_student: row.relation_to_student || '',
+                });
+              }} style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
+                {Icons.edit(14)} Edit
+              </Button>
+            )} />
+          </div>
+
+          <div className="mobile-show-only" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {guardians.map((row) => {
+              const u = row.user;
+              const fallbackUrl = u ? `https://ui-avatars.com/api/?name=${u.first_name}+${u.last_name}&background=F2A900&color=fff` : '';
+              return (
+                <div key={row.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16 }}>
+                  <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12 }}>
+                    {u && <img src={u.avatar_url || fallbackUrl} alt="Avatar" style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover' }} />}
+                    <div>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff' }}>{u?.first_name} {u?.last_name}</div>
+                      <div style={{ fontSize: '0.75rem', color: GOLD, marginTop: 4 }}>CNIC: {u?.cnic}</div>
+                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
+                    <div>
+                      <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Phone</div>
+                      <div style={{ fontSize: '0.85rem', color: '#fff' }}>{u?.phone || '—'}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Occupation</div>
+                      <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.occupation || '—'}</div>
+                    </div>
+                    <div style={{ gridColumn: '1 / -1' }}>
+                      <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Enrolled Children</div>
+                      <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.students?.length || 0}</div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: 8, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 12, justifyContent: 'flex-end' }}>
+                    <Button variant="secondary" onClick={() => {
+                      setEditingGuardian(row);
+                      setEditForm({
+                        first_name: u?.first_name || '',
+                        last_name: u?.last_name || '',
+                        phone: u?.phone || '',
+                        occupation: row.occupation || '',
+                        relation_to_student: row.relation_to_student || '',
+                      });
+                    }} style={{ padding: '6px 12px', fontSize: '0.75rem', width: '100%' }}>
+                      {Icons.edit(14)} Edit Guardian
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {/* Edit Guardian Modal */}
+      {editingGuardian && (
+        <Modal title={`Edit Guardian: ${editingGuardian.user?.first_name} ${editingGuardian.user?.last_name}`} onClose={() => setEditingGuardian(null)}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
+            <InputField label="First Name" value={editForm.first_name} onChange={(e) => setEditForm(p => ({ ...p, first_name: e.target.value }))} />
+            <InputField label="Last Name" value={editForm.last_name} onChange={(e) => setEditForm(p => ({ ...p, last_name: e.target.value }))} />
+            <InputField label="Phone" value={editForm.phone} onChange={(e) => setEditForm(p => ({ ...p, phone: e.target.value }))} />
+            <InputField label="Occupation" value={editForm.occupation} onChange={(e) => setEditForm(p => ({ ...p, occupation: e.target.value }))} />
+          </div>
+          <InputField label="Relation to Student" value={editForm.relation_to_student} onChange={(e) => setEditForm(p => ({ ...p, relation_to_student: e.target.value }))} />
+          
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 16 }}>
+            <Button variant="secondary" onClick={() => setEditingGuardian(null)}>Cancel</Button>
+            <Button onClick={handleUpdate} disabled={savingEdit}>{savingEdit ? 'Saving...' : 'Save Changes'}</Button>
+          </div>
+        </Modal>
       )}
     </div>
   );
@@ -1664,13 +1961,23 @@ function GuardiansSection() {
 function AuditSection() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [actionFilter, setActionFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  // Debounce search
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchQuery), 400);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
 
   useEffect(() => {
-    db.getActivityLog(100).then((data) => {
+    setLoading(true);
+    db.getActivityLog(100, { action: actionFilter, searchQuery: debouncedSearch }).then((data) => {
       setLogs(data);
       setLoading(false);
     });
-  }, []);
+  }, [actionFilter, debouncedSearch]);
 
   const columns = [
     { key: 'timestamp', label: 'Time', render: (r) => new Date(r.created_at).toLocaleString(), nowrap: true },
@@ -1683,8 +1990,61 @@ function AuditSection() {
   return (
     <div>
       <SectionHeader title="System Audit Trail & Activity Logs" subtitle="Permanent record of administrative overrides, modifications, and actions" />
+      
+      <div style={{ display: 'flex', gap: 16, marginBottom: 20, flexWrap: 'wrap' }}>
+        <div style={{ flex: '1 1 200px' }}>
+          <InputField 
+            placeholder="Search descriptions..." 
+            value={searchQuery} 
+            onChange={(e) => setSearchQuery(e.target.value)} 
+          />
+        </div>
+        <div style={{ flex: '1 1 150px', maxWidth: 200 }}>
+          <SelectField
+            value={actionFilter}
+            onChange={(e) => setActionFilter(e.target.value)}
+            options={[
+              { value: '', label: 'All Actions' },
+              { value: 'create', label: 'Create' },
+              { value: 'update', label: 'Update' },
+              { value: 'delete', label: 'Delete' },
+              { value: 'login', label: 'Login' }
+            ]}
+          />
+        </div>
+      </div>
+
       {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)' }}>Loading...</div> : (
-        <Table columns={columns} data={logs} />
+        <>
+          <div className="desktop-hide-on-mobile">
+            <Table columns={columns} data={logs} />
+          </div>
+
+          <div className="mobile-show-only" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {logs.map((row) => (
+              <div key={row.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                  <div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff' }}>{row.user ? `${row.user.first_name}` : 'System'}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>
+                      {new Date(row.created_at).toLocaleString()}
+                    </div>
+                  </div>
+                  <Badge text={row.action} color={row.action === 'create' ? '#22c55e' : (row.action === 'delete' ? '#ef4444' : GOLD)} />
+                </div>
+                
+                <div style={{ background: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 8, border: '1px solid rgba(255,255,255,0.04)' }}>
+                  <div style={{ fontSize: '0.7rem', color: GOLD, textTransform: 'uppercase', marginBottom: 4 }}>
+                    {row.entity_type} {row.entity_id ? `(#${row.entity_id})` : ''}
+                  </div>
+                  <div style={{ fontSize: '0.85rem', color: '#fff', lineHeight: 1.4 }}>
+                    {row.description || 'No description provided'}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

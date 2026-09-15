@@ -42,34 +42,68 @@ export default function App({ Component, pageProps }) {
       <style jsx global>{`
         :root {
           --bg-color: #0a0e1a;
+          --bg-sidebar: #0d111e;
+          --bg-header: #0d111e;
+          --bg-dropdown: #111625;
+          --bg-table-header: #1a1f2e;
+
           --text-primary: #ffffff;
           --text-secondary: rgba(255,255,255,0.6);
           --text-tertiary: rgba(255,255,255,0.4);
+
           --border-color: rgba(255,255,255,0.08);
           --border-light: rgba(255,255,255,0.04);
+          
           --card-bg: rgba(255,255,255,0.03);
           --card-bg-hover: rgba(255,255,255,0.06);
           --input-bg: rgba(0,0,0,0.2);
           --modal-bg: #111;
+          
           --accent-gold: #F2A900;
           --accent-gold-transparent: rgba(242, 169, 0, 0.22);
           --shadow-color: rgba(0,0,0,0.5);
+
+          /* Semantic Status Colors */
+          --color-danger: #ef4444;
+          --text-danger: #fca5a5;
+          --color-success: #22c55e;
+          --text-success: #86efac;
+          --color-info: #3b82f6;
+          --color-warning: #f97316;
+          --color-purple: #a855f7;
         }
 
         [data-theme='light'] {
           --bg-color: #f4f7fb;
-          --text-primary: #1e293b;
-          --text-secondary: #475569;
-          --text-tertiary: #94a3b8;
+          --bg-sidebar: #ffffff;
+          --bg-header: #ffffff;
+          --bg-dropdown: #ffffff;
+          --bg-table-header: #f1f5f9;
+
+          --text-primary: #0f172a;
+          --text-secondary: #334155;
+          --text-tertiary: #64748b;
+
           --border-color: rgba(0,0,0,0.1);
           --border-light: rgba(0,0,0,0.05);
+
           --card-bg: #ffffff;
           --card-bg-hover: #f8fafc;
           --input-bg: #ffffff;
           --modal-bg: #ffffff;
+          
           --accent-gold: #D48F00;
           --accent-gold-transparent: rgba(212, 143, 0, 0.15);
           --shadow-color: rgba(0,0,0,0.1);
+
+          /* Semantic Status Colors */
+          --color-danger: #ef4444;
+          --text-danger: #ef4444;
+          --color-success: #16a34a;
+          --text-success: #16a34a;
+          --color-info: #2563eb;
+          --color-warning: #ea580c;
+          --color-purple: #9333ea;
         }
 
         *, *::before, *::after {

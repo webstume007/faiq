@@ -91,7 +91,7 @@ const Icons = {
 };
 
 const GOLD = 'var(--accent-gold)';
-const NAVY = '#002147';
+const NAVY = 'var(--bg-sidebar)';
 
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: Icons.dashboard },
@@ -159,8 +159,8 @@ const Button = ({ children, onClick, variant = 'primary', style, disabled }) => 
   const variants = {
     primary: { background: `linear-gradient(135deg, ${GOLD}, #e09800)`, color: 'var(--bg-color)' },
     secondary: { background: 'var(--card-bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' },
-    danger: { background: 'rgba(239,68,68,0.15)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.25)' },
-    success: { background: 'rgba(34,197,94,0.15)', color: '#86efac', border: '1px solid rgba(34,197,94,0.25)' },
+    danger: { background: 'rgba(239,68,68,0.15)', color: 'var(--text-danger)', border: '1px solid rgba(239,68,68,0.25)' },
+    success: { background: 'rgba(34,197,94,0.15)', color: 'var(--text-success)', border: '1px solid rgba(34,197,94,0.25)' },
     gold: { background: 'rgba(242,169,0,0.15)', color: GOLD, border: '1px solid rgba(242,169,0,0.3)' },
   };
   return (
@@ -183,7 +183,7 @@ const Badge = ({ text, color = GOLD }) => (
 
 const InputField = ({ label, value, onChange, type = 'text', placeholder, required, disabled }) => (
   <div style={{ marginBottom: 14 }}>
-    {label && <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 500 }}>{label}{required && <span style={{ color: '#ef4444' }}> *</span>}</label>}
+    {label && <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 500 }}>{label}{required && <span style={{ color: 'var(--color-danger)' }}> *</span>}</label>}
     <input
       type={type}
       value={value ?? ''}
@@ -208,7 +208,7 @@ const InputField = ({ label, value, onChange, type = 'text', placeholder, requir
 
 const SelectField = ({ label, value, onChange, options, required, disabled }) => (
   <div style={{ marginBottom: 14 }}>
-    {label && <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 500 }}>{label}{required && <span style={{ color: '#ef4444' }}> *</span>}</label>}
+    {label && <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 500 }}>{label}{required && <span style={{ color: 'var(--color-danger)' }}> *</span>}</label>}
     <select
       value={value ?? ''}
       onChange={onChange}
@@ -225,9 +225,9 @@ const SelectField = ({ label, value, onChange, options, required, disabled }) =>
         outline: 'none',
       }}
     >
-      <option value="" style={{ background: '#1a1f2e' }}>Select...</option>
+      <option value="" style={{ background: 'var(--bg-table-header)' }}>Select...</option>
       {options.map((o) => (
-        <option key={o.value} value={o.value} style={{ background: '#1a1f2e' }}>{o.label}</option>
+        <option key={o.value} value={o.value} style={{ background: 'var(--bg-table-header)' }}>{o.label}</option>
       ))}
     </select>
   </div>
@@ -241,7 +241,7 @@ const Modal = ({ title, onClose, children, width = 560 }) => (
     padding: 20,
   }}>
     <div style={{
-      background: '#111625',
+      background: 'var(--bg-dropdown)',
       border: '1px solid var(--border-color)',
       borderRadius: 20,
       width: '100%',
@@ -255,7 +255,7 @@ const Modal = ({ title, onClose, children, width = 560 }) => (
         padding: '20px 24px',
         borderBottom: '1px solid var(--card-bg-hover)',
         position: 'sticky', top: 0,
-        background: '#111625',
+        background: 'var(--bg-dropdown)',
         zIndex: 1,
         borderRadius: '20px 20px 0 0',
       }}>
@@ -286,7 +286,7 @@ const Table = ({ columns, data, actions }) => (
         ) : data.map((row, i) => (
           <tr key={row.id || i} style={{ borderTop: '1px solid var(--border-light)', transition: 'background 0.15s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--card-bg)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
             {columns.map((col) => (
-              <td key={col.key} style={{ padding: '12px 16px', color: '#e2e8f0', whiteSpace: col.nowrap ? 'nowrap' : 'normal' }}>
+              <td key={col.key} style={{ padding: '12px 16px', color: 'var(--text-primary)', whiteSpace: col.nowrap ? 'nowrap' : 'normal' }}>
                 {col.render ? col.render(row) : row[col.key]}
               </td>
             ))}
@@ -394,7 +394,7 @@ function DashboardSection({ user, activeSession }) {
         {searchResults && (
           <div style={{
             position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 8,
-            background: '#151928', border: '1px solid rgba(255,255,255,0.12)',
+            background: 'var(--bg-dropdown)', border: '1px solid rgba(255,255,255,0.12)',
             borderRadius: 14, padding: 16, zIndex: 100,
             boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
             maxHeight: 320, overflow: 'auto',
@@ -404,9 +404,9 @@ function DashboardSection({ user, activeSession }) {
                 <div key={cat} style={{ marginBottom: 12 }}>
                   <div style={{ fontSize: '0.7rem', fontWeight: 700, color: GOLD, textTransform: 'uppercase', marginBottom: 6, letterSpacing: '0.1em' }}>{cat}</div>
                   {searchResults[cat].map((item) => (
-                    <div key={item.id} style={{ padding: '8px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.85rem', color: '#e2e8f0', display: 'flex', justifyContent: 'space-between' }}>
+                    <div key={item.id} style={{ padding: '8px 12px', borderRadius: 8, cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-primary)', display: 'flex', justifyContent: 'space-between' }}>
                       <span>{item.first_name} {item.last_name} {item.roll_no && <span style={{ color: GOLD, marginLeft: 8 }}>({item.roll_no})</span>}</span>
-                      {item.program_type && <Badge text={item.program_type === 'hifz' ? 'Hifz' : 'Dars-e-Nizami'} color="#3b82f6" />}
+                      {item.program_type && <Badge text={item.program_type === 'hifz' ? 'Hifz' : 'Dars-e-Nizami'} color="var(--color-info)" />}
                     </div>
                   ))}
                 </div>
@@ -419,19 +419,19 @@ function DashboardSection({ user, activeSession }) {
       {/* KPI Stats Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: 16, marginBottom: 28 }}>
         <StatCard label="Hifz Students" value={stats?.hifzStudents ?? '—'} icon={Icons.book} color={GOLD} sublabel="Quran Memorization" />
-        <StatCard label="Dars-e-Nizami" value={stats?.darsStudents ?? '—'} icon={Icons.student} color="#3b82f6" sublabel="Sanviya & Shahadah" />
-        <StatCard label="Total Teachers" value={stats?.totalTeachers ?? '—'} icon={Icons.teacher} color="#10b981" />
-        <StatCard label="Pending Admissions" value={stats?.pendingAdmissions ?? '—'} icon={Icons.admission} color="#f97316" />
-        <StatCard label="Pending Challans" value={stats?.pendingChallans ?? '—'} icon={Icons.challan} color="#a855f7" />
-        <StatCard label="Absence Escalations" value={stats?.activeAbsenceFlags ?? '—'} icon={Icons.flag} color="#ef4444" sublabel="Requires Office Visit" />
+        <StatCard label="Dars-e-Nizami" value={stats?.darsStudents ?? '—'} icon={Icons.student} color="var(--color-info)" sublabel="Sanviya & Shahadah" />
+        <StatCard label="Total Teachers" value={stats?.totalTeachers ?? '—'} icon={Icons.teacher} color="var(--color-success)" />
+        <StatCard label="Pending Admissions" value={stats?.pendingAdmissions ?? '—'} icon={Icons.admission} color="var(--color-warning)" />
+        <StatCard label="Pending Challans" value={stats?.pendingChallans ?? '—'} icon={Icons.challan} color="var(--color-purple)" />
+        <StatCard label="Absence Escalations" value={stats?.activeAbsenceFlags ?? '—'} icon={Icons.flag} color="var(--color-danger)" sublabel="Requires Office Visit" />
       </div>
 
       {/* Absence Escalation Banner Widget */}
       {flags.length > 0 && (
         <Card style={{ marginBottom: 28, border: '1px solid rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-            {Icons.flag(20, '#ef4444')}
-            <h3 style={{ margin: 0, fontSize: '1rem', color: '#fca5a5', fontWeight: 700 }}>
+            {Icons.flag(20, 'var(--color-danger)')}
+            <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-danger)', fontWeight: 700 }}>
               Flagged Students (2+ Consecutive Absences — Visit Office Requested)
             </h3>
           </div>
@@ -449,7 +449,7 @@ function DashboardSection({ user, activeSession }) {
                   </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Badge text={`${f.consecutive_absences} Absences`} color="#ef4444" />
+                  <Badge text={`${f.consecutive_absences} Absences`} color="var(--color-danger)" />
                   <Button variant="success" onClick={() => setResolvingFlag(f)} style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
                     Mark Visited & Clear
                   </Button>
@@ -556,7 +556,7 @@ function TeachersSection({ user }) {
     { key: 'phone', label: 'Phone', render: (r) => r.user?.phone || '—', nowrap: true },
     { key: 'specialization', label: 'Specialization' },
     { key: 'qualification', label: 'Qualification' },
-    { key: 'status', label: 'Status', render: (r) => <Badge text={r.status} color={r.status === 'active' ? '#22c55e' : '#ef4444'} /> },
+    { key: 'status', label: 'Status', render: (r) => <Badge text={r.status} color={r.status === 'active' ? 'var(--color-success)' : 'var(--color-danger)'} /> },
   ];
 
   return (
@@ -569,7 +569,7 @@ function TeachersSection({ user }) {
           <div className="desktop-hide-on-mobile">
             <Table columns={columns} data={teachers} actions={(row) => (
               <>
-                <ActionButton icon={Icons.edit(14)} title="Edit Teacher" color="#3b82f6" onClick={() => openEdit(row)} />
+                <ActionButton icon={Icons.edit(14)} title="Edit Teacher" color="var(--color-info)" onClick={() => openEdit(row)} />
               </>
             )} />
           </div>
@@ -590,7 +590,7 @@ function TeachersSection({ user }) {
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>{t.employee_id} &bull; {t.user?.phone || 'No Phone'}</div>
                     </div>
                   </div>
-                  <Badge text={t.status} color={t.status === 'active' ? '#22c55e' : '#ef4444'} />
+                  <Badge text={t.status} color={t.status === 'active' ? 'var(--color-success)' : 'var(--color-danger)'} />
                 </div>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, background: 'var(--input-bg)', padding: 12, borderRadius: 8, marginTop: 4 }}>
@@ -629,7 +629,7 @@ function TeachersSection({ user }) {
             <InputField label="Specialization" value={formData.specialization} onChange={(e) => setFormData((p) => ({ ...p, specialization: e.target.value }))} placeholder="e.g. Hifz, Fiqh, Hadith, Nahw" />
             {!editingTeacher && <InputField label="Joining Date" value={formData.joining_date} onChange={(e) => setFormData((p) => ({ ...p, joining_date: e.target.value }))} type="date" />}
           </div>
-          {msg && <div style={{ color: '#ef4444', fontSize: '0.82rem', marginBottom: 12 }}>{msg}</div>}
+          {msg && <div style={{ color: 'var(--color-danger)', fontSize: '0.82rem', marginBottom: 12 }}>{msg}</div>}
           <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 12 }}>
             <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
             <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : (editingTeacher ? 'Update Teacher' : 'Create Teacher')}</Button>
@@ -843,8 +843,8 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
                 <div>
                   <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: 10 }}>
                     {session.name}
-                    {session.is_active && <Badge text="Active Session" color="#22c55e" />}
-                    {session.status === 'archived' && <Badge text="Archived (Read-Only)" color="#6b7280" />}
+                    {session.is_active && <Badge text="Active Session" color="var(--color-success)" />}
+                    {session.status === 'archived' && <Badge text="Archived (Read-Only)" color="var(--text-tertiary)" />}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 4 }}>
                     {session.start_date} — {session.end_date || 'Ongoing'}
@@ -901,15 +901,15 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
                     }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                         <div style={{ width: 36, height: 36, borderRadius: 8, background: c.course_type === 'hifz' ? `${GOLD}20` : 'rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          {Icons.book(18, c.course_type === 'hifz' ? GOLD : '#3b82f6')}
+                          {Icons.book(18, c.course_type === 'hifz' ? GOLD : 'var(--color-info)')}
                         </div>
                         <div style={{ flex: 1 }}>
                           <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>{c.course_name}</div>
                           <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', marginTop: 2, textTransform: 'uppercase' }}>{c.course_type} &bull; Fee: Rs {c.monthly_fee || 0}</div>
                         </div>
                         <div style={{ display: 'flex', gap: 6 }}>
-                          <ActionButton icon={Icons.edit(14)} color="#3b82f6" onClick={() => setEditProgramData(c)} />
-                          <ActionButton icon={Icons.trash(14)} color="#ef4444" onClick={() => handleDeleteProgram(c.id)} />
+                          <ActionButton icon={Icons.edit(14)} color="var(--color-info)" onClick={() => setEditProgramData(c)} />
+                          <ActionButton icon={Icons.trash(14)} color="var(--color-danger)" onClick={() => handleDeleteProgram(c.id)} />
                         </div>
                       </div>
                     </div>
@@ -936,8 +936,8 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
                       { key: 'max_students', label: 'Capacity' },
                       { key: 'actions', label: '', render: (r) => (
                           <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
-                            <ActionButton icon={Icons.edit(14)} color="#3b82f6" onClick={() => setEditClassData(r)} />
-                            <ActionButton icon={Icons.trash(14)} color="#ef4444" onClick={() => handleDeleteClass(r.id)} />
+                            <ActionButton icon={Icons.edit(14)} color="var(--color-info)" onClick={() => setEditClassData(r)} />
+                            <ActionButton icon={Icons.trash(14)} color="var(--color-danger)" onClick={() => handleDeleteClass(r.id)} />
                           </div>
                         )
                       }
@@ -955,8 +955,8 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
                           <div style={{ fontSize: '0.75rem', color: GOLD, marginTop: 2 }}>{cl.course?.course_name}</div>
                         </div>
                         <div style={{ display: 'flex', gap: 6 }}>
-                          <ActionButton icon={Icons.edit(14)} color="#3b82f6" onClick={() => setEditClassData(cl)} />
-                          <ActionButton icon={Icons.trash(14)} color="#ef4444" onClick={() => handleDeleteClass(cl.id)} />
+                          <ActionButton icon={Icons.edit(14)} color="var(--color-info)" onClick={() => setEditClassData(cl)} />
+                          <ActionButton icon={Icons.trash(14)} color="var(--color-danger)" onClick={() => handleDeleteClass(cl.id)} />
                         </div>
                       </div>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
@@ -1117,7 +1117,7 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
             <Table
               columns={[
                 { key: 'name', label: 'Student', render: (r) => `${r.first_name} ${r.last_name} (${r.roll_no})` },
-                { key: 'program', label: 'Program', render: (r) => <Badge text={r.program_type === 'hifz' ? 'Hifz' : 'Dars-e-Nizami'} color={r.program_type === 'hifz' ? GOLD : '#3b82f6'} /> },
+                { key: 'program', label: 'Program', render: (r) => <Badge text={r.program_type === 'hifz' ? 'Hifz' : 'Dars-e-Nizami'} color={r.program_type === 'hifz' ? GOLD : 'var(--color-info)'} /> },
                 { key: 'current_class', label: 'Current Class', render: (r) => r.class?.class_name || '—' },
                 {
                   key: 'action', label: 'Action', render: (r) => (
@@ -1129,7 +1129,7 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
                           ...p,
                           [r.id]: { ...p[r.id], hold_back: e.target.checked },
                         }))}
-                        style={{ accentColor: '#ef4444' }}
+                        style={{ accentColor: 'var(--color-danger)' }}
                       />
                       Hold Back
                     </label>
@@ -1210,10 +1210,10 @@ function StudentsSection({ user, activeSession }) {
   const columns = [
     { key: 'roll_no', label: 'Roll No', nowrap: true },
     { key: 'name', label: 'Student Name', render: (r) => `${r.first_name} ${r.last_name}` },
-    { key: 'program', label: 'Program', render: (r) => <Badge text={r.program_type === 'hifz' ? 'Hifz Ul Quran' : 'Dars-e-Nizami'} color={r.program_type === 'hifz' ? GOLD : '#3b82f6'} /> },
+    { key: 'program', label: 'Program', render: (r) => <Badge text={r.program_type === 'hifz' ? 'Hifz Ul Quran' : 'Dars-e-Nizami'} color={r.program_type === 'hifz' ? GOLD : 'var(--color-info)'} /> },
     { key: 'class', label: 'Class / Halqa', render: (r) => r.class ? `${r.class.class_name} (${r.class.section})` : '—' },
     { key: 'guardian', label: 'Guardian', render: (r) => r.guardian?.user ? `${r.guardian.user.first_name} ${r.guardian.user.last_name}` : '—' },
-    { key: 'status', label: 'Status', render: (r) => <Badge text={r.status} color={r.status === 'active' ? '#22c55e' : '#ef4444'} /> },
+    { key: 'status', label: 'Status', render: (r) => <Badge text={r.status} color={r.status === 'active' ? 'var(--color-success)' : 'var(--color-danger)'} /> },
   ];
 
   return (
@@ -1259,7 +1259,7 @@ function StudentsSection({ user, activeSession }) {
                 {row.program_type === 'hifz' && (
                   <ActionButton icon={Icons.book(14)} title="Hifz Quran Progress" color={GOLD} onClick={() => handleViewHifz(row)} />
                 )}
-                <ActionButton icon={Icons.edit(14)} title="Edit Student" color="#3b82f6" onClick={() => {
+                <ActionButton icon={Icons.edit(14)} title="Edit Student" color="var(--color-info)" onClick={() => {
                   setEditingStudent(row);
                   setEditForm({
                     first_name: row.first_name,
@@ -1282,7 +1282,7 @@ function StudentsSection({ user, activeSession }) {
                     <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>{row.first_name} {row.last_name}</div>
                     <div style={{ fontSize: '0.75rem', color: GOLD, marginTop: 4 }}>Roll No: {row.roll_no}</div>
                   </div>
-                  <Badge text={row.status} color={row.status === 'active' ? '#22c55e' : '#ef4444'} />
+                  <Badge text={row.status} color={row.status === 'active' ? 'var(--color-success)' : 'var(--color-danger)'} />
                 </div>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
@@ -1370,7 +1370,7 @@ function StudentsSection({ user, activeSession }) {
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 2 }}>{hifzData.stats.totalAyahsMemorized} / 6,236 Ayahs</div>
               </div>
               <div style={{ padding: 16, background: 'rgba(59,130,246,0.1)', borderRadius: 12, border: '1px solid rgba(59,130,246,0.2)' }}>
-                <div style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 700 }}>MANZIL (PARAS REVISED)</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-info)', fontWeight: 700 }}>MANZIL (PARAS REVISED)</div>
                 <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: 4 }}>{hifzData.stats.revisedParasCount} / 30 Paras</div>
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 2 }}>{hifzData.stats.manzilPercentage}% Revision Coverage</div>
               </div>
@@ -1381,7 +1381,7 @@ function StudentsSection({ user, activeSession }) {
             columns={[
               { key: 'date', label: 'Date', nowrap: true },
               { key: 'sabaq', label: 'Sabaq Range', render: (r) => `Surah ${r.sabaq_surah_start}:${r.sabaq_ayah_start} - ${r.sabaq_ayah_end}` },
-              { key: 'sabaq_quality', label: 'Quality', render: (r) => <Badge text={r.sabaq_quality} color="#22c55e" /> },
+              { key: 'sabaq_quality', label: 'Quality', render: (r) => <Badge text={r.sabaq_quality} color="var(--color-success)" /> },
               { key: 'overall_grade', label: 'Grade', render: (r) => <span style={{ fontWeight: 800, color: GOLD }}>{r.overall_grade}</span> },
             ]}
             data={hifzData?.dailyRecords || []}
@@ -1438,10 +1438,10 @@ function AdmissionsSection({ user, activeSession }) {
 
   const columns = [
     { key: 'student', label: 'Applicant Name', render: (r) => `${r.student_first_name} ${r.student_last_name}` },
-    { key: 'program', label: 'Program', render: (r) => <Badge text={r.course_type === 'hifz' ? 'Hifz Ul Quran' : (r.desired_course || 'Dars-e-Nizami')} color={r.course_type === 'hifz' ? GOLD : '#3b82f6'} /> },
+    { key: 'program', label: 'Program', render: (r) => <Badge text={r.course_type === 'hifz' ? 'Hifz Ul Quran' : (r.desired_course || 'Dars-e-Nizami')} color={r.course_type === 'hifz' ? GOLD : 'var(--color-info)'} /> },
     { key: 'guardian', label: 'Guardian', render: (r) => r.guardian?.user ? `${r.guardian.user.first_name} ${r.guardian.user.last_name}` : '—' },
     { key: 'phone', label: 'Contact', render: (r) => r.guardian?.user?.phone || '—', nowrap: true },
-    { key: 'status', label: 'Status', render: (r) => <Badge text={r.status} color={r.status === 'pending' ? '#f97316' : (r.status === 'approved' ? '#22c55e' : '#ef4444')} /> },
+    { key: 'status', label: 'Status', render: (r) => <Badge text={r.status} color={r.status === 'pending' ? 'var(--color-warning)' : (r.status === 'approved' ? 'var(--color-success)' : 'var(--color-danger)')} /> },
     { key: 'created_at', label: 'Applied On', render: (r) => new Date(r.created_at).toLocaleDateString(), nowrap: true },
   ];
 
@@ -1466,7 +1466,7 @@ function AdmissionsSection({ user, activeSession }) {
                     <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>{row.student_first_name} {row.student_last_name}</div>
                     <div style={{ fontSize: '0.75rem', color: GOLD, marginTop: 4 }}>Applied: {new Date(row.created_at).toLocaleDateString()}</div>
                   </div>
-                  <Badge text={row.status} color={row.status === 'pending' ? '#f97316' : (row.status === 'approved' ? '#22c55e' : '#ef4444')} />
+                  <Badge text={row.status} color={row.status === 'pending' ? 'var(--color-warning)' : (row.status === 'approved' ? 'var(--color-success)' : 'var(--color-danger)')} />
                 </div>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
@@ -1626,8 +1626,8 @@ function ChallansSection({ user, activeSession }) {
     { key: 'due_date', label: 'Due Date', nowrap: true },
     {
       key: 'status', label: 'Status', render: (r) => {
-        if (r.compensation_status === 'compensated') return <Badge text="Compensated (Needy)" color="#a855f7" />;
-        return <Badge text={r.status?.replace('_', ' ')} color={r.status === 'paid' ? '#22c55e' : (r.status === 'pending_verification' ? '#f97316' : '#ef4444')} />;
+        if (r.compensation_status === 'compensated') return <Badge text="Compensated (Needy)" color="var(--color-purple)" />;
+        return <Badge text={r.status?.replace('_', ' ')} color={r.status === 'paid' ? 'var(--color-success)' : (r.status === 'pending_verification' ? 'var(--color-warning)' : 'var(--color-danger)')} />;
       },
     },
   ];
@@ -1687,9 +1687,9 @@ function ChallansSection({ user, activeSession }) {
                     <div style={{ fontSize: '0.75rem', color: GOLD, marginTop: 4 }}>Challan: {row.challan_no}</div>
                   </div>
                   {row.compensation_status === 'compensated' ? (
-                    <Badge text="Compensated" color="#a855f7" />
+                    <Badge text="Compensated" color="var(--color-purple)" />
                   ) : (
-                    <Badge text={row.status?.replace('_', ' ')} color={row.status === 'paid' ? '#22c55e' : (row.status === 'pending_verification' ? '#f97316' : '#ef4444')} />
+                    <Badge text={row.status?.replace('_', ' ')} color={row.status === 'paid' ? 'var(--color-success)' : (row.status === 'pending_verification' ? 'var(--color-warning)' : 'var(--color-danger)')} />
                   )}
                 </div>
                 
@@ -1983,7 +1983,7 @@ function AuditSection() {
   const columns = [
     { key: 'timestamp', label: 'Time', render: (r) => new Date(r.created_at).toLocaleString(), nowrap: true },
     { key: 'user', label: 'Admin / Scholar', render: (r) => r.user ? `${r.user.first_name} (${r.user.role})` : 'System' },
-    { key: 'action', label: 'Action', render: (r) => <Badge text={r.action} color={r.action === 'create' ? '#22c55e' : (r.action === 'delete' ? '#ef4444' : GOLD)} /> },
+    { key: 'action', label: 'Action', render: (r) => <Badge text={r.action} color={r.action === 'create' ? 'var(--color-success)' : (r.action === 'delete' ? 'var(--color-danger)' : GOLD)} /> },
     { key: 'entity', label: 'Entity Type', render: (r) => r.entity_type },
     { key: 'description', label: 'Description', render: (r) => r.description || '—' },
   ];
@@ -2031,7 +2031,7 @@ function AuditSection() {
                       {new Date(row.created_at).toLocaleString()}
                     </div>
                   </div>
-                  <Badge text={row.action} color={row.action === 'create' ? '#22c55e' : (row.action === 'delete' ? '#ef4444' : GOLD)} />
+                  <Badge text={row.action} color={row.action === 'create' ? 'var(--color-success)' : (row.action === 'delete' ? 'var(--color-danger)' : GOLD)} />
                 </div>
                 
                 <div style={{ background: 'var(--input-bg)', padding: 12, borderRadius: 8, border: '1px solid var(--border-light)' }}>
@@ -2178,14 +2178,14 @@ function AnnouncementsSection({ user }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                   <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.98rem' }}>{a.title}</span>
                   {a.is_pinned && <Badge text="Pinned" color={GOLD} />}
-                  <Badge text={a.category} color="#3b82f6" />
+                  <Badge text={a.category} color="var(--color-info)" />
                 </div>
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>{a.content}</p>
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 8 }}>
                   {new Date(a.created_at).toLocaleDateString()} &bull; Posted by {a.author ? `${a.author.first_name} ${a.author.last_name}` : 'Administration'}
                 </div>
               </div>
-              <ActionButton icon={Icons.trash(14)} title="Delete Notice" color="#ef4444" onClick={() => handleDelete(a.id)} />
+              <ActionButton icon={Icons.trash(14)} title="Delete Notice" color="var(--color-danger)" onClick={() => handleDelete(a.id)} />
             </Card>
           ))
         )}
@@ -2298,7 +2298,7 @@ export default function AdminPortal() {
           }}
         >
           {sessions.map((s) => (
-            <option key={s.id} value={s.id} style={{ background: '#111625', color: 'var(--text-primary)' }}>
+            <option key={s.id} value={s.id} style={{ background: 'var(--bg-dropdown)', color: 'var(--text-primary)' }}>
               {s.name} {s.is_active ? '' : (s.status === 'archived' ? '(Archived)' : '')}
             </option>
           ))}
@@ -2347,11 +2347,11 @@ export default function AdminPortal() {
             display: 'flex', alignItems: 'center', gap: 8,
             width: '100%', padding: '9px 12px',
             background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
-            borderRadius: 10, cursor: 'pointer', color: '#fca5a5',
+            borderRadius: 10, cursor: 'pointer', color: 'var(--text-danger)',
             fontSize: '0.8rem', fontWeight: 600,
           }}
         >
-          {Icons.logout(16, '#fca5a5')} Sign Out
+          {Icons.logout(16, 'var(--text-danger)')} Sign Out
         </button>
       </div>
     </>
@@ -2368,7 +2368,7 @@ export default function AdminPortal() {
         {!isMobile && (
           <aside style={{
             width: 270, minHeight: '100vh',
-            background: '#0d111e',
+            background: 'var(--bg-sidebar)',
             borderRight: '1px solid var(--card-bg-hover)',
             display: 'flex', flexDirection: 'column',
             position: 'fixed', left: 0, top: 0, bottom: 0,
@@ -2384,7 +2384,7 @@ export default function AdminPortal() {
             <div onClick={() => setSidebarOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', zIndex: 998 }} />
             <aside style={{
               position: 'fixed', left: 0, top: 0, bottom: 0, width: 280, zIndex: 999,
-              background: '#0d111e', borderRight: '1px solid var(--border-color)',
+              background: 'var(--bg-sidebar)', borderRight: '1px solid var(--border-color)',
               display: 'flex', flexDirection: 'column',
             }}>
               {sidebarContent}
@@ -2402,7 +2402,7 @@ export default function AdminPortal() {
           {isMobile && (
             <div style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '14px 20px', background: '#0d111e', borderBottom: '1px solid var(--card-bg-hover)',
+              padding: '14px 20px', background: 'var(--bg-sidebar)', borderBottom: '1px solid var(--card-bg-hover)',
               position: 'sticky', top: 0, zIndex: 50,
             }}>
               <button onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-primary)', padding: 0 }}>

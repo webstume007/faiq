@@ -4,7 +4,7 @@ import Head from 'next/head';
 import { getCurrentUserSync, getPortalPath } from '../lib/auth';
 
 const GOLD = 'var(--accent-gold)';
-const NAVY = '#002147';
+const NAVY = 'var(--bg-sidebar)';
 
 const Icons = {
   book: (s = 24, c = 'currentColor') => (
@@ -53,7 +53,7 @@ const PROGRAMS = [
     name: 'Dars-e-Nizami (درس نظامی)',
     duration: '4 Academic Levels',
     icon: Icons.graduation,
-    color: '#3b82f6',
+    color: 'var(--color-info)',
     desc: 'Comprehensive Islamic scholarship curriculum: Pre 9th (Sanviya Aamah), 9th (Sanviya Khasa), 10th (Shahadah Aaliya), and 11th (Shahadah Aalmiya / Dora-e-Hadith).',
   },
 ];

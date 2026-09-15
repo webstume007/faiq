@@ -7,7 +7,7 @@ import { getStudentsByGuardian, submitChallanPayment, getActiveBankConfig, creat
 import { QURAN_SURAHS, QURAN_PARAS, formatAyahRange } from '../lib/quranData';
 
 const GOLD = 'var(--accent-gold)';
-const NAVY = '#002147';
+const NAVY = 'var(--bg-sidebar)';
 
 const Icons = {
   home: (size = 18, color = 'currentColor') => (
@@ -100,8 +100,8 @@ const Button = ({ children, onClick, variant = 'primary', style, disabled }) => 
   const variants = {
     primary: { background: `linear-gradient(135deg, ${GOLD}, #e09800)`, color: 'var(--bg-color)' },
     secondary: { background: 'var(--card-bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' },
-    success: { background: 'rgba(34,197,94,0.15)', color: '#86efac', border: '1px solid rgba(34,197,94,0.25)' },
-    danger: { background: 'rgba(239,68,68,0.15)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.25)' },
+    success: { background: 'rgba(34,197,94,0.15)', color: 'var(--text-success)', border: '1px solid rgba(34,197,94,0.25)' },
+    danger: { background: 'rgba(239,68,68,0.15)', color: 'var(--text-danger)', border: '1px solid rgba(239,68,68,0.25)' },
   };
   return (
     <button onClick={disabled ? undefined : onClick} style={{ ...baseStyle, ...variants[variant], ...style }}>{children}</button>
@@ -372,7 +372,7 @@ export default function GuardianPortal() {
             <p style={{ color: 'var(--text-secondary)', textAlign: 'center', marginBottom: 24, fontSize: '0.9rem' }}>
               Please provide the required details before accessing the parent portal.
             </p>
-            <form onSubmit={handleOnboardingSubmit} style={{ background: '#111625', padding: 24, borderRadius: 16, border: '1px solid var(--border-color)' }}>
+            <form onSubmit={handleOnboardingSubmit} style={{ background: 'var(--bg-dropdown)', padding: 24, borderRadius: 16, border: '1px solid var(--border-color)' }}>
               
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 20 }}>
                 <div style={{ width: 80, height: 80, borderRadius: 40, background: 'var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, overflow: 'hidden' }}>
@@ -406,7 +406,7 @@ export default function GuardianPortal() {
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Relationship to Student *</label>
-                  <select required value={onboardingForm.relation} onChange={e => setOnboardingForm(p => ({...p, relation: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: '#111625', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }}>
+                  <select required value={onboardingForm.relation} onChange={e => setOnboardingForm(p => ({...p, relation: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }}>
                     <option value="Father">Father</option>
                     <option value="Mother">Mother</option>
                     <option value="Guardian">Guardian</option>
@@ -455,7 +455,7 @@ export default function GuardianPortal() {
           <>
             {/* Global Header */}
             <header style={{
-              padding: '16px 24px', background: '#0d111e', borderBottom: '1px solid var(--card-bg-hover)',
+              padding: '16px 24px', background: 'var(--bg-sidebar)', borderBottom: '1px solid var(--card-bg-hover)',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -484,10 +484,10 @@ export default function GuardianPortal() {
                   style={{
                     display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', marginLeft: 10,
                     background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
-                    borderRadius: 8, color: '#fca5a5', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600,
+                    borderRadius: 8, color: 'var(--text-danger)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600,
                   }}
                 >
-                  {Icons.logOut(14, '#fca5a5')} Sign Out
+                  {Icons.logOut(14, 'var(--text-danger)')} Sign Out
                 </button>
               </div>
 
@@ -507,7 +507,7 @@ export default function GuardianPortal() {
                 position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', justifyContent: 'flex-end'
               }} onClick={() => setIsMobileMenuOpen(false)}>
                 <div style={{
-                  width: 280, background: '#0d111e', height: '100%', borderLeft: '1px solid var(--border-color)',
+                  width: 280, background: 'var(--bg-sidebar)', height: '100%', borderLeft: '1px solid var(--border-color)',
                   padding: 24, display: 'flex', flexDirection: 'column'
                 }} onClick={(e) => e.stopPropagation()}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
@@ -560,11 +560,11 @@ export default function GuardianPortal() {
                     style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px',
                       background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
-                      borderRadius: 10, color: '#fca5a5', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700,
+                      borderRadius: 10, color: 'var(--text-danger)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700,
                       marginTop: 'auto'
                     }}
                   >
-                    {Icons.logOut(18, '#fca5a5')} Sign Out
+                    {Icons.logOut(18, 'var(--text-danger)')} Sign Out
                   </button>
                 </div>
               </div>
@@ -604,7 +604,7 @@ export default function GuardianPortal() {
         {toastMsg && (
           <div style={{
             position: 'fixed', bottom: 24, right: 24, zIndex: 1000,
-            background: '#22c55e', color: 'var(--bg-color)', padding: '12px 20px',
+            background: 'var(--color-success)', color: 'var(--bg-color)', padding: '12px 20px',
             borderRadius: 12, fontWeight: 700, fontSize: '0.88rem',
             boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
           }}>
@@ -620,14 +620,14 @@ export default function GuardianPortal() {
               border: '2px solid rgba(239,68,68,0.5)', borderRadius: 16, padding: '16px 20px',
               marginBottom: 20, display: 'flex', alignItems: 'center', gap: 14,
             }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--color-danger)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {Icons.flag(24, 'var(--text-primary)')}
               </div>
               <div>
-                <div style={{ fontSize: '0.98rem', fontWeight: 800, color: '#fca5a5' }}>
+                <div style={{ fontSize: '0.98rem', fontWeight: 800, color: 'var(--text-danger)' }}>
                   Urgent Notice: {currentChild.studentName} has {currentChild.activeAbsenceFlag.consecutive_absences} Consecutive Absences
                 </div>
-                <div style={{ fontSize: '0.82rem', color: '#e2e8f0', marginTop: 3 }}>
+                <div style={{ fontSize: '0.82rem', color: 'var(--text-primary)', marginTop: 3 }}>
                   Please visit the Al-Faiq administration office as soon as possible regarding your child's continuous absence.
                 </div>
               </div>
@@ -645,7 +645,7 @@ export default function GuardianPortal() {
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <span style={{ fontSize: '1.15rem', fontWeight: 800 }}>{currentChild?.studentName}</span>
-                      <Badge text={currentChild?.programType === 'hifz' ? 'Hifz Ul Quran' : 'Dars-e-Nizami'} color={currentChild?.programType === 'hifz' ? GOLD : '#3b82f6'} />
+                      <Badge text={currentChild?.programType === 'hifz' ? 'Hifz Ul Quran' : 'Dars-e-Nizami'} color={currentChild?.programType === 'hifz' ? GOLD : 'var(--color-info)'} />
                     </div>
                     <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 2 }}>
                       Roll No: <strong style={{ color: GOLD }}>{currentChild?.rollNo}</strong> &bull; Class: {currentChild?.classSection}
@@ -660,7 +660,7 @@ export default function GuardianPortal() {
                       value={selectedChildIndex}
                       onChange={(e) => setSelectedChildIndex(Number(e.target.value))}
                       style={{
-                        padding: '8px 12px', background: '#111625', border: '1px solid rgba(242,169,0,0.4)',
+                        padding: '8px 12px', background: 'var(--bg-dropdown)', border: '1px solid rgba(242,169,0,0.4)',
                         borderRadius: 10, color: GOLD, fontWeight: 700, fontSize: '0.82rem', outline: 'none',
                       }}
                     >
@@ -686,7 +686,7 @@ export default function GuardianPortal() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
                 <Card>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', fontWeight: 700 }}>OVERALL ATTENDANCE</div>
-                  <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#22c55e', marginTop: 4 }}>
+                  <div style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--color-success)', marginTop: 4 }}>
                     {currentChild?.overallAttendance || '100%'}
                   </div>
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 2 }}>
@@ -706,7 +706,7 @@ export default function GuardianPortal() {
                   </Card>
                 ) : (
                   <Card>
-                    <div style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 700 }}>DARS-E-NIZAMI CLASS</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-info)', fontWeight: 700 }}>DARS-E-NIZAMI CLASS</div>
                     <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: 6 }}>
                       {currentChild?.class?.class_name || 'Sanviya Aamah'}
                     </div>
@@ -725,7 +725,7 @@ export default function GuardianPortal() {
                       {Icons.book(20, GOLD)}
                       <h3 style={{ margin: 0, fontSize: '1.05rem', color: GOLD, fontWeight: 800 }}>Latest Sabaq & Memorization</h3>
                     </div>
-                    <Badge text={currentChild.hifz.todaySabaq.sabaq_quality} color="#22c55e" />
+                    <Badge text={currentChild.hifz.todaySabaq.sabaq_quality} color="var(--color-success)" />
                   </div>
                   <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
                     {formatAyahRange(currentChild.hifz.todaySabaq.sabaq_surah_start, currentChild.hifz.todaySabaq.sabaq_ayah_start, currentChild.hifz.todaySabaq.sabaq_surah_end, currentChild.hifz.todaySabaq.sabaq_ayah_end)}
@@ -776,7 +776,7 @@ export default function GuardianPortal() {
                           padding: '8px 4px', textAlign: 'center', borderRadius: 8,
                           background: isRevised ? 'rgba(34,197,94,0.2)' : 'var(--card-bg)',
                           border: isRevised ? '1px solid #22c55e' : '1px solid var(--border-color)',
-                          color: isRevised ? '#86efac' : 'var(--text-tertiary)',
+                          color: isRevised ? 'var(--text-success)' : 'var(--text-tertiary)',
                         }}
                       >
                         <div style={{ fontSize: '0.7rem', fontWeight: 700 }}>Para {p.number}</div>
@@ -800,7 +800,7 @@ export default function GuardianPortal() {
                         <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>Date: {r.date}</div>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <Badge text={r.sabaq_quality} color="#22c55e" />
+                        <Badge text={r.sabaq_quality} color="var(--color-success)" />
                         <span style={{ fontWeight: 900, color: GOLD }}>{r.overall_grade}</span>
                       </div>
                     </div>
@@ -813,7 +813,7 @@ export default function GuardianPortal() {
           {/* TAB: TEST RESULTS (Dars-e-Nizami) */}
           {activeTab === 'results' && (
             <div>
-              <h2 style={{ fontSize: '1.3rem', fontWeight: 800, margin: '0 0 16px 0', color: '#3b82f6' }}>
+              <h2 style={{ fontSize: '1.3rem', fontWeight: 800, margin: '0 0 16px 0', color: 'var(--color-info)' }}>
                 Academic & Examination Test Results
               </h2>
 
@@ -830,7 +830,7 @@ export default function GuardianPortal() {
                       <div style={{ fontSize: '1.2rem', fontWeight: 900, color: GOLD }}>
                         {res.marksObtained} <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>/ {res.totalMarks}</span>
                       </div>
-                      <Badge text={`Grade ${res.grade}`} color="#22c55e" />
+                      <Badge text={`Grade ${res.grade}`} color="var(--color-success)" />
                     </div>
                   </Card>
                 ))}
@@ -849,7 +849,7 @@ export default function GuardianPortal() {
                       <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>{att.date}</div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{att.subject}</div>
                     </div>
-                    <Badge text={att.status} color={att.status.toLowerCase() === 'present' ? '#22c55e' : '#ef4444'} />
+                    <Badge text={att.status} color={att.status.toLowerCase() === 'present' ? 'var(--color-success)' : 'var(--color-danger)'} />
                   </Card>
                 ))}
               </div>
@@ -904,7 +904,7 @@ export default function GuardianPortal() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <Badge
                         text={ch.status === 'paid' ? 'Paid' : (ch.status === 'pending_verification' ? 'Pending Verification' : 'Unpaid')}
-                        color={ch.status === 'paid' ? '#22c55e' : (ch.status === 'pending_verification' ? '#f97316' : '#ef4444')}
+                        color={ch.status === 'paid' ? 'var(--color-success)' : (ch.status === 'pending_verification' ? 'var(--color-warning)' : 'var(--color-danger)')}
                       />
                       {ch.status === 'unpaid' && (
                         <Button onClick={() => setPayingChallan(ch)} style={{ padding: '8px 16px' }}>
@@ -931,7 +931,7 @@ export default function GuardianPortal() {
                         Code: {s.code} &bull; Scholar: <strong style={{ color: GOLD }}>{s.teacher}</strong>
                       </div>
                     </div>
-                    <Badge text="Enrolled" color="#22c55e" />
+                    <Badge text="Enrolled" color="var(--color-success)" />
                   </Card>
                 ))}
               </div>
@@ -945,7 +945,7 @@ export default function GuardianPortal() {
             position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.7)',
             backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
           }}>
-            <div style={{ background: '#111625', border: '1px solid var(--border-color)', borderRadius: 20, width: '100%', maxWidth: 500, padding: 24 }}>
+            <div style={{ background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 20, width: '100%', maxWidth: 500, padding: 24 }}>
               <h3 style={{ margin: '0 0 12px 0', fontSize: '1.1rem', color: GOLD }}>Submit Fee Payment</h3>
               <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
                 Please transfer <strong>Rs. {Number(payingChallan.amount).toLocaleString()}</strong> to the institute bank account and enter the <strong>Transaction ID (TID)</strong> below:
@@ -981,7 +981,7 @@ export default function GuardianPortal() {
             position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.75)',
             backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
           }}>
-            <div style={{ background: '#111625', border: '1px solid var(--border-color)', borderRadius: 20, width: '100%', maxWidth: 560, padding: 24 }}>
+            <div style={{ background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 20, width: '100%', maxWidth: 560, padding: 24 }}>
               <h3 style={{ margin: '0 0 8px 0', fontSize: '1.15rem', color: GOLD }}>Apply for Student Admission</h3>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 16 }}>
                 Fill out the applicant details for admission into Hifz Ul Quran or Dars-e-Nizami.
@@ -1018,7 +1018,7 @@ export default function GuardianPortal() {
                       course_type: e.target.value,
                       desired_course: e.target.value === 'hifz' ? 'Hifz Ul Quran' : 'Pre 9th / Sanviya Aamah',
                     }))}
-                    style={{ width: '100%', padding: '9px 12px', background: '#111625', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }}
+                    style={{ width: '100%', padding: '9px 12px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }}
                   >
                     <option value="hifz">Hifz Ul Quran</option>
                     <option value="dars_nizami">Dars-e-Nizami</option>
@@ -1029,7 +1029,7 @@ export default function GuardianPortal() {
                   <select
                     value={admissionForm.desired_course}
                     onChange={(e) => setAdmissionForm((p) => ({ ...p, desired_course: e.target.value }))}
-                    style={{ width: '100%', padding: '9px 12px', background: '#111625', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }}
+                    style={{ width: '100%', padding: '9px 12px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }}
                   >
                     {admissionForm.course_type === 'hifz' ? (
                       <option value="Hifz Ul Quran">Hifz Ul Quran (حفظ القرآن)</option>

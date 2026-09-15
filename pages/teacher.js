@@ -6,7 +6,7 @@ import * as db from '../lib/db';
 import { QURAN_SURAHS, QURAN_PARAS, formatAyahRange } from '../lib/quranData';
 
 const GOLD = 'var(--accent-gold)';
-const NAVY = '#002147';
+const NAVY = 'var(--bg-sidebar)';
 
 const Icons = {
   dashboard: (s = 20, c = 'currentColor') => (
@@ -65,8 +65,8 @@ const Button = ({ children, onClick, variant = 'primary', style, disabled }) => 
   const variants = {
     primary: { background: `linear-gradient(135deg, ${GOLD}, #e09800)`, color: 'var(--bg-color)' },
     secondary: { background: 'var(--card-bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' },
-    danger: { background: 'rgba(239,68,68,0.15)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.25)' },
-    success: { background: 'rgba(34,197,94,0.15)', color: '#86efac', border: '1px solid rgba(34,197,94,0.25)' },
+    danger: { background: 'rgba(239,68,68,0.15)', color: 'var(--text-danger)', border: '1px solid rgba(239,68,68,0.25)' },
+    success: { background: 'rgba(34,197,94,0.15)', color: 'var(--text-success)', border: '1px solid rgba(34,197,94,0.25)' },
   };
   return (
     <button onClick={disabled ? undefined : onClick} style={{ ...baseStyle, ...variants[variant], ...style }}>{children}</button>
@@ -280,7 +280,7 @@ export default function TeacherPortal() {
       <div style={{ minHeight: '100vh', background: 'var(--bg-color)', fontFamily: "'Inter', sans-serif", color: 'var(--text-primary)' }}>
         {/* Global Header */}
         <header style={{
-          padding: '16px 28px', background: '#0d111e',
+          padding: '16px 28px', background: 'var(--bg-sidebar)',
           borderBottom: '1px solid var(--card-bg-hover)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           position: 'sticky', top: 0, zIndex: 100,
@@ -303,10 +303,10 @@ export default function TeacherPortal() {
               style={{
                 display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px',
                 background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
-                borderRadius: 10, color: '#fca5a5', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600,
+                borderRadius: 10, color: 'var(--text-danger)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600,
               }}
             >
-              {Icons.logout(14, '#fca5a5')} Sign Out
+              {Icons.logout(14, 'var(--text-danger)')} Sign Out
             </button>
           </div>
         </header>
@@ -343,7 +343,7 @@ export default function TeacherPortal() {
         {toastMsg && (
           <div style={{
             position: 'fixed', bottom: 24, right: 24, zIndex: 1000,
-            background: '#22c55e', color: 'var(--bg-color)', padding: '12px 20px',
+            background: 'var(--color-success)', color: 'var(--bg-color)', padding: '12px 20px',
             borderRadius: 12, fontWeight: 700, fontSize: '0.88rem',
             boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
           }}>
@@ -366,7 +366,7 @@ export default function TeacherPortal() {
                   value={selectedClassId}
                   onChange={(e) => setSelectedClassId(e.target.value)}
                   style={{
-                    padding: '8px 12px', background: '#111625', border: '1px solid var(--border-color)',
+                    padding: '8px 12px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)',
                     borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none',
                   }}
                 >
@@ -385,7 +385,7 @@ export default function TeacherPortal() {
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
                   style={{
-                    padding: '8px 12px', background: '#111625', border: '1px solid var(--border-color)',
+                    padding: '8px 12px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)',
                     borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none',
                   }}
                 />
@@ -409,7 +409,7 @@ export default function TeacherPortal() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
                         <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: '0 0 4px 0' }}>{c.class_name}</h3>
-                        <Badge text={c.course?.course_code || 'Class'} color={c.course?.course_type === 'hifz' ? GOLD : '#3b82f6'} />
+                        <Badge text={c.course?.course_code || 'Class'} color={c.course?.course_type === 'hifz' ? GOLD : 'var(--color-info)'} />
                       </div>
                       <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>Section {c.section}</span>
                     </div>
@@ -473,7 +473,7 @@ export default function TeacherPortal() {
                                 ...p,
                                 [st.id]: { ...p[st.id], overall_grade: e.target.value },
                               }))}
-                              style={{ padding: '6px 10px', background: '#111625', border: '1px solid rgba(242,169,0,0.4)', borderRadius: 8, color: GOLD, fontWeight: 700, outline: 'none' }}
+                              style={{ padding: '6px 10px', background: 'var(--bg-dropdown)', border: '1px solid rgba(242,169,0,0.4)', borderRadius: 8, color: GOLD, fontWeight: 700, outline: 'none' }}
                             >
                               {['A+', 'A', 'B', 'C', 'D', 'F'].map((g) => <option key={g} value={g}>{g}</option>)}
                             </select>
@@ -491,7 +491,7 @@ export default function TeacherPortal() {
                                 ...p,
                                 [st.id]: { ...p[st.id], sabaq_surah_start: Number(e.target.value) },
                               }))}
-                              style={{ width: '100%', padding: '8px 10px', background: '#111625', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.82rem', outline: 'none' }}
+                              style={{ width: '100%', padding: '8px 10px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.82rem', outline: 'none' }}
                             >
                               {QURAN_SURAHS.map((s) => (
                                 <option key={s.number} value={s.number}>
@@ -514,7 +514,7 @@ export default function TeacherPortal() {
                                   ...p,
                                   [st.id]: { ...p[st.id], sabaq_ayah_start: e.target.value },
                                 }))}
-                                style={{ width: '100%', padding: '8px 10px', background: '#111625', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.82rem', outline: 'none' }}
+                                style={{ width: '100%', padding: '8px 10px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.82rem', outline: 'none' }}
                               />
                             </div>
                             <div style={{ flex: 1 }}>
@@ -528,7 +528,7 @@ export default function TeacherPortal() {
                                   ...p,
                                   [st.id]: { ...p[st.id], sabaq_ayah_end: e.target.value },
                                 }))}
-                                style={{ width: '100%', padding: '8px 10px', background: '#111625', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.82rem', outline: 'none' }}
+                                style={{ width: '100%', padding: '8px 10px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.82rem', outline: 'none' }}
                               />
                             </div>
                           </div>
@@ -542,7 +542,7 @@ export default function TeacherPortal() {
                                 ...p,
                                 [st.id]: { ...p[st.id], sabaq_quality: e.target.value },
                               }))}
-                              style={{ width: '100%', padding: '8px 10px', background: '#111625', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.82rem', outline: 'none' }}
+                              style={{ width: '100%', padding: '8px 10px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.82rem', outline: 'none' }}
                             >
                               <option value="excellent">Mumtaz / Excellent (ممتاز)</option>
                               <option value="good">Jayyid Jiddan / Good (جيد جداً)</option>
@@ -560,7 +560,7 @@ export default function TeacherPortal() {
                                 ...p,
                                 [st.id]: { ...p[st.id], manzil_para: Number(e.target.value) },
                               }))}
-                              style={{ width: '100%', padding: '8px 10px', background: '#111625', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.82rem', outline: 'none' }}
+                              style={{ width: '100%', padding: '8px 10px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.82rem', outline: 'none' }}
                             >
                               {QURAN_PARAS.map((p) => (
                                 <option key={p.number} value={p.number}>
@@ -582,7 +582,7 @@ export default function TeacherPortal() {
                               [st.id]: { ...p[st.id], sabaq_notes: e.target.value },
                             }))}
                             style={{
-                              width: '100%', padding: '8px 12px', background: '#111625',
+                              width: '100%', padding: '8px 12px', background: 'var(--bg-dropdown)',
                               border: '1px solid var(--card-bg-hover)', borderRadius: 8,
                               color: 'var(--text-primary)', fontSize: '0.8rem', outline: 'none',
                             }}
@@ -638,9 +638,9 @@ export default function TeacherPortal() {
                       {/* Status Toggle Buttons */}
                       <div style={{ display: 'flex', gap: 6 }}>
                         {[
-                          { id: 'present', label: 'Present', color: '#22c55e' },
-                          { id: 'absent', label: 'Absent', color: '#ef4444' },
-                          { id: 'leave', label: 'Leave', color: '#f97316' },
+                          { id: 'present', label: 'Present', color: 'var(--color-success)' },
+                          { id: 'absent', label: 'Absent', color: 'var(--color-danger)' },
+                          { id: 'leave', label: 'Leave', color: 'var(--color-warning)' },
                         ].map((btn) => (
                           <button
                             key={btn.id}
@@ -685,7 +685,7 @@ export default function TeacherPortal() {
                   <select
                     value={selectedTestId}
                     onChange={(e) => setSelectedTestId(e.target.value)}
-                    style={{ width: '100%', padding: '10px', background: '#111625', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none' }}
+                    style={{ width: '100%', padding: '10px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none' }}
                   >
                     <option value="">Select Test Session...</option>
                     {testSessions.map((t) => (
@@ -699,7 +699,7 @@ export default function TeacherPortal() {
                   <select
                     value={selectedSubjectId}
                     onChange={(e) => setSelectedSubjectId(e.target.value)}
-                    style={{ width: '100%', padding: '10px', background: '#111625', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none' }}
+                    style={{ width: '100%', padding: '10px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none' }}
                   >
                     <option value="">Select Subject...</option>
                     {selectedClass?.subjects?.map((s) => (
@@ -729,7 +729,7 @@ export default function TeacherPortal() {
                             ...p,
                             [st.id]: { ...p[st.id], obtained: e.target.value },
                           }))}
-                          style={{ width: 90, padding: '8px', background: '#111625', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', textAlign: 'center', fontWeight: 700 }}
+                          style={{ width: 90, padding: '8px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', textAlign: 'center', fontWeight: 700 }}
                         />
                       </div>
                       <span style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>/</span>
@@ -742,7 +742,7 @@ export default function TeacherPortal() {
                             ...p,
                             [st.id]: { ...p[st.id], total: e.target.value },
                           }))}
-                          style={{ width: 80, padding: '8px', background: '#111625', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', textAlign: 'center' }}
+                          style={{ width: 80, padding: '8px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', textAlign: 'center' }}
                         />
                       </div>
                     </div>

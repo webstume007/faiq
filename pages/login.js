@@ -573,7 +573,7 @@ export default function LoginPage() {
             {/* Status Message */}
             {message.text && (
               <div style={styles.message(message.type)}>
-                {message.type === 'error' ? Icons.alertCircle(18, '#fca5a5') : Icons.checkCircle(18, '#86efac')}
+                {message.type === 'error' ? Icons.alertCircle(18, 'var(--text-danger)') : Icons.checkCircle(18, 'var(--text-success)')}
                 <span>{message.text}</span>
               </div>
             )}
@@ -864,7 +864,7 @@ const styles = {
     borderRadius: 10, fontSize: '0.84rem', fontWeight: 500, marginBottom: 20,
     background: type === 'error' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(34, 197, 94, 0.12)',
     border: `1px solid ${type === 'error' ? 'rgba(239, 68, 68, 0.25)' : 'rgba(34, 197, 94, 0.25)'}`,
-    color: type === 'error' ? '#fca5a5' : '#86efac',
+    color: type === 'error' ? 'var(--text-danger)' : 'var(--text-success)',
   }),
   inputRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
   otpHint: { textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 4 },

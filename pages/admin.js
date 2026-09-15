@@ -2445,7 +2445,7 @@ export default function AdminPortal() {
         *::-webkit-scrollbar-track { background: transparent; }
         *::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
 
-        .mobile-show-only { display: none; }
+        .mobile-show-only { display: none !important; }
         @media (max-width: 960px) {
           .desktop-hide-on-mobile { display: none !important; }
           .mobile-show-only { display: flex !important; }

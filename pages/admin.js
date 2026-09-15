@@ -747,6 +747,29 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
     loadData();
   };
 
+  const handleDeleteSession = async (sessionId) => {
+    const confirmation = prompt('Type "Delete" to confirm session deletion:');
+    if (confirmation === 'Delete') {
+      await db.deleteSession(sessionId, user.id);
+      loadData();
+      if (activeSession?.id === sessionId) onSessionChange && onSessionChange();
+    } else if (confirmation !== null) {
+      alert('Deletion cancelled: You must type exactly "Delete".');
+    }
+  };
+
+  const handleEditFees = async (sessionId, currentFees) => {
+    const hifz = prompt('Enter Hifz Ul Quran Monthly Fee (Rs):', currentFees?.hifz_monthly || 4000);
+    if (hifz === null) return;
+    const dars = prompt('Enter Dars-e-Nizami Monthly Fee (Rs):', currentFees?.dars_monthly || 5000);
+    if (dars === null) return;
+    
+    await db.updateSession(sessionId, {
+      fee_structure: { hifz_monthly: Number(hifz), dars_monthly: Number(dars) }
+    }, user.id);
+    loadData();
+  };
+
   return (
     <div>
       <SectionHeader
@@ -800,30 +823,82 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
 
             {isExpanded && (
               <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.06)' }} onClick={(e) => e.stopPropagation()}>
-                {/* Courses / Programs */}
+                
+                {/* Fee Structure Display & Actions */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, padding: 12, background: 'rgba(255,255,255,0.03)', borderRadius: 10 }}>
+                  <div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: GOLD, textTransform: 'uppercase', marginBottom: 6, letterSpacing: '0.08em' }}>Monthly Fee Structure</div>
+                    <div style={{ display: 'flex', gap: 16 }}>
+                      <div style={{ fontSize: '0.85rem', color: '#fff' }}><span style={{ color: 'rgba(255,255,255,0.5)' }}>Hifz:</span> Rs {session.fee_structure?.hifz_monthly || 0}</div>
+                      <div style={{ fontSize: '0.85rem', color: '#fff' }}><span style={{ color: 'rgba(255,255,255,0.5)' }}>Dars-e-Nizami:</span> Rs {session.fee_structure?.dars_monthly || 0}</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <Button variant="secondary" onClick={() => handleEditFees(session.id, session.fee_structure)} style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
+                      {Icons.edit(14)} Edit Fees
+                    </Button>
+                    <Button variant="danger" onClick={() => handleDeleteSession(session.id)} style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
+                      {Icons.trash(14)} Delete Session
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Courses / Programs UI Enhancement */}
                 <div style={{ fontSize: '0.75rem', fontWeight: 700, color: GOLD, textTransform: 'uppercase', marginBottom: 10, letterSpacing: '0.08em' }}>
                   Academic Programs in this Session
                 </div>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12, marginBottom: 24 }}>
                   {sessionCourses.map((c) => (
-                    <Badge key={c.id} text={`${c.course_code} — ${c.course_name}`} color={c.course_type === 'hifz' ? GOLD : '#3b82f6'} />
+                    <div key={c.id} style={{
+                      background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)',
+                      padding: '12px 14px', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 12
+                    }}>
+                      <div style={{ width: 36, height: 36, borderRadius: 8, background: c.course_type === 'hifz' ? `${GOLD}20` : 'rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {Icons.book(18, c.course_type === 'hifz' ? GOLD : '#3b82f6')}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff' }}>{c.course_name}</div>
+                        <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginTop: 2, textTransform: 'uppercase' }}>{c.course_code} &bull; {c.course_type}</div>
+                      </div>
+                    </div>
                   ))}
                 </div>
 
-                {/* Classes Table */}
+                {/* Classes Table (Responsive) */}
                 <div style={{ fontSize: '0.75rem', fontWeight: 700, color: GOLD, textTransform: 'uppercase', marginBottom: 10, letterSpacing: '0.08em' }}>
                   Enrolled Classes & Assigned Teachers
                 </div>
-                <Table
-                  columns={[
-                    { key: 'class_name', label: 'Class / Halqa' },
-                    { key: 'section', label: 'Section' },
-                    { key: 'course', label: 'Program', render: (r) => r.course ? `${r.course.course_code} (${r.course.course_type === 'hifz' ? 'Hifz' : 'Dars-e-Nizami'})` : '—' },
-                    { key: 'incharge', label: 'Incharge Scholar', render: (r) => r.incharge?.user ? `${r.incharge.user.first_name} ${r.incharge.user.last_name}` : 'Assigned' },
-                    { key: 'max_students', label: 'Capacity' },
-                  ]}
-                  data={sessionClasses}
-                />
+                
+                <div className="desktop-hide-on-mobile">
+                  <Table
+                    columns={[
+                      { key: 'class_name', label: 'Class / Halqa' },
+                      { key: 'section', label: 'Section' },
+                      { key: 'course', label: 'Program', render: (r) => r.course ? `${r.course.course_code} (${r.course.course_type === 'hifz' ? 'Hifz' : 'Dars-e-Nizami'})` : '—' },
+                      { key: 'incharge', label: 'Incharge Scholar', render: (r) => r.incharge?.user ? `${r.incharge.user.first_name} ${r.incharge.user.last_name}` : 'Assigned' },
+                      { key: 'max_students', label: 'Capacity' },
+                    ]}
+                    data={sessionClasses}
+                  />
+                </div>
+                
+                <div className="mobile-show-only" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {sessionClasses.map((cl) => (
+                    <div key={cl.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: 14 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>{cl.class_name} <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem' }}>({cl.section})</span></div>
+                        <Badge text={cl.course?.course_type === 'hifz' ? 'Hifz' : 'Dars'} color={cl.course?.course_type === 'hifz' ? GOLD : '#3b82f6'} />
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>
+                        <strong>Scholar:</strong> {cl.incharge?.user ? `${cl.incharge.user.first_name} ${cl.incharge.user.last_name}` : 'Pending Assignment'}
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)' }}>
+                        <strong>Capacity:</strong> {cl.max_students} Students
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
               </div>
             )}
           </Card>

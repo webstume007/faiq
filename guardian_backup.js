@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { getCurrentUser, logout } from '../lib/auth';
@@ -185,8 +185,8 @@ export default function GuardianPortal() {
   return (
     <>
       <Head>
-        <title>Guardian Portal - Al-Faeq Education System</title>
-        <link rel="icon" href="/faeq-logo.png" />
+        <title>Guardian Portal - Al-Faiq Education System</title>
+        <link rel="icon" href="/faiq-logo.png" />
       </Head>
 
       <div style={styles.page}>
@@ -198,9 +198,9 @@ export default function GuardianPortal() {
           <div style={styles.headerContainer}>
             <div style={styles.brandGroup}>
               <div style={styles.logoBox}>
-                <img src="/faeq-logo.png" alt="Al-Faeq Logo" style={styles.logoImg} />
+                <img src="/faiq-logo.png" alt="Al-Faiq Logo" style={styles.logoImg} />
               </div>
-              <h1 style={styles.brandTitle}>Al-Faeq Education System</h1>
+              <h1 style={styles.brandTitle}>Al-Faiq Education System</h1>
             </div>
             
             <div style={styles.headerActions}>

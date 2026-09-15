@@ -353,7 +353,7 @@ export default function GuardianPortal() {
   return (
     <>
       <Head>
-        <title>Parent Portal — Al-Faeq Islamic Education System</title>
+        <title>Parent Portal — Al-Faiq Islamic Education System</title>
         <style>{`
           .mobile-hide { display: flex; }
           .desktop-hide { display: none; }
@@ -459,9 +459,9 @@ export default function GuardianPortal() {
               display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <img src="/faeq-logo.png" alt="" style={{ width: 34, height: 34, borderRadius: 10 }} />
+                <img src="/faiq-logo.png" alt="" style={{ width: 34, height: 34, borderRadius: 10 }} />
                 <div>
-                  <div style={{ fontSize: '0.92rem', fontWeight: 800 }}>Al-Faeq Education</div>
+                  <div style={{ fontSize: '0.92rem', fontWeight: 800 }}>Al-Faiq Education</div>
                   <div style={{ fontSize: '0.68rem', color: GOLD, fontWeight: 700 }}>Parent / Guardian Portal</div>
                 </div>
               </div>
@@ -628,7 +628,7 @@ export default function GuardianPortal() {
                   Urgent Notice: {currentChild.studentName} has {currentChild.activeAbsenceFlag.consecutive_absences} Consecutive Absences
                 </div>
                 <div style={{ fontSize: '0.82rem', color: '#e2e8f0', marginTop: 3 }}>
-                  Please visit the Al-Faeq administration office as soon as possible regarding your child's continuous absence.
+                  Please visit the Al-Faiq administration office as soon as possible regarding your child's continuous absence.
                 </div>
               </div>
             </div>

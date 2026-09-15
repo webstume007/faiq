@@ -87,8 +87,8 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Al-Faeq Islamic Institute — Excellence in Islamic Education</title>
-        <meta name="description" content="Al-Faeq Education System offers Hifz Ul Quran with daily Sabaq/Manzil tracking and Dars-e-Nizami scholarship programs." />
+        <title>Al-Faiq Islamic Institute — Excellence in Islamic Education</title>
+        <meta name="description" content="Al-Faiq Education System offers Hifz Ul Quran with daily Sabaq/Manzil tracking and Dars-e-Nizami scholarship programs." />
       </Head>
 
       <div style={{ background: '#0a0e1a', color: '#fff', fontFamily: "'Inter', sans-serif", minHeight: '100vh' }}>
@@ -103,9 +103,9 @@ export default function Home() {
           transition: 'all 0.3s ease',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <img src="/faeq-logo.png" alt="Al-Faeq Logo" style={{ width: 40, height: 40, borderRadius: 12, objectFit: 'cover' }} />
+            <img src="/faiq-logo.png" alt="Al-Faiq Logo" style={{ width: 40, height: 40, borderRadius: 12, objectFit: 'cover' }} />
             <div>
-              <div style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>Al-Faeq Institute</div>
+              <div style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>Al-Faiq Institute</div>
               <div style={{ fontSize: '0.68rem', color: GOLD, fontWeight: 700, letterSpacing: '0.08em' }}>ISLAMIC EDUCATION SYSTEM</div>
             </div>
           </div>
@@ -142,8 +142,8 @@ export default function Home() {
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
             padding: '12px 16px 2px',
           }}>
-            <img src="/faeq-logo.png" alt="Al-Faeq Logo" style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'cover' }} />
-            <span style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>Al-Faeq Institute</span>
+            <img src="/faiq-logo.png" alt="Al-Faiq Logo" style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'cover' }} />
+            <span style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>Al-Faiq Institute</span>
           </div>
 
           {/* Islamic Education System */}
@@ -230,7 +230,7 @@ export default function Home() {
               fontSize: '1.1rem', color: 'rgba(255,255,255,0.6)',
               lineHeight: 1.6, maxWidth: 640, margin: '0 auto 36px',
             }}>
-              Al-Faeq delivers authentic Quranic memorization with daily Surah & Ayah-level tracking, alongside the classical Dars-e-Nizami curriculum with real-time guardian visibility.
+              Al-Faiq delivers authentic Quranic memorization with daily Surah & Ayah-level tracking, alongside the classical Dars-e-Nizami curriculum with real-time guardian visibility.
             </p>
 
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -323,11 +323,11 @@ export default function Home() {
         {/* Footer */}
         <footer id="about" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '40px 24px', textAlign: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 12 }}>
-            <img src="/faeq-logo.png" alt="" style={{ width: 28, height: 28, borderRadius: 8 }} />
-            <span style={{ fontWeight: 800, fontSize: '0.95rem' }}>Al-Faeq Islamic Institute</span>
+            <img src="/faiq-logo.png" alt="" style={{ width: 28, height: 28, borderRadius: 8 }} />
+            <span style={{ fontWeight: 800, fontSize: '0.95rem' }}>Al-Faiq Islamic Institute</span>
           </div>
           <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.78rem', margin: 0 }}>
-            &copy; {new Date().getFullYear()} Al-Faeq Islamic Education System. All rights reserved.
+            &copy; {new Date().getFullYear()} Al-Faiq Islamic Education System. All rights reserved.
           </p>
         </footer>
       </div>

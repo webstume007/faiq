@@ -920,7 +920,7 @@ function StudentsSection({ user, activeSession }) {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `Al_Faeq_Students_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `Al_Faiq_Students_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -1449,7 +1449,7 @@ function SettingsSection({ user }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
           <InputField label="Bank Name" value={bank.bank_name} onChange={(e) => setBank((p) => ({ ...p, bank_name: e.target.value }))} placeholder="e.g. Meezan Bank Ltd." required />
-          <InputField label="Account Title" value={bank.account_title} onChange={(e) => setBank((p) => ({ ...p, account_title: e.target.value }))} placeholder="e.g. Al-Faeq Islamic Institute" required />
+          <InputField label="Account Title" value={bank.account_title} onChange={(e) => setBank((p) => ({ ...p, account_title: e.target.value }))} placeholder="e.g. Al-Faiq Islamic Institute" required />
           <InputField label="Account Number" value={bank.account_number} onChange={(e) => setBank((p) => ({ ...p, account_number: e.target.value }))} placeholder="01020304050607" required />
           <InputField label="Branch Name" value={bank.branch_name} onChange={(e) => setBank((p) => ({ ...p, branch_name: e.target.value }))} placeholder="Main Branch" />
         </div>
@@ -1610,9 +1610,9 @@ export default function AdminPortal() {
     <>
       {/* Brand Header */}
       <div style={{ padding: '24px 20px 20px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <img src="/faeq-logo.png" alt="Al-Faeq" style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'cover' }} />
+        <img src="/faiq-logo.png" alt="Al-Faiq" style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'cover' }} />
         <div>
-          <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#fff', lineHeight: 1.1 }}>Al-Faeq Institute</div>
+          <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#fff', lineHeight: 1.1 }}>Al-Faiq Institute</div>
           <div style={{ fontSize: '0.68rem', color: GOLD, fontWeight: 700, marginTop: 2 }}>Islamic Education System</div>
         </div>
       </div>
@@ -1697,7 +1697,7 @@ export default function AdminPortal() {
   return (
     <>
       <Head>
-        <title>Admin Dashboard — Al-Faeq Islamic Education System</title>
+        <title>Admin Dashboard — Al-Faiq Islamic Education System</title>
       </Head>
 
       <div style={{ display: 'flex', minHeight: '100vh', background: '#0a0e1a', fontFamily: "'Inter', sans-serif" }}>
@@ -1746,8 +1746,8 @@ export default function AdminPortal() {
                 {Icons.menu(24)}
               </button>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <img src="/faeq-logo.png" alt="" style={{ width: 28, height: 28, borderRadius: 8 }} />
-                <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#fff' }}>Al-Faeq Admin</span>
+                <img src="/faiq-logo.png" alt="" style={{ width: 28, height: 28, borderRadius: 8 }} />
+                <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#fff' }}>Al-Faiq Admin</span>
               </div>
               <div style={{ width: 24 }} />
             </div>

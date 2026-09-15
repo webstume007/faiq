@@ -538,19 +538,28 @@ export default function GuardianPortal() {
             {/* Mobile Top Header (Hidden on Desktop) */}
             <div className="mobile-show-only" style={{
               alignItems: 'center', justifyContent: 'space-between',
-              padding: '14px 20px', background: '#0d111e', borderBottom: '1px solid rgba(255,255,255,0.06)',
+              padding: '12px 16px', background: '#0d111e', borderBottom: '1px solid rgba(255,255,255,0.06)',
               position: 'sticky', top: 0, zIndex: 50,
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <img src="/faiq-logo.png" alt="" style={{ width: 28, height: 28, borderRadius: 8 }} />
-                <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#fff' }}>Parent Portal</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                {guardianProfile?.profile_picture_url ? (
+                  <img src={guardianProfile.profile_picture_url} style={{ width: 36, height: 36, borderRadius: 18, objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ width: 36, height: 36, borderRadius: 18, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {Icons.user(18, 'rgba(255,255,255,0.6)')}
+                  </div>
+                )}
+                <div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fff' }}>{user.first_name} {user.last_name}</div>
+                  <div style={{ fontSize: '0.65rem', color: GOLD, fontWeight: 700 }}>Parent Portal</div>
+                </div>
               </div>
               <button
                 onClick={() => { logout().then(() => router.push('/login')); }}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px',
+                  display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px',
                   background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
-                  borderRadius: 8, color: '#fca5a5', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600,
+                  borderRadius: 8, color: '#fca5a5', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600,
                 }}
               >
                 {Icons.logOut(14, '#fca5a5')} Sign Out

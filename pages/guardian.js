@@ -38,6 +38,9 @@ const Icons = {
   plus: (size = 18, color = 'currentColor') => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   ),
+  users: (size = 18, color = 'currentColor') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  ),
   bell: (size = 18, color = 'currentColor') => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
   ),
@@ -197,16 +200,21 @@ export default function GuardianPortal() {
       }));
     }
 
-    const [anns, bank, sess, { data: courses }] = await Promise.all([
+    const [anns, bank, sess] = await Promise.all([
       getAnnouncementsByRole('guardian'),
       getActiveBankConfig(),
-      getActiveSession(),
-      supabase.from('courses').select('*')
+      getActiveSession()
     ]);
     setAnnouncements(anns || []);
     setBankConfig(bank);
     setActiveSession(sess);
-    setAvailableCourses(courses || []);
+
+    let courses = [];
+    if (sess && sess.id) {
+      const { data } = await supabase.from('session_courses').select('*').eq('session_id', sess.id);
+      courses = data || [];
+    }
+    setAvailableCourses(courses);
   }, []);
 
   useEffect(() => {
@@ -1019,83 +1027,7 @@ export default function GuardianPortal() {
           </div>
         )}
 
-        {/* New Admission Modal */}
-        {showAdmissionModal && (
-          <div style={{
-            position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.75)',
-            backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
-          }}>
-            <div style={{ background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 20, width: '100%', maxWidth: 560, padding: 24 }}>
-              <h3 style={{ margin: '0 0 8px 0', fontSize: '1.15rem', color: GOLD }}>Apply for Student Admission</h3>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 16 }}>
-                Fill out the applicant details for admission into Hifz Ul Quran or Dars-e-Nizami.
-              </p>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 14px', marginBottom: 14 }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>First Name *</label>
-                  <input
-                    type="text"
-                    value={admissionForm.student_first_name}
-                    onChange={(e) => setAdmissionForm((p) => ({ ...p, student_first_name: e.target.value }))}
-                    style={{ width: '100%', padding: '9px 12px', background: 'var(--border-light)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Last Name *</label>
-                  <input
-                    type="text"
-                    value={admissionForm.student_last_name}
-                    onChange={(e) => setAdmissionForm((p) => ({ ...p, student_last_name: e.target.value }))}
-                    style={{ width: '100%', padding: '9px 12px', background: 'var(--border-light)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 14px', marginBottom: 14 }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Program *</label>
-                  <select
-                    value={admissionForm.course_type}
-                    onChange={(e) => setAdmissionForm((p) => ({
-                      ...p,
-                      course_type: e.target.value,
-                      desired_course: e.target.value === 'hifz' ? 'Hifz Ul Quran' : 'Pre 9th / Sanviya Aamah',
-                    }))}
-                    style={{ width: '100%', padding: '9px 12px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }}
-                  >
-                    <option value="hifz">Hifz Ul Quran</option>
-                    <option value="dars_nizami">Dars-e-Nizami</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Specific Class Level</label>
-                  <select
-                    value={admissionForm.desired_course}
-                    onChange={(e) => setAdmissionForm((p) => ({ ...p, desired_course: e.target.value }))}
-                    style={{ width: '100%', padding: '9px 12px', background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }}
-                  >
-                    {admissionForm.course_type === 'hifz' ? (
-                      <option value="Hifz Ul Quran">Hifz Ul Quran (حفظ القرآن)</option>
-                    ) : (
-                      <>
-                        <option value="Pre 9th / Sanviya Aamah">Pre 9th / Sanviya Aamah (سنویہ عامہ)</option>
-                        <option value="9th / Sanviya Khasa">9th / Sanviya Khasa (سنویہ خاصہ)</option>
-                        <option value="10th / Shahadah Aaliya">10th / Shahadah Aaliya (شہادہ عالیہ)</option>
-                        <option value="11th / Shahadah Aalmiya">11th / Shahadah Aalmiya (شہادہ عالمیہ)</option>
-                      </>
-                    )}
-                  </select>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
-                <Button variant="secondary" onClick={() => setShowAdmissionModal(false)}>Cancel</Button>
-                <Button onClick={handleApplyAdmission}>Submit Application</Button>
-              </div>
-            </div>
-          </div>
-        )}
         </>
         )}
       </div>

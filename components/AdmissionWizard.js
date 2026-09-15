@@ -283,13 +283,13 @@ export default function AdmissionWizard({ onCancel, onSubmit, availableCourses }
             <h3 style={{ marginTop: 0, marginBottom: 20, color: GOLD }}>5. Madrasa-Specific Information (مدرسہ کی مخصوص معلومات)</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
               <Select label="Course Applied For" value={formData.desired_course} onChange={e => {
-                const selected = availableCourses?.find(c => c.name === e.target.value);
+                const selected = availableCourses?.find(c => c.course_name === e.target.value);
                 updateForm('desired_course', e.target.value);
-                updateForm('course_type', selected ? selected.program_type : 'hifz');
+                updateForm('course_type', selected ? selected.course_type : 'hifz');
               }} required>
                 <option value="">-- Select Course --</option>
                 {availableCourses?.map(c => (
-                  <option key={c.id} value={c.name}>{c.name}</option>
+                  <option key={c.id} value={c.course_name}>{c.course_name}</option>
                 ))}
               </Select>
               

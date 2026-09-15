@@ -5,6 +5,7 @@ import { getCurrentUser, getCurrentUserSync, logout } from '../lib/auth';
 import { getChildData, getAnnouncementsByRole } from '../lib/guardianData';
 import { getStudentsByGuardian, submitChallanPayment, getActiveBankConfig, createAdmission, getActiveSession, supabase, updateGuardianProfile } from '../lib/db';
 import { QURAN_SURAHS, QURAN_PARAS, formatAyahRange } from '../lib/quranData';
+import AdmissionWizard from '../components/AdmissionWizard';
 
 const GOLD = 'var(--accent-gold)';
 const NAVY = 'var(--bg-sidebar)';
@@ -118,6 +119,7 @@ export default function GuardianPortal() {
   const [announcements, setAnnouncements] = useState([]);
   const [bankConfig, setBankConfig] = useState(null);
   const [activeSession, setActiveSession] = useState(null);
+  const [availableCourses, setAvailableCourses] = useState([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Guardian Profile & Onboarding State
@@ -138,14 +140,7 @@ export default function GuardianPortal() {
   const [toastMsg, setToastMsg] = useState('');
 
   // Admission Application state
-  const [showAdmissionModal, setShowAdmissionModal] = useState(false);
-  const [admissionStep, setAdmissionStep] = useState(1);
-  const [admissionPic, setAdmissionPic] = useState(null);
   const [admissionLoading, setAdmissionLoading] = useState(false);
-  const [admissionForm, setAdmissionForm] = useState({
-    student_first_name: '', student_last_name: '', student_dob: '', student_gender: 'male',
-    student_b_form: '', course_type: 'hifz', desired_course: 'Hifz Ul Quran', previous_school: '',
-  });
 
   const loadData = useCallback(async (currentUser) => {
     const students = await getStudentsByGuardian(currentUser.id);
@@ -196,14 +191,16 @@ export default function GuardianPortal() {
       }));
     }
 
-    const [anns, bank, sess] = await Promise.all([
+    const [anns, bank, sess, { data: courses }] = await Promise.all([
       getAnnouncementsByRole('guardian'),
       getActiveBankConfig(),
       getActiveSession(),
+      supabase.from('courses').select('*')
     ]);
     setAnnouncements(anns || []);
     setBankConfig(bank);
     setActiveSession(sess);
+    setAvailableCourses(courses || []);
   }, []);
 
   useEffect(() => {
@@ -261,21 +258,15 @@ export default function GuardianPortal() {
     setTimeout(() => setToastMsg(''), 3500);
   };
 
-  const handleApplyAdmission = async (e) => {
-    e.preventDefault();
-    if (!admissionForm.student_first_name || !admissionForm.student_last_name) {
-      alert('Please enter your child\'s name.');
-      return;
-    }
+  const handleApplyAdmission = async (formData, photoBlob) => {
     setAdmissionLoading(true);
-    
     let picUrl = null;
-    if (admissionPic) {
-      const ext = admissionPic.name.split('.').pop();
-      const fileName = `student-${user.id}-${Date.now()}.${ext}`;
+    
+    if (photoBlob) {
+      const fileName = `student-${user.id}-${Date.now()}.jpg`;
       const { data: uploadData, error: uploadErr } = await supabase.storage
         .from('profiles')
-        .upload(fileName, admissionPic, { cacheControl: '3600', upsert: false });
+        .upload(fileName, photoBlob, { cacheControl: '3600', upsert: false });
       
       if (!uploadErr && uploadData) {
         const { data: publicUrlData } = supabase.storage.from('profiles').getPublicUrl(fileName);
@@ -283,22 +274,23 @@ export default function GuardianPortal() {
       }
     }
 
-    await createAdmission({
+    const { admission, error } = await createAdmission({
+      ...formData,
       guardian_id: user.id,
       session_id: activeSession?.id || 'e0000000-0000-0000-0000-000000000001',
-      student_first_name: admissionForm.student_first_name,
-      student_last_name: admissionForm.student_last_name,
-      student_dob: admissionForm.student_dob || null,
-      student_gender: admissionForm.student_gender,
-      student_b_form: admissionForm.student_b_form,
-      course_type: admissionForm.course_type,
-      desired_course: admissionForm.desired_course,
-      previous_school: admissionForm.previous_school,
+      profile_picture_url: picUrl,
       status: 'pending',
     });
-    setShowAdmissionModal(false);
-    setToastMsg('Admission application submitted to Administration!');
-    setTimeout(() => setToastMsg(''), 3500);
+
+    if (error) {
+      alert(`Error submitting application: ${error}`);
+    } else {
+      setActiveTab('home');
+      setToastMsg('Application submitted & Admission Fee Challan generated!');
+      setTimeout(() => setToastMsg(''), 3500);
+      loadData(user);
+    }
+    setAdmissionLoading(false);
   };
 
   const handleOnboardingSubmit = async (e) => {
@@ -532,6 +524,7 @@ export default function GuardianPortal() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
                     {[
                       { id: 'home', label: 'Home Overview', icon: Icons.home },
+                      { id: 'admissions', label: 'Admissions & Enrollment', icon: Icons.admission },
                       ...(currentChild?.programType === 'hifz' ? [{ id: 'hifz', label: 'Hifz Sabaq & Manzil', icon: Icons.book }] : []),
                       ...(currentChild?.programType !== 'hifz' ? [{ id: 'results', label: 'Test Results', icon: Icons.results }] : []),
                       { id: 'attendance', label: 'Attendance', icon: Icons.attendance },
@@ -577,6 +570,7 @@ export default function GuardianPortal() {
             }}>
               {[
                 { id: 'home', label: 'Home Overview', icon: Icons.home },
+                { id: 'admissions', label: 'Admissions & Enrollment', icon: Icons.admission },
                 ...(currentChild?.programType === 'hifz' ? [{ id: 'hifz', label: 'Hifz Sabaq & Manzil', icon: Icons.book }] : []),
                 ...(currentChild?.programType !== 'hifz' ? [{ id: 'results', label: 'Test Results', icon: Icons.results }] : []),
                 { id: 'attendance', label: 'Attendance', icon: Icons.attendance },
@@ -671,7 +665,7 @@ export default function GuardianPortal() {
                       ))}
                     </select>
                   )}
-                  <Button variant="secondary" onClick={() => setShowAdmissionModal(true)} style={{ padding: '8px 14px', fontSize: '0.78rem' }}>
+                  <Button variant="secondary" onClick={() => setActiveTab('admissions')} style={{ padding: '8px 14px', fontSize: '0.78rem' }}>
                     {Icons.plus(14)} Enroll Another Child
                   </Button>
                 </div>
@@ -682,6 +676,34 @@ export default function GuardianPortal() {
           {/* TAB: HOME OVERVIEW */}
           {activeTab === 'home' && (
             <div>
+              {/* Main Dashboard Quick Navigation Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14, marginBottom: 24 }}>
+                <Card style={{ textAlign: 'center', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }} onClick={() => setActiveTab('admissions')}>
+                  <div style={{ width: 48, height: 48, borderRadius: 24, background: `${GOLD}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {Icons.admission(24, GOLD)}
+                  </div>
+                  <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>Admissions</div>
+                </Card>
+                <Card style={{ textAlign: 'center', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }} onClick={() => setActiveTab('schedule')}>
+                  <div style={{ width: 48, height: 48, borderRadius: 24, background: `rgba(59,130,246,0.2)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {Icons.book(24, 'var(--color-info)')}
+                  </div>
+                  <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>Our Courses</div>
+                </Card>
+                <Card style={{ textAlign: 'center', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }} onClick={() => setActiveTab('schedule')}>
+                  <div style={{ width: 48, height: 48, borderRadius: 24, background: `rgba(34,197,94,0.2)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {Icons.calendar(24, 'var(--color-success)')}
+                  </div>
+                  <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>Schedule</div>
+                </Card>
+                <Card style={{ textAlign: 'center', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }} onClick={() => window.open('https://al-faiq.edu.pk', '_blank')}>
+                  <div style={{ width: 48, height: 48, borderRadius: 24, background: `rgba(168,85,247,0.2)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {Icons.flag(24, 'var(--color-purple)')}
+                  </div>
+                  <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>Life at Al-Faiq</div>
+                </Card>
+              </div>
+
               {/* Quick Metrics */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
                 <Card>
@@ -753,6 +775,22 @@ export default function GuardianPortal() {
                   ))}
                 </div>
               </Card>
+            </div>
+          )}
+
+          {/* TAB: ADMISSIONS WIZARD */}
+          {activeTab === 'admissions' && (
+            <div>
+              <h2 style={{ fontSize: '1.4rem', fontWeight: 800, margin: '0 0 8px 0' }}>Student Admissions & Enrollment</h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginBottom: 20 }}>
+                Please fill out all the mandatory information carefully. Once submitted, an Admission Challan will be auto-generated.
+              </p>
+              
+              <AdmissionWizard 
+                availableCourses={availableCourses}
+                onCancel={() => setActiveTab('home')}
+                onSubmit={handleApplyAdmission}
+              />
             </div>
           )}
 

@@ -300,14 +300,24 @@ export default function GuardianPortal() {
     // Strip UI-only fields not in DB schema
     const { docs, ...admissionPayload } = formData;
 
+    // Convert empty strings to null for optional/numeric fields to avoid DB type errors
+    const numericFields = ['father_income', 'previous_marks'];
+    const sanitized = { ...admissionPayload };
+    for (const key of Object.keys(sanitized)) {
+      if (sanitized[key] === '') {
+        sanitized[key] = numericFields.includes(key) ? null : null;
+      }
+    }
+
     const { admission, error } = await createAdmission({
-      ...admissionPayload,
+      ...sanitized,
       guardian_id: user.id,
       session_id: activeSession?.id || 'e0000000-0000-0000-0000-000000000001',
       profile_picture_url: picUrl,
       status: 'pending',
       docs_checklist: docs,
     });
+
 
     if (error) {
       alert(`Error submitting application: ${error}`);

@@ -6,7 +6,7 @@ import { getChildData, getAnnouncementsByRole } from '../lib/guardianData';
 import { getStudentsByGuardian, submitChallanPayment, getActiveBankConfig, createAdmission, getActiveSession, supabase, updateGuardianProfile } from '../lib/db';
 import { QURAN_SURAHS, QURAN_PARAS, formatAyahRange } from '../lib/quranData';
 
-const GOLD = '#F2A900';
+const GOLD = 'var(--accent-gold)';
 const NAVY = '#002147';
 
 const Icons = {
@@ -59,8 +59,8 @@ const Icons = {
 
 const Card = ({ children, style, onClick }) => (
   <div onClick={onClick} style={{
-    background: 'rgba(255,255,255,0.03)',
-    border: '1px solid rgba(255,255,255,0.06)',
+    background: 'var(--card-bg)',
+    border: '1px solid var(--card-bg-hover)',
     borderRadius: 16,
     padding: 20,
     ...style,
@@ -98,8 +98,8 @@ const Button = ({ children, onClick, variant = 'primary', style, disabled }) => 
     opacity: disabled ? 0.5 : 1,
   };
   const variants = {
-    primary: { background: `linear-gradient(135deg, ${GOLD}, #e09800)`, color: '#0a0e1a' },
-    secondary: { background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' },
+    primary: { background: `linear-gradient(135deg, ${GOLD}, #e09800)`, color: 'var(--bg-color)' },
+    secondary: { background: 'var(--card-bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' },
     success: { background: 'rgba(34,197,94,0.15)', color: '#86efac', border: '1px solid rgba(34,197,94,0.25)' },
     danger: { background: 'rgba(239,68,68,0.15)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.25)' },
   };
@@ -364,22 +364,22 @@ export default function GuardianPortal() {
         `}</style>
       </Head>
 
-      <div style={{ minHeight: '100vh', background: '#0a0e1a', fontFamily: "'Inter', sans-serif", color: '#fff', position: 'relative' }}>
+      <div style={{ minHeight: '100vh', background: 'var(--bg-color)', fontFamily: "'Inter', sans-serif", color: 'var(--text-primary)', position: 'relative' }}>
         
         {isOnboarding ? (
           <div style={{ padding: 24, maxWidth: 600, margin: '0 auto', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <h2 style={{ fontSize: '1.5rem', color: GOLD, marginBottom: 8, textAlign: 'center' }}>Complete Your Guardian Profile</h2>
-            <p style={{ color: 'rgba(255,255,255,0.6)', textAlign: 'center', marginBottom: 24, fontSize: '0.9rem' }}>
+            <p style={{ color: 'var(--text-secondary)', textAlign: 'center', marginBottom: 24, fontSize: '0.9rem' }}>
               Please provide the required details before accessing the parent portal.
             </p>
-            <form onSubmit={handleOnboardingSubmit} style={{ background: '#111625', padding: 24, borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
+            <form onSubmit={handleOnboardingSubmit} style={{ background: '#111625', padding: 24, borderRadius: 16, border: '1px solid var(--border-color)' }}>
               
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 20 }}>
-                <div style={{ width: 80, height: 80, borderRadius: 40, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, overflow: 'hidden' }}>
+                <div style={{ width: 80, height: 80, borderRadius: 40, background: 'var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, overflow: 'hidden' }}>
                   {profilePic ? (
                     <img src={URL.createObjectURL(profilePic)} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
-                    Icons.user(32, 'rgba(255,255,255,0.3)')
+                    Icons.user(32, 'var(--text-tertiary)')
                   )}
                 </div>
                 <label style={{ color: GOLD, fontSize: '0.8rem', cursor: 'pointer', fontWeight: 600 }}>
@@ -390,23 +390,23 @@ export default function GuardianPortal() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>First Name *</label>
-                  <input required value={onboardingForm.firstName} onChange={e => setOnboardingForm(p => ({...p, firstName: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>First Name *</label>
+                  <input required value={onboardingForm.firstName} onChange={e => setOnboardingForm(p => ({...p, firstName: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'var(--border-light)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Last Name *</label>
-                  <input required value={onboardingForm.lastName} onChange={e => setOnboardingForm(p => ({...p, lastName: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Last Name *</label>
+                  <input required value={onboardingForm.lastName} onChange={e => setOnboardingForm(p => ({...p, lastName: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'var(--border-light)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }} />
                 </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Father's Name *</label>
-                  <input required value={onboardingForm.fatherName} onChange={e => setOnboardingForm(p => ({...p, fatherName: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Father's Name *</label>
+                  <input required value={onboardingForm.fatherName} onChange={e => setOnboardingForm(p => ({...p, fatherName: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'var(--border-light)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Relationship to Student *</label>
-                  <select required value={onboardingForm.relation} onChange={e => setOnboardingForm(p => ({...p, relation: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: '#111625', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }}>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Relationship to Student *</label>
+                  <select required value={onboardingForm.relation} onChange={e => setOnboardingForm(p => ({...p, relation: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: '#111625', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }}>
                     <option value="Father">Father</option>
                     <option value="Mother">Mother</option>
                     <option value="Guardian">Guardian</option>
@@ -416,34 +416,34 @@ export default function GuardianPortal() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>CNIC *</label>
-                  <input required value={onboardingForm.cnic} onChange={e => setOnboardingForm(p => ({...p, cnic: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>CNIC *</label>
+                  <input required value={onboardingForm.cnic} onChange={e => setOnboardingForm(p => ({...p, cnic: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'var(--border-light)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Phone *</label>
-                  <input required type="tel" value={onboardingForm.phone} onChange={e => setOnboardingForm(p => ({...p, phone: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Phone *</label>
+                  <input required type="tel" value={onboardingForm.phone} onChange={e => setOnboardingForm(p => ({...p, phone: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'var(--border-light)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }} />
                 </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Occupation *</label>
-                  <input required value={onboardingForm.occupation} onChange={e => setOnboardingForm(p => ({...p, occupation: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Occupation *</label>
+                  <input required value={onboardingForm.occupation} onChange={e => setOnboardingForm(p => ({...p, occupation: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'var(--border-light)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Estimated Earning (PKR)</label>
-                  <input type="number" value={onboardingForm.earning} onChange={e => setOnboardingForm(p => ({...p, earning: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Estimated Earning (PKR)</label>
+                  <input type="number" value={onboardingForm.earning} onChange={e => setOnboardingForm(p => ({...p, earning: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'var(--border-light)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }} />
                 </div>
               </div>
 
               <div style={{ marginBottom: 12 }}>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Address *</label>
-                <textarea required value={onboardingForm.address} onChange={e => setOnboardingForm(p => ({...p, address: e.target.value}))} rows={2} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff', resize: 'none' }} />
+                <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Address *</label>
+                <textarea required value={onboardingForm.address} onChange={e => setOnboardingForm(p => ({...p, address: e.target.value}))} rows={2} style={{ width: '100%', padding: '9px 12px', background: 'var(--border-light)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)', resize: 'none' }} />
               </div>
 
               <div style={{ marginBottom: 20 }}>
-                <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Number of Children to Enroll *</label>
-                <input required type="number" min="1" max="10" value={onboardingForm.childCount} onChange={e => setOnboardingForm(p => ({...p, childCount: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Number of Children to Enroll *</label>
+                <input required type="number" min="1" max="10" value={onboardingForm.childCount} onChange={e => setOnboardingForm(p => ({...p, childCount: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'var(--border-light)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }} />
               </div>
 
               <Button type="submit" disabled={onboardingLoading} style={{ width: '100%' }}>
@@ -455,7 +455,7 @@ export default function GuardianPortal() {
           <>
             {/* Global Header */}
             <header style={{
-              padding: '16px 24px', background: '#0d111e', borderBottom: '1px solid rgba(255,255,255,0.06)',
+              padding: '16px 24px', background: '#0d111e', borderBottom: '1px solid var(--card-bg-hover)',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -470,13 +470,13 @@ export default function GuardianPortal() {
               <div className="mobile-hide" style={{ alignItems: 'center', gap: 14 }}>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: '0.82rem', fontWeight: 700 }}>{user.first_name} {user.last_name}</div>
-                  <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.4)' }}>CNIC: {user.cnic}</div>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)' }}>CNIC: {user.cnic}</div>
                 </div>
                 {guardianProfile?.profile_picture_url ? (
                   <img src={guardianProfile.profile_picture_url} style={{ width: 36, height: 36, borderRadius: 18, objectFit: 'cover' }} />
                 ) : (
-                  <div style={{ width: 36, height: 36, borderRadius: 18, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {Icons.user(18, 'rgba(255,255,255,0.6)')}
+                  <div style={{ width: 36, height: 36, borderRadius: 18, background: 'var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {Icons.user(18, 'var(--text-secondary)')}
                   </div>
                 )}
                 <button
@@ -495,7 +495,7 @@ export default function GuardianPortal() {
               <button 
                 className="desktop-hide" 
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', cursor: 'pointer' }}
               >
                 {Icons.menu(28)}
               </button>
@@ -507,7 +507,7 @@ export default function GuardianPortal() {
                 position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', justifyContent: 'flex-end'
               }} onClick={() => setIsMobileMenuOpen(false)}>
                 <div style={{
-                  width: 280, background: '#0d111e', height: '100%', borderLeft: '1px solid rgba(255,255,255,0.1)',
+                  width: 280, background: '#0d111e', height: '100%', borderLeft: '1px solid var(--border-color)',
                   padding: 24, display: 'flex', flexDirection: 'column'
                 }} onClick={(e) => e.stopPropagation()}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
@@ -515,8 +515,8 @@ export default function GuardianPortal() {
                       {guardianProfile?.profile_picture_url ? (
                         <img src={guardianProfile.profile_picture_url} style={{ width: 44, height: 44, borderRadius: 22, objectFit: 'cover' }} />
                       ) : (
-                        <div style={{ width: 44, height: 44, borderRadius: 22, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          {Icons.user(24, 'rgba(255,255,255,0.6)')}
+                        <div style={{ width: 44, height: 44, borderRadius: 22, background: 'var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {Icons.user(24, 'var(--text-secondary)')}
                         </div>
                       )}
                       <div>
@@ -524,7 +524,7 @@ export default function GuardianPortal() {
                         <div style={{ fontSize: '0.7rem', color: GOLD }}>Edit Profile</div>
                       </div>
                     </div>
-                    <button onClick={() => setIsMobileMenuOpen(false)} style={{ background: 'transparent', border: 'none', color: '#fff' }}>
+                    <button onClick={() => setIsMobileMenuOpen(false)} style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)' }}>
                       {Icons.close(24)}
                     </button>
                   </div>
@@ -545,11 +545,11 @@ export default function GuardianPortal() {
                           display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
                           borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700,
                           background: activeTab === t.id ? `${GOLD}20` : 'transparent',
-                          color: activeTab === t.id ? GOLD : '#fff',
+                          color: activeTab === t.id ? GOLD : 'var(--text-primary)',
                           textAlign: 'left'
                         }}
                       >
-                        {t.icon(18, activeTab === t.id ? GOLD : 'rgba(255,255,255,0.6)')}
+                        {t.icon(18, activeTab === t.id ? GOLD : 'var(--text-secondary)')}
                         {t.label}
                       </button>
                     ))}
@@ -572,8 +572,8 @@ export default function GuardianPortal() {
 
             {/* Desktop Sub-Header Tabs */}
             <div className="mobile-hide" style={{
-              display: 'flex', gap: 4, padding: '10px 24px', background: 'rgba(255,255,255,0.02)',
-              borderBottom: '1px solid rgba(255,255,255,0.06)', overflowX: 'auto',
+              display: 'flex', gap: 4, padding: '10px 24px', background: 'var(--card-bg)',
+              borderBottom: '1px solid var(--card-bg-hover)', overflowX: 'auto',
             }}>
               {[
                 { id: 'home', label: 'Home Overview', icon: Icons.home },
@@ -590,11 +590,11 @@ export default function GuardianPortal() {
                     display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px',
                     borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 700,
                     background: activeTab === t.id ? `${GOLD}20` : 'transparent',
-                    color: activeTab === t.id ? GOLD : 'rgba(255,255,255,0.5)',
+                    color: activeTab === t.id ? GOLD : 'var(--text-secondary)',
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {t.icon(16, activeTab === t.id ? GOLD : 'rgba(255,255,255,0.4)')}
+                  {t.icon(16, activeTab === t.id ? GOLD : 'var(--text-tertiary)')}
                   {t.label}
                 </button>
               ))}
@@ -604,7 +604,7 @@ export default function GuardianPortal() {
         {toastMsg && (
           <div style={{
             position: 'fixed', bottom: 24, right: 24, zIndex: 1000,
-            background: '#22c55e', color: '#0a0e1a', padding: '12px 20px',
+            background: '#22c55e', color: 'var(--bg-color)', padding: '12px 20px',
             borderRadius: 12, fontWeight: 700, fontSize: '0.88rem',
             boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
           }}>
@@ -621,7 +621,7 @@ export default function GuardianPortal() {
               marginBottom: 20, display: 'flex', alignItems: 'center', gap: 14,
             }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                {Icons.flag(24, '#fff')}
+                {Icons.flag(24, 'var(--text-primary)')}
               </div>
               <div>
                 <div style={{ fontSize: '0.98rem', fontWeight: 800, color: '#fca5a5' }}>
@@ -647,7 +647,7 @@ export default function GuardianPortal() {
                       <span style={{ fontSize: '1.15rem', fontWeight: 800 }}>{currentChild?.studentName}</span>
                       <Badge text={currentChild?.programType === 'hifz' ? 'Hifz Ul Quran' : 'Dars-e-Nizami'} color={currentChild?.programType === 'hifz' ? GOLD : '#3b82f6'} />
                     </div>
-                    <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 2 }}>
                       Roll No: <strong style={{ color: GOLD }}>{currentChild?.rollNo}</strong> &bull; Class: {currentChild?.classSection}
                     </div>
                   </div>
@@ -685,11 +685,11 @@ export default function GuardianPortal() {
               {/* Quick Metrics */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
                 <Card>
-                  <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>OVERALL ATTENDANCE</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', fontWeight: 700 }}>OVERALL ATTENDANCE</div>
                   <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#22c55e', marginTop: 4 }}>
                     {currentChild?.overallAttendance || '100%'}
                   </div>
-                  <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 2 }}>
                     {currentChild?.attendance?.stats?.present || 0} Days Present / {currentChild?.attendance?.stats?.totalClasses || 0} Total
                   </div>
                 </Card>
@@ -697,20 +697,20 @@ export default function GuardianPortal() {
                 {currentChild?.programType === 'hifz' ? (
                   <Card>
                     <div style={{ fontSize: '0.75rem', color: GOLD, fontWeight: 700 }}>HIFZ MEMORIZATION</div>
-                    <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fff', marginTop: 4 }}>
+                    <div style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--text-primary)', marginTop: 4 }}>
                       {currentChild?.hifz?.stats?.completionPercentage || 0}%
                     </div>
-                    <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 2 }}>
                       {currentChild?.hifz?.stats?.totalAyahsMemorized || 0} / 6,236 Ayahs
                     </div>
                   </Card>
                 ) : (
                   <Card>
                     <div style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 700 }}>DARS-E-NIZAMI CLASS</div>
-                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff', marginTop: 6 }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: 6 }}>
                       {currentChild?.class?.class_name || 'Sanviya Aamah'}
                     </div>
-                    <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 2 }}>
                       {currentChild?.schedule?.length || 4} Islamic Subjects
                     </div>
                   </Card>
@@ -727,11 +727,11 @@ export default function GuardianPortal() {
                     </div>
                     <Badge text={currentChild.hifz.todaySabaq.sabaq_quality} color="#22c55e" />
                   </div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', marginBottom: 8 }}>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
                     {formatAyahRange(currentChild.hifz.todaySabaq.sabaq_surah_start, currentChild.hifz.todaySabaq.sabaq_ayah_start, currentChild.hifz.todaySabaq.sabaq_surah_end, currentChild.hifz.todaySabaq.sabaq_ayah_end)}
                   </div>
                   {currentChild.hifz.todaySabaq.sabaq_notes && (
-                    <div style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.6)', background: 'rgba(255,255,255,0.03)', padding: '10px 14px', borderRadius: 8 }}>
+                    <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', background: 'var(--card-bg)', padding: '10px 14px', borderRadius: 8 }}>
                       Teacher Note: {currentChild.hifz.todaySabaq.sabaq_notes}
                     </div>
                   )}
@@ -742,13 +742,13 @@ export default function GuardianPortal() {
               <Card>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                   {Icons.bell(18, GOLD)}
-                  <h3 style={{ margin: 0, fontSize: '1rem', color: '#fff', fontWeight: 800 }}>Madrassa Notice Board</h3>
+                  <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-primary)', fontWeight: 800 }}>Madrassa Notice Board</h3>
                 </div>
                 <div style={{ display: 'grid', gap: 10 }}>
                   {announcements.map((a) => (
-                    <div key={a.id} style={{ padding: '12px 16px', background: 'rgba(255,255,255,0.02)', borderRadius: 10 }}>
+                    <div key={a.id} style={{ padding: '12px 16px', background: 'var(--card-bg)', borderRadius: 10 }}>
                       <div style={{ fontWeight: 700, fontSize: '0.9rem', color: GOLD }}>{a.title}</div>
-                      <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.6)', margin: '4px 0 0 0', lineHeight: 1.4 }}>{a.content}</p>
+                      <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: '4px 0 0 0', lineHeight: 1.4 }}>{a.content}</p>
                     </div>
                   ))}
                 </div>
@@ -774,9 +774,9 @@ export default function GuardianPortal() {
                         key={p.number}
                         style={{
                           padding: '8px 4px', textAlign: 'center', borderRadius: 8,
-                          background: isRevised ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.03)',
-                          border: isRevised ? '1px solid #22c55e' : '1px solid rgba(255,255,255,0.08)',
-                          color: isRevised ? '#86efac' : 'rgba(255,255,255,0.4)',
+                          background: isRevised ? 'rgba(34,197,94,0.2)' : 'var(--card-bg)',
+                          border: isRevised ? '1px solid #22c55e' : '1px solid var(--border-color)',
+                          color: isRevised ? '#86efac' : 'var(--text-tertiary)',
                         }}
                       >
                         <div style={{ fontSize: '0.7rem', fontWeight: 700 }}>Para {p.number}</div>
@@ -792,12 +792,12 @@ export default function GuardianPortal() {
                 <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: '0 0 14px 0' }}>Daily Sabaq Log History</h3>
                 <div style={{ display: 'grid', gap: 10 }}>
                   {(currentChild.hifz?.dailyRecords || []).map((r) => (
-                    <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
+                    <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'var(--card-bg)', borderRadius: 8 }}>
                       <div>
                         <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>
                           Surah {r.sabaq_surah_start}, Ayah {r.sabaq_ayah_start} to {r.sabaq_ayah_end}
                         </div>
-                        <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)' }}>Date: {r.date}</div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>Date: {r.date}</div>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <Badge text={r.sabaq_quality} color="#22c55e" />
@@ -821,14 +821,14 @@ export default function GuardianPortal() {
                 {(currentChild?.results || []).map((res) => (
                   <Card key={res.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: '1rem', color: '#fff' }}>{res.subject}</div>
-                      <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                      <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>{res.subject}</div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: 2 }}>
                         {res.testName} &bull; {res.remarks}
                       </div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: '1.2rem', fontWeight: 900, color: GOLD }}>
-                        {res.marksObtained} <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>/ {res.totalMarks}</span>
+                        {res.marksObtained} <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>/ {res.totalMarks}</span>
                       </div>
                       <Badge text={`Grade ${res.grade}`} color="#22c55e" />
                     </div>
@@ -847,7 +847,7 @@ export default function GuardianPortal() {
                   <Card key={att.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 18px' }}>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>{att.date}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)' }}>{att.subject}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{att.subject}</div>
                     </div>
                     <Badge text={att.status} color={att.status.toLowerCase() === 'present' ? '#22c55e' : '#ef4444'} />
                   </Card>
@@ -869,19 +869,19 @@ export default function GuardianPortal() {
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
                     <div>
-                      <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>Bank Name</div>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>Bank Name</div>
                       <div style={{ fontWeight: 700 }}>{bankConfig.bank_name}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>Account Title</div>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>Account Title</div>
                       <div style={{ fontWeight: 700 }}>{bankConfig.account_title}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>Account Number</div>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>Account Number</div>
                       <div style={{ fontWeight: 800, color: GOLD }}>{bankConfig.account_number}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>IBAN</div>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>IBAN</div>
                       <div style={{ fontWeight: 700, fontSize: '0.8rem' }}>{bankConfig.iban || '—'}</div>
                     </div>
                   </div>
@@ -892,8 +892,8 @@ export default function GuardianPortal() {
                 {challans.map((ch) => (
                   <Card key={ch.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
                     <div>
-                      <div style={{ fontWeight: 800, fontSize: '1rem', color: '#fff' }}>{ch.title}</div>
-                      <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                      <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)' }}>{ch.title}</div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: 2 }}>
                         Challan No: {ch.challan_no} &bull; Due: {ch.due_date}
                       </div>
                       <div style={{ fontSize: '1.2rem', fontWeight: 900, color: GOLD, marginTop: 4 }}>
@@ -927,7 +927,7 @@ export default function GuardianPortal() {
                   <Card key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: '1rem' }}>{s.course}</div>
-                      <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: 2 }}>
                         Code: {s.code} &bull; Scholar: <strong style={{ color: GOLD }}>{s.teacher}</strong>
                       </div>
                     </div>
@@ -945,22 +945,22 @@ export default function GuardianPortal() {
             position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.7)',
             backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
           }}>
-            <div style={{ background: '#111625', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, width: '100%', maxWidth: 500, padding: 24 }}>
+            <div style={{ background: '#111625', border: '1px solid var(--border-color)', borderRadius: 20, width: '100%', maxWidth: 500, padding: 24 }}>
               <h3 style={{ margin: '0 0 12px 0', fontSize: '1.1rem', color: GOLD }}>Submit Fee Payment</h3>
-              <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5, marginBottom: 16 }}>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
                 Please transfer <strong>Rs. {Number(payingChallan.amount).toLocaleString()}</strong> to the institute bank account and enter the <strong>Transaction ID (TID)</strong> below:
               </p>
 
               <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', marginBottom: 6 }}>Bank Transaction ID (TID) *</label>
+                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: 6 }}>Bank Transaction ID (TID) *</label>
                 <input
                   type="text"
                   placeholder="e.g. TRX-98234123"
                   value={tidInput}
                   onChange={(e) => setTidInput(e.target.value)}
                   style={{
-                    width: '100%', padding: '10px 14px', background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(242,169,0,0.3)', borderRadius: 10, color: '#fff', fontSize: '0.9rem', outline: 'none',
+                    width: '100%', padding: '10px 14px', background: 'var(--border-light)',
+                    border: '1px solid rgba(242,169,0,0.3)', borderRadius: 10, color: 'var(--text-primary)', fontSize: '0.9rem', outline: 'none',
                   }}
                 />
               </div>
@@ -981,36 +981,36 @@ export default function GuardianPortal() {
             position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.75)',
             backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
           }}>
-            <div style={{ background: '#111625', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, width: '100%', maxWidth: 560, padding: 24 }}>
+            <div style={{ background: '#111625', border: '1px solid var(--border-color)', borderRadius: 20, width: '100%', maxWidth: 560, padding: 24 }}>
               <h3 style={{ margin: '0 0 8px 0', fontSize: '1.15rem', color: GOLD }}>Apply for Student Admission</h3>
-              <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', marginBottom: 16 }}>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 16 }}>
                 Fill out the applicant details for admission into Hifz Ul Quran or Dars-e-Nizami.
               </p>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 14px', marginBottom: 14 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>First Name *</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>First Name *</label>
                   <input
                     type="text"
                     value={admissionForm.student_first_name}
                     onChange={(e) => setAdmissionForm((p) => ({ ...p, student_first_name: e.target.value }))}
-                    style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }}
+                    style={{ width: '100%', padding: '9px 12px', background: 'var(--border-light)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Last Name *</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Last Name *</label>
                   <input
                     type="text"
                     value={admissionForm.student_last_name}
                     onChange={(e) => setAdmissionForm((p) => ({ ...p, student_last_name: e.target.value }))}
-                    style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }}
+                    style={{ width: '100%', padding: '9px 12px', background: 'var(--border-light)', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }}
                   />
                 </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 14px', marginBottom: 14 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Program *</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Program *</label>
                   <select
                     value={admissionForm.course_type}
                     onChange={(e) => setAdmissionForm((p) => ({
@@ -1018,18 +1018,18 @@ export default function GuardianPortal() {
                       course_type: e.target.value,
                       desired_course: e.target.value === 'hifz' ? 'Hifz Ul Quran' : 'Pre 9th / Sanviya Aamah',
                     }))}
-                    style={{ width: '100%', padding: '9px 12px', background: '#111625', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }}
+                    style={{ width: '100%', padding: '9px 12px', background: '#111625', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }}
                   >
                     <option value="hifz">Hifz Ul Quran</option>
                     <option value="dars_nizami">Dars-e-Nizami</option>
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Specific Class Level</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Specific Class Level</label>
                   <select
                     value={admissionForm.desired_course}
                     onChange={(e) => setAdmissionForm((p) => ({ ...p, desired_course: e.target.value }))}
-                    style={{ width: '100%', padding: '9px 12px', background: '#111625', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }}
+                    style={{ width: '100%', padding: '9px 12px', background: '#111625', border: '1px solid var(--border-color)', borderRadius: 8, color: 'var(--text-primary)' }}
                   >
                     {admissionForm.course_type === 'hifz' ? (
                       <option value="Hifz Ul Quran">Hifz Ul Quran (حفظ القرآن)</option>

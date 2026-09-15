@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { getCurrentUser, getCurrentUserSync, logout } from '../lib/auth';
 import * as db from '../lib/db';
 import { QURAN_SURAHS, QURAN_PARAS } from '../lib/quranData';
+import { useTheme } from './_app';
 
 // ============================================================
 // SVG ICONS (Pure vector, zero emojis)
@@ -89,7 +90,7 @@ const Icons = {
   ),
 };
 
-const GOLD = '#F2A900';
+const GOLD = 'var(--accent-gold)';
 const NAVY = '#002147';
 
 const NAV_ITEMS = [
@@ -111,8 +112,8 @@ const NAV_ITEMS = [
 
 const Card = ({ children, style, onClick }) => (
   <div onClick={onClick} style={{
-    background: 'rgba(255,255,255,0.03)',
-    border: '1px solid rgba(255,255,255,0.06)',
+    background: 'var(--card-bg)',
+    border: '1px solid var(--card-bg-hover)',
     borderRadius: 16,
     padding: 24,
     transition: 'all 0.3s ease',
@@ -133,9 +134,9 @@ const StatCard = ({ label, value, icon, color, sublabel }) => (
       {icon(22, color)}
     </div>
     <div>
-      <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>{value}</div>
-      <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', marginTop: 4, fontWeight: 600 }}>{label}</div>
-      {sublabel && <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>{sublabel}</div>}
+      <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 4, fontWeight: 600 }}>{label}</div>
+      {sublabel && <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', marginTop: 2 }}>{sublabel}</div>}
     </div>
   </Card>
 );
@@ -156,8 +157,8 @@ const Button = ({ children, onClick, variant = 'primary', style, disabled }) => 
     opacity: disabled ? 0.5 : 1,
   };
   const variants = {
-    primary: { background: `linear-gradient(135deg, ${GOLD}, #e09800)`, color: '#0a0e1a' },
-    secondary: { background: 'rgba(255,255,255,0.06)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' },
+    primary: { background: `linear-gradient(135deg, ${GOLD}, #e09800)`, color: 'var(--bg-color)' },
+    secondary: { background: 'var(--card-bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' },
     danger: { background: 'rgba(239,68,68,0.15)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.25)' },
     success: { background: 'rgba(34,197,94,0.15)', color: '#86efac', border: '1px solid rgba(34,197,94,0.25)' },
     gold: { background: 'rgba(242,169,0,0.15)', color: GOLD, border: '1px solid rgba(242,169,0,0.3)' },
@@ -182,7 +183,7 @@ const Badge = ({ text, color = GOLD }) => (
 
 const InputField = ({ label, value, onChange, type = 'text', placeholder, required, disabled }) => (
   <div style={{ marginBottom: 14 }}>
-    {label && <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', marginBottom: 6, fontWeight: 500 }}>{label}{required && <span style={{ color: '#ef4444' }}> *</span>}</label>}
+    {label && <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 500 }}>{label}{required && <span style={{ color: '#ef4444' }}> *</span>}</label>}
     <input
       type={type}
       value={value ?? ''}
@@ -193,10 +194,10 @@ const InputField = ({ label, value, onChange, type = 'text', placeholder, requir
       style={{
         width: '100%',
         padding: '10px 14px',
-        background: 'rgba(255,255,255,0.04)',
-        border: '1px solid rgba(255,255,255,0.1)',
+        background: 'var(--border-light)',
+        border: '1px solid var(--border-color)',
         borderRadius: 10,
-        color: '#fff',
+        color: 'var(--text-primary)',
         fontSize: '0.85rem',
         outline: 'none',
         transition: 'border-color 0.2s',
@@ -207,7 +208,7 @@ const InputField = ({ label, value, onChange, type = 'text', placeholder, requir
 
 const SelectField = ({ label, value, onChange, options, required, disabled }) => (
   <div style={{ marginBottom: 14 }}>
-    {label && <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', marginBottom: 6, fontWeight: 500 }}>{label}{required && <span style={{ color: '#ef4444' }}> *</span>}</label>}
+    {label && <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 500 }}>{label}{required && <span style={{ color: '#ef4444' }}> *</span>}</label>}
     <select
       value={value ?? ''}
       onChange={onChange}
@@ -216,10 +217,10 @@ const SelectField = ({ label, value, onChange, options, required, disabled }) =>
       style={{
         width: '100%',
         padding: '10px 14px',
-        background: 'rgba(255,255,255,0.04)',
-        border: '1px solid rgba(255,255,255,0.1)',
+        background: 'var(--border-light)',
+        border: '1px solid var(--border-color)',
         borderRadius: 10,
-        color: '#fff',
+        color: 'var(--text-primary)',
         fontSize: '0.85rem',
         outline: 'none',
       }}
@@ -241,7 +242,7 @@ const Modal = ({ title, onClose, children, width = 560 }) => (
   }}>
     <div style={{
       background: '#111625',
-      border: '1px solid rgba(255,255,255,0.1)',
+      border: '1px solid var(--border-color)',
       borderRadius: 20,
       width: '100%',
       maxWidth: width,
@@ -252,14 +253,14 @@ const Modal = ({ title, onClose, children, width = 560 }) => (
       <div style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         padding: '20px 24px',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        borderBottom: '1px solid var(--card-bg-hover)',
         position: 'sticky', top: 0,
         background: '#111625',
         zIndex: 1,
         borderRadius: '20px 20px 0 0',
       }}>
-        <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff', margin: 0 }}>{title}</h3>
-        <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', padding: 4 }}>
+        <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{title}</h3>
+        <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-tertiary)', padding: 4 }}>
           {Icons.x(18)}
         </button>
       </div>
@@ -269,21 +270,21 @@ const Modal = ({ title, onClose, children, width = 560 }) => (
 );
 
 const Table = ({ columns, data, actions }) => (
-  <div style={{ overflowX: 'auto', borderRadius: 14, border: '1px solid rgba(255,255,255,0.06)' }}>
+  <div style={{ overflowX: 'auto', borderRadius: 14, border: '1px solid var(--card-bg-hover)' }}>
     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
       <thead>
-        <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
+        <tr style={{ background: 'var(--card-bg)' }}>
           {columns.map((col) => (
-            <th key={col.key} style={{ padding: '12px 16px', textAlign: 'left', color: 'rgba(255,255,255,0.5)', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{col.label}</th>
+            <th key={col.key} style={{ padding: '12px 16px', textAlign: 'left', color: 'var(--text-secondary)', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{col.label}</th>
           ))}
-          {actions && <th style={{ padding: '12px 16px', textAlign: 'right', color: 'rgba(255,255,255,0.5)', fontWeight: 600, fontSize: '0.75rem' }}>Actions</th>}
+          {actions && <th style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--text-secondary)', fontWeight: 600, fontSize: '0.75rem' }}>Actions</th>}
         </tr>
       </thead>
       <tbody>
         {data.length === 0 ? (
-          <tr><td colSpan={columns.length + (actions ? 1 : 0)} style={{ padding: 40, textAlign: 'center', color: 'rgba(255,255,255,0.25)' }}>No records found</td></tr>
+          <tr><td colSpan={columns.length + (actions ? 1 : 0)} style={{ padding: 40, textAlign: 'center', color: 'var(--text-tertiary)' }}>No records found</td></tr>
         ) : data.map((row, i) => (
-          <tr key={row.id || i} style={{ borderTop: '1px solid rgba(255,255,255,0.04)', transition: 'background 0.15s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+          <tr key={row.id || i} style={{ borderTop: '1px solid var(--border-light)', transition: 'background 0.15s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--card-bg)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
             {columns.map((col) => (
               <td key={col.key} style={{ padding: '12px 16px', color: '#e2e8f0', whiteSpace: col.nowrap ? 'nowrap' : 'normal' }}>
                 {col.render ? col.render(row) : row[col.key]}
@@ -306,17 +307,17 @@ const Table = ({ columns, data, actions }) => (
 const SectionHeader = ({ title, subtitle, action }) => (
   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
     <div>
-      <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#fff', margin: 0 }}>{title}</h2>
-      {subtitle && <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>{subtitle}</p>}
+      <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>{title}</h2>
+      {subtitle && <p style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)', marginTop: 4 }}>{subtitle}</p>}
     </div>
     {action}
   </div>
 );
 
-const ActionButton = ({ icon, onClick, title, color = 'rgba(255,255,255,0.4)' }) => (
+const ActionButton = ({ icon, onClick, title, color = 'var(--text-tertiary)' }) => (
   <button onClick={onClick} title={title} style={{
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.08)',
+    background: 'var(--border-light)',
+    border: '1px solid var(--border-color)',
     borderRadius: 8, padding: 6,
     cursor: 'pointer', transition: 'all 0.2s',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -374,21 +375,21 @@ function DashboardSection({ user, activeSession }) {
       <div style={{ position: 'relative', marginBottom: 28 }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 12,
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.1)',
+          background: 'var(--border-light)',
+          border: '1px solid var(--border-color)',
           borderRadius: 16, padding: '14px 20px',
         }}>
-          {Icons.search(20, 'rgba(255,255,255,0.4)')}
+          {Icons.search(20, 'var(--text-tertiary)')}
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search students, teachers, guardians by name, CNIC, or roll number..."
             style={{
               flex: 1, background: 'none', border: 'none', outline: 'none',
-              color: '#fff', fontSize: '0.92rem',
+              color: 'var(--text-primary)', fontSize: '0.92rem',
             }}
           />
-          {searching && <div style={{ width: 18, height: 18, border: '2px solid rgba(255,255,255,0.1)', borderTopColor: GOLD, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />}
+          {searching && <div style={{ width: 18, height: 18, border: '2px solid var(--border-color)', borderTopColor: GOLD, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />}
         </div>
         {searchResults && (
           <div style={{
@@ -438,12 +439,12 @@ function DashboardSection({ user, activeSession }) {
             {flags.map((f) => (
               <div key={f.id} style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '12px 16px', background: 'rgba(0,0,0,0.2)', borderRadius: 10, flexWrap: 'wrap', gap: 8,
+                padding: '12px 16px', background: 'var(--input-bg)', borderRadius: 10, flexWrap: 'wrap', gap: 8,
               }}>
                 <div>
-                  <span style={{ fontWeight: 700, color: '#fff' }}>{f.student?.first_name} {f.student?.last_name}</span>
+                  <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{f.student?.first_name} {f.student?.last_name}</span>
                   <span style={{ color: GOLD, marginLeft: 8, fontSize: '0.8rem' }}>({f.student?.roll_no})</span>
-                  <span style={{ color: 'rgba(255,255,255,0.4)', marginLeft: 12, fontSize: '0.78rem' }}>
+                  <span style={{ color: 'var(--text-tertiary)', marginLeft: 12, fontSize: '0.78rem' }}>
                     Class: {f.student?.class?.class_name} &bull; Guardian: {f.student?.guardian?.user?.first_name} ({f.student?.guardian?.user?.phone})
                   </span>
                 </div>
@@ -462,7 +463,7 @@ function DashboardSection({ user, activeSession }) {
       {/* Flag Resolution Modal */}
       {resolvingFlag && (
         <Modal title={`Resolve Absence Flag: ${resolvingFlag.student?.first_name}`} onClose={() => setResolvingFlag(null)}>
-          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem', marginBottom: 14 }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: 14 }}>
             Guardian {resolvingFlag.student?.guardian?.user?.first_name} visited the office regarding {resolvingFlag.student?.first_name}'s {resolvingFlag.consecutive_absences} consecutive absences. Enter resolution notes to clear the portal banner.
           </p>
           <InputField label="Resolution Remarks" value={resolutionNotes} onChange={(e) => setResolutionNotes(e.target.value)} placeholder="e.g. Guardian visited, student had medical leave, submitted doctor note." required />
@@ -563,7 +564,7 @@ function TeachersSection({ user }) {
       <SectionHeader title="Teachers" subtitle={`${teachers.length} registered Islamic scholars & teachers`} action={
         <Button onClick={() => { setEditingTeacher(null); setFormData({}); setShowModal(true); }}>{Icons.plus(16)} Add Teacher</Button>
       } />
-      {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)' }}>Loading...</div> : (
+      {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>Loading...</div> : (
         <>
           <div className="desktop-hide-on-mobile">
             <Table columns={columns} data={teachers} actions={(row) => (
@@ -576,7 +577,7 @@ function TeachersSection({ user }) {
           <div className="mobile-show-only" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {teachers.map((t) => (
               <div key={t.id} style={{
-                background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
+                background: 'var(--card-bg)', border: '1px solid var(--card-bg-hover)',
                 borderRadius: 12, padding: 16, display: 'flex', flexDirection: 'column', gap: 10
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -585,21 +586,21 @@ function TeachersSection({ user }) {
                       {Icons.teacher(20, GOLD)}
                     </div>
                     <div>
-                      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff' }}>{t.user?.first_name} {t.user?.last_name}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{t.employee_id} &bull; {t.user?.phone || 'No Phone'}</div>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t.user?.first_name} {t.user?.last_name}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>{t.employee_id} &bull; {t.user?.phone || 'No Phone'}</div>
                     </div>
                   </div>
                   <Badge text={t.status} color={t.status === 'active' ? '#22c55e' : '#ef4444'} />
                 </div>
                 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, background: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 8, marginTop: 4 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, background: 'var(--input-bg)', padding: 12, borderRadius: 8, marginTop: 4 }}>
                   <div>
-                    <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700, marginBottom: 2 }}>Specialization</div>
-                    <div style={{ fontSize: '0.8rem', color: '#fff' }}>{t.specialization || '—'}</div>
+                    <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', fontWeight: 700, marginBottom: 2 }}>Specialization</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-primary)' }}>{t.specialization || '—'}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 700, marginBottom: 2 }}>Qualification</div>
-                    <div style={{ fontSize: '0.8rem', color: '#fff' }}>{t.qualification || '—'}</div>
+                    <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', fontWeight: 700, marginBottom: 2 }}>Qualification</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-primary)' }}>{t.qualification || '—'}</div>
                   </div>
                 </div>
 
@@ -836,40 +837,40 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
           <Card key={session.id} style={{ marginBottom: 16, cursor: 'pointer' }} onClick={() => setExpandedSession(isExpanded ? null : session.id)}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 42, height: 42, borderRadius: 12, background: session.is_active ? `${GOLD}20` : 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {Icons.calendar(20, session.is_active ? GOLD : 'rgba(255,255,255,0.4)')}
+                <div style={{ width: 42, height: 42, borderRadius: 12, background: session.is_active ? `${GOLD}20` : 'var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {Icons.calendar(20, session.is_active ? GOLD : 'var(--text-tertiary)')}
                 </div>
                 <div>
-                  <div style={{ fontWeight: 800, color: '#fff', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: 10 }}>
                     {session.name}
                     {session.is_active && <Badge text="Active Session" color="#22c55e" />}
                     {session.status === 'archived' && <Badge text="Archived (Read-Only)" color="#6b7280" />}
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 4 }}>
                     {session.start_date} — {session.end_date || 'Ongoing'}
                   </div>
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>
                   {sessionCourses.length} programs, {sessionClasses.length} classes
                 </span>
                 <div style={{ transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
-                  {Icons.chevronDown(16, 'rgba(255,255,255,0.4)')}
+                  {Icons.chevronDown(16, 'var(--text-tertiary)')}
                 </div>
               </div>
             </div>
 
             {isExpanded && (
-              <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.06)' }} onClick={(e) => e.stopPropagation()}>
+              <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--card-bg-hover)' }} onClick={(e) => e.stopPropagation()}>
                 
                 {/* Fee Structure Display & Actions */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, padding: 12, background: 'rgba(255,255,255,0.03)', borderRadius: 10 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, padding: 12, background: 'var(--card-bg)', borderRadius: 10 }}>
                   <div>
                     <div style={{ fontSize: '0.75rem', fontWeight: 700, color: GOLD, textTransform: 'uppercase', marginBottom: 6, letterSpacing: '0.08em' }}>Monthly Fee Structure</div>
                     <div style={{ display: 'flex', gap: 16 }}>
-                      <div style={{ fontSize: '0.85rem', color: '#fff' }}><span style={{ color: 'rgba(255,255,255,0.5)' }}>Hifz:</span> Rs {session.fee_structure?.hifz_monthly || 0}</div>
-                      <div style={{ fontSize: '0.85rem', color: '#fff' }}><span style={{ color: 'rgba(255,255,255,0.5)' }}>Dars-e-Nizami:</span> Rs {session.fee_structure?.dars_monthly || 0}</div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}><span style={{ color: 'var(--text-secondary)' }}>Hifz:</span> Rs {session.fee_structure?.hifz_monthly || 0}</div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}><span style={{ color: 'var(--text-secondary)' }}>Dars-e-Nizami:</span> Rs {session.fee_structure?.dars_monthly || 0}</div>
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 10 }}>
@@ -895,7 +896,7 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12, marginBottom: 24 }}>
                   {sessionCourses.map((c) => (
                     <div key={c.id} style={{
-                      background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)',
+                      background: 'var(--input-bg)', border: '1px solid var(--border-light)',
                       padding: '12px 14px', borderRadius: 10, display: 'flex', flexDirection: 'column', gap: 8
                     }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -903,8 +904,8 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
                           {Icons.book(18, c.course_type === 'hifz' ? GOLD : '#3b82f6')}
                         </div>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff' }}>{c.course_name}</div>
-                          <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginTop: 2, textTransform: 'uppercase' }}>{c.course_type} &bull; Fee: Rs {c.monthly_fee || 0}</div>
+                          <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>{c.course_name}</div>
+                          <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', marginTop: 2, textTransform: 'uppercase' }}>{c.course_type} &bull; Fee: Rs {c.monthly_fee || 0}</div>
                         </div>
                         <div style={{ display: 'flex', gap: 6 }}>
                           <ActionButton icon={Icons.edit(14)} color="#3b82f6" onClick={() => setEditProgramData(c)} />
@@ -913,7 +914,7 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
                       </div>
                     </div>
                   ))}
-                  {sessionCourses.length === 0 && <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.3)', padding: 10 }}>No programs configured.</div>}
+                  {sessionCourses.length === 0 && <div style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', padding: 10 }}>No programs configured.</div>}
                 </div>
 
                 {/* Classes Table (Responsive) */}
@@ -947,10 +948,10 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
                 
                 <div className="mobile-show-only" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {sessionClasses.map((cl) => (
-                    <div key={cl.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: 14 }}>
+                    <div key={cl.id} style={{ background: 'var(--card-bg)', border: '1px solid var(--card-bg-hover)', borderRadius: 10, padding: 14 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                         <div>
-                          <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>{cl.class_name} <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem' }}>({cl.section})</span></div>
+                          <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)' }}>{cl.class_name} <span style={{ color: 'var(--text-tertiary)', fontSize: '0.8rem' }}>({cl.section})</span></div>
                           <div style={{ fontSize: '0.75rem', color: GOLD, marginTop: 2 }}>{cl.course?.course_name}</div>
                         </div>
                         <div style={{ display: 'flex', gap: 6 }}>
@@ -958,12 +959,12 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
                           <ActionButton icon={Icons.trash(14)} color="#ef4444" onClick={() => handleDeleteClass(cl.id)} />
                         </div>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)' }}>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                         <strong>Capacity:</strong> {cl.max_students} Students
                       </div>
                     </div>
                   ))}
-                  {sessionClasses.length === 0 && <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.3)', padding: 10 }}>No classes configured.</div>}
+                  {sessionClasses.length === 0 && <div style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', padding: 10 }}>No classes configured.</div>}
                 </div>
 
               </div>
@@ -1000,7 +1001,7 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
           {wizardStep === 2 && (
             <div>
               <h4 style={{ color: GOLD, margin: '0 0 16px 0' }}>Step 2: Define Academic Programs</h4>
-              <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginBottom: 12 }}>Add all the programs (e.g., Hifz, Dars-e-Nizami) for this session, along with their specific monthly fee.</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 12 }}>Add all the programs (e.g., Hifz, Dars-e-Nizami) for this session, along with their specific monthly fee.</p>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
                 {wizardData.programs.map((p, idx) => (
@@ -1028,7 +1029,7 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
           {wizardStep === 3 && (
             <div>
               <h4 style={{ color: GOLD, margin: '0 0 16px 0' }}>Step 3: Define Classes / Sections</h4>
-              <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginBottom: 12 }}>Create classes (e.g. Class 1A, Ula) and assign them to the programs you just created.</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 12 }}>Create classes (e.g. Class 1A, Ula) and assign them to the programs you just created.</p>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
                 {wizardData.classes.map((c, idx) => (
@@ -1057,16 +1058,16 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
           {wizardStep === 4 && (
             <div>
               <h4 style={{ color: GOLD, margin: '0 0 16px 0' }}>Step 4: Review & Finalize</h4>
-              <p style={{ fontSize: '0.85rem', color: '#fff', marginBottom: 10 }}>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', marginBottom: 10 }}>
                 You are about to create session <strong>{wizardData.name}</strong> ({wizardData.start_date} to {wizardData.end_date}).
               </p>
               {!wizardData.cloneFrom && (
-                <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginBottom: 20 }}>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 20 }}>
                   It includes {wizardData.programs.length} programs and {wizardData.classes.length} classes.
                 </p>
               )}
               {wizardData.cloneFrom && (
-                <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginBottom: 20 }}>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 20 }}>
                   It will automatically clone the complete structure of the selected previous session.
                 </p>
               )}
@@ -1109,7 +1110,7 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
       {/* Promotion / Rollover Modal */}
       {showPromotion && (
         <Modal title="Student Promotion & Session Rollover" onClose={() => setShowPromotion(false)} width={700}>
-          <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.6)', marginBottom: 16 }}>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: 16 }}>
             Review students eligible for session transition. Hifz students preserve cumulative memorization progress, while Dars-e-Nizami students advance to the next class level. Check "Hold Back" to retain specific students.
           </p>
           <div style={{ maxHeight: 350, overflowY: 'auto', marginBottom: 16 }}>
@@ -1120,7 +1121,7 @@ function SessionsSection({ user, activeSession, onSessionChange }) {
                 { key: 'current_class', label: 'Current Class', render: (r) => r.class?.class_name || '—' },
                 {
                   key: 'action', label: 'Action', render: (r) => (
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: '#fff', cursor: 'pointer' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: 'var(--text-primary)', cursor: 'pointer' }}>
                       <input
                         type="checkbox"
                         checked={promoSelection[r.id]?.hold_back || false}
@@ -1241,8 +1242,8 @@ function StudentsSection({ user, activeSession }) {
             onClick={() => setFilterProgram(tab.id)}
             style={{
               padding: '8px 16px', borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600,
-              background: filterProgram === tab.id ? `${GOLD}22` : 'rgba(255,255,255,0.04)',
-              color: filterProgram === tab.id ? GOLD : 'rgba(255,255,255,0.5)',
+              background: filterProgram === tab.id ? 'var(--accent-gold-transparent)' : 'var(--border-light)',
+              color: filterProgram === tab.id ? GOLD : 'var(--text-secondary)',
             }}
           >
             {tab.label}
@@ -1250,7 +1251,7 @@ function StudentsSection({ user, activeSession }) {
         ))}
       </div>
 
-      {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)' }}>Loading...</div> : (
+      {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>Loading...</div> : (
         <>
           <div className="desktop-hide-on-mobile">
             <Table columns={columns} data={filtered} actions={(row) => (
@@ -1275,10 +1276,10 @@ function StudentsSection({ user, activeSession }) {
           
           <div className="mobile-show-only" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {filtered.map((row) => (
-              <div key={row.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16 }}>
+              <div key={row.id} style={{ background: 'var(--card-bg)', border: '1px solid var(--card-bg-hover)', borderRadius: 12, padding: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                   <div>
-                    <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff' }}>{row.first_name} {row.last_name}</div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>{row.first_name} {row.last_name}</div>
                     <div style={{ fontSize: '0.75rem', color: GOLD, marginTop: 4 }}>Roll No: {row.roll_no}</div>
                   </div>
                   <Badge text={row.status} color={row.status === 'active' ? '#22c55e' : '#ef4444'} />
@@ -1286,20 +1287,20 @@ function StudentsSection({ user, activeSession }) {
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
                   <div>
-                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Program</div>
-                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.program_type === 'hifz' ? 'Hifz Ul Quran' : 'Dars-e-Nizami'}</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Program</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{row.program_type === 'hifz' ? 'Hifz Ul Quran' : 'Dars-e-Nizami'}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Class</div>
-                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.class ? `${row.class.class_name} (${row.class.section})` : '—'}</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Class</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{row.class ? `${row.class.class_name} (${row.class.section})` : '—'}</div>
                   </div>
                   <div style={{ gridColumn: '1 / -1' }}>
-                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Guardian</div>
-                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.guardian?.user ? `${row.guardian.user.first_name} ${row.guardian.user.last_name}` : '—'}</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Guardian</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{row.guardian?.user ? `${row.guardian.user.first_name} ${row.guardian.user.last_name}` : '—'}</div>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: 8, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 12, justifyContent: 'flex-end' }}>
+                <div style={{ display: 'flex', gap: 8, borderTop: '1px solid var(--card-bg-hover)', paddingTop: 12, justifyContent: 'flex-end' }}>
                   {row.program_type === 'hifz' && (
                     <Button variant="gold" onClick={() => handleViewHifz(row)} style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
                       {Icons.book(14)} Progress
@@ -1365,13 +1366,13 @@ function StudentsSection({ user, activeSession }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
               <div style={{ padding: 16, background: 'rgba(242,169,0,0.1)', borderRadius: 12, border: '1px solid rgba(242,169,0,0.2)' }}>
                 <div style={{ fontSize: '0.75rem', color: GOLD, fontWeight: 700 }}>MEMORIZATION COMPLETION</div>
-                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff', marginTop: 4 }}>{hifzData.stats.completionPercentage}%</div>
-                <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{hifzData.stats.totalAyahsMemorized} / 6,236 Ayahs</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: 4 }}>{hifzData.stats.completionPercentage}%</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 2 }}>{hifzData.stats.totalAyahsMemorized} / 6,236 Ayahs</div>
               </div>
               <div style={{ padding: 16, background: 'rgba(59,130,246,0.1)', borderRadius: 12, border: '1px solid rgba(59,130,246,0.2)' }}>
                 <div style={{ fontSize: '0.75rem', color: '#3b82f6', fontWeight: 700 }}>MANZIL (PARAS REVISED)</div>
-                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff', marginTop: 4 }}>{hifzData.stats.revisedParasCount} / 30 Paras</div>
-                <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{hifzData.stats.manzilPercentage}% Revision Coverage</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: 4 }}>{hifzData.stats.revisedParasCount} / 30 Paras</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 2 }}>{hifzData.stats.manzilPercentage}% Revision Coverage</div>
               </div>
             </div>
           )}
@@ -1447,7 +1448,7 @@ function AdmissionsSection({ user, activeSession }) {
   return (
     <div>
       <SectionHeader title="Admission Applications" subtitle={`${admissions.filter((a) => a.status === 'pending').length} pending admissions`} />
-      {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)' }}>Loading...</div> : (
+      {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>Loading...</div> : (
         <>
           <div className="desktop-hide-on-mobile">
             <Table columns={columns} data={admissions} actions={(row) => (
@@ -1459,10 +1460,10 @@ function AdmissionsSection({ user, activeSession }) {
 
           <div className="mobile-show-only" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {admissions.map((row) => (
-              <div key={row.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16 }}>
+              <div key={row.id} style={{ background: 'var(--card-bg)', border: '1px solid var(--card-bg-hover)', borderRadius: 12, padding: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                   <div>
-                    <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff' }}>{row.student_first_name} {row.student_last_name}</div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>{row.student_first_name} {row.student_last_name}</div>
                     <div style={{ fontSize: '0.75rem', color: GOLD, marginTop: 4 }}>Applied: {new Date(row.created_at).toLocaleDateString()}</div>
                   </div>
                   <Badge text={row.status} color={row.status === 'pending' ? '#f97316' : (row.status === 'approved' ? '#22c55e' : '#ef4444')} />
@@ -1470,20 +1471,20 @@ function AdmissionsSection({ user, activeSession }) {
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
                   <div>
-                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Program</div>
-                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.course_type === 'hifz' ? 'Hifz Ul Quran' : (row.desired_course || 'Dars-e-Nizami')}</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Program</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{row.course_type === 'hifz' ? 'Hifz Ul Quran' : (row.desired_course || 'Dars-e-Nizami')}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Contact</div>
-                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.guardian?.user?.phone || '—'}</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Contact</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{row.guardian?.user?.phone || '—'}</div>
                   </div>
                   <div style={{ gridColumn: '1 / -1' }}>
-                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Guardian</div>
-                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.guardian?.user ? `${row.guardian.user.first_name} ${row.guardian.user.last_name}` : '—'}</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Guardian</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{row.guardian?.user ? `${row.guardian.user.first_name} ${row.guardian.user.last_name}` : '—'}</div>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: 8, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 12, justifyContent: 'flex-end' }}>
+                <div style={{ display: 'flex', gap: 8, borderTop: '1px solid var(--card-bg-hover)', paddingTop: 12, justifyContent: 'flex-end' }}>
                   <Button variant={row.status === 'pending' ? 'primary' : 'secondary'} onClick={() => { setSelectedApp(row); setSelectedClassId(''); }} style={{ padding: '6px 12px', fontSize: '0.75rem', width: '100%' }}>
                     {row.status === 'pending' ? 'Review & Approve' : 'View Details'}
                   </Button>
@@ -1509,8 +1510,8 @@ function AdmissionsSection({ user, activeSession }) {
               ['Previous Madrassa / School', selectedApp.previous_school || 'None'],
             ].map(([l, v]) => (
               <div key={l}>
-                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700, textTransform: 'uppercase' }}>{l}</div>
-                <div style={{ fontSize: '0.88rem', color: '#fff', marginTop: 2 }}>{v}</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 700, textTransform: 'uppercase' }}>{l}</div>
+                <div style={{ fontSize: '0.88rem', color: 'var(--text-primary)', marginTop: 2 }}>{v}</div>
               </div>
             ))}
           </div>
@@ -1524,7 +1525,7 @@ function AdmissionsSection({ user, activeSession }) {
                 options={classes.map((c) => ({ value: c.id, label: `${c.class_name} (${c.section})` }))}
                 required
               />
-              <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)' }}>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>
                 Approving this admission will generate a Student ID/Roll number and automatically issue the initial fee challan.
               </p>
               <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
@@ -1533,7 +1534,7 @@ function AdmissionsSection({ user, activeSession }) {
               </div>
             </div>
           ) : (
-            <div style={{ padding: 12, background: 'rgba(255,255,255,0.04)', borderRadius: 10, color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem' }}>
+            <div style={{ padding: 12, background: 'var(--border-light)', borderRadius: 10, color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
               Status: <strong>{selectedApp.status.toUpperCase()}</strong>
             </div>
           )}
@@ -1655,8 +1656,8 @@ function ChallansSection({ user, activeSession }) {
             onClick={() => setTab(t.id)}
             style={{
               padding: '8px 16px', borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600,
-              background: tab === t.id ? `${GOLD}22` : 'rgba(255,255,255,0.04)',
-              color: tab === t.id ? GOLD : 'rgba(255,255,255,0.5)',
+              background: tab === t.id ? 'var(--accent-gold-transparent)' : 'var(--border-light)',
+              color: tab === t.id ? GOLD : 'var(--text-secondary)',
             }}
           >
             {t.label}
@@ -1664,7 +1665,7 @@ function ChallansSection({ user, activeSession }) {
         ))}
       </div>
 
-      {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)' }}>Loading...</div> : (
+      {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>Loading...</div> : (
         <>
           <div className="desktop-hide-on-mobile">
             <Table columns={columns} data={filtered} actions={(row) => (
@@ -1679,10 +1680,10 @@ function ChallansSection({ user, activeSession }) {
 
           <div className="mobile-show-only" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {filtered.map((row) => (
-              <div key={row.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16 }}>
+              <div key={row.id} style={{ background: 'var(--card-bg)', border: '1px solid var(--card-bg-hover)', borderRadius: 12, padding: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                   <div>
-                    <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff' }}>{row.student?.first_name} {row.student?.last_name}</div>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>{row.student?.first_name} {row.student?.last_name}</div>
                     <div style={{ fontSize: '0.75rem', color: GOLD, marginTop: 4 }}>Challan: {row.challan_no}</div>
                   </div>
                   {row.compensation_status === 'compensated' ? (
@@ -1694,20 +1695,20 @@ function ChallansSection({ user, activeSession }) {
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
                   <div>
-                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Amount</div>
-                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>Rs. {Number(row.amount).toLocaleString()}</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Amount</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>Rs. {Number(row.amount).toLocaleString()}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Due Date</div>
-                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.due_date}</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Due Date</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{row.due_date}</div>
                   </div>
                   <div style={{ gridColumn: '1 / -1' }}>
-                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Title</div>
-                    <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.title}</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Title</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{row.title}</div>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: 8, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 12, justifyContent: 'flex-end' }}>
+                <div style={{ display: 'flex', gap: 8, borderTop: '1px solid var(--card-bg-hover)', paddingTop: 12, justifyContent: 'flex-end' }}>
                   <Button variant="secondary" onClick={() => {
                     setReviewingChallan(row);
                     setIsEditing(false);
@@ -1739,13 +1740,13 @@ function ChallansSection({ user, activeSession }) {
                   ['Concession Status', reviewingChallan.compensation_status.toUpperCase()],
                 ].map(([l, v]) => (
                   <div key={l}>
-                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700, textTransform: 'uppercase' }}>{l}</div>
-                    <div style={{ fontSize: '0.88rem', color: '#fff', marginTop: 2 }}>{v}</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 700, textTransform: 'uppercase' }}>{l}</div>
+                    <div style={{ fontSize: '0.88rem', color: 'var(--text-primary)', marginTop: 2 }}>{v}</div>
                   </div>
                 ))}
               </div>
 
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 16 }}>
+              <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                   <h4 style={{ color: GOLD, margin: 0, fontSize: '0.85rem' }}>Admin Override & Reversals:</h4>
                   <Button variant="secondary" onClick={() => {
@@ -1768,7 +1769,7 @@ function ChallansSection({ user, activeSession }) {
                     {Icons.x(16)} Reject / Mark Unpaid
                   </Button>
                 </div>
-                <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', marginTop: 8 }}>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 8 }}>
                   Note: You can use "Reject / Mark Unpaid" to reverse a previously paid challan back to unpaid status if there was an error.
                 </p>
               </div>
@@ -1865,7 +1866,7 @@ function GuardiansSection({ user }) {
   return (
     <div>
       <SectionHeader title="Guardians Roster" subtitle={`${guardians.length} registered guardians`} />
-      {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)' }}>Loading...</div> : (
+      {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>Loading...</div> : (
         <>
           <div className="desktop-hide-on-mobile">
             <Table columns={columns} data={guardians} actions={(row) => (
@@ -1889,31 +1890,31 @@ function GuardiansSection({ user }) {
               const u = row.user;
               const fallbackUrl = u ? `https://ui-avatars.com/api/?name=${u.first_name}+${u.last_name}&background=F2A900&color=fff` : '';
               return (
-                <div key={row.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16 }}>
+                <div key={row.id} style={{ background: 'var(--card-bg)', border: '1px solid var(--card-bg-hover)', borderRadius: 12, padding: 16 }}>
                   <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12 }}>
                     {u && <img src={u.avatar_url || fallbackUrl} alt="Avatar" style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover' }} />}
                     <div>
-                      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff' }}>{u?.first_name} {u?.last_name}</div>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>{u?.first_name} {u?.last_name}</div>
                       <div style={{ fontSize: '0.75rem', color: GOLD, marginTop: 4 }}>CNIC: {u?.cnic}</div>
                     </div>
                   </div>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
                     <div>
-                      <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Phone</div>
-                      <div style={{ fontSize: '0.85rem', color: '#fff' }}>{u?.phone || '—'}</div>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Phone</div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{u?.phone || '—'}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Occupation</div>
-                      <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.occupation || '—'}</div>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Occupation</div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{row.occupation || '—'}</div>
                     </div>
                     <div style={{ gridColumn: '1 / -1' }}>
-                      <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Enrolled Children</div>
-                      <div style={{ fontSize: '0.85rem', color: '#fff' }}>{row.students?.length || 0}</div>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Enrolled Children</div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{row.students?.length || 0}</div>
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: 8, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 12, justifyContent: 'flex-end' }}>
+                  <div style={{ display: 'flex', gap: 8, borderTop: '1px solid var(--card-bg-hover)', paddingTop: 12, justifyContent: 'flex-end' }}>
                     <Button variant="secondary" onClick={() => {
                       setEditingGuardian(row);
                       setEditForm({
@@ -2014,7 +2015,7 @@ function AuditSection() {
         </div>
       </div>
 
-      {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)' }}>Loading...</div> : (
+      {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>Loading...</div> : (
         <>
           <div className="desktop-hide-on-mobile">
             <Table columns={columns} data={logs} />
@@ -2022,22 +2023,22 @@ function AuditSection() {
 
           <div className="mobile-show-only" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {logs.map((row) => (
-              <div key={row.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16 }}>
+              <div key={row.id} style={{ background: 'var(--card-bg)', border: '1px solid var(--card-bg-hover)', borderRadius: 12, padding: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                   <div>
-                    <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff' }}>{row.user ? `${row.user.first_name}` : 'System'}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>
+                    <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>{row.user ? `${row.user.first_name}` : 'System'}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 4 }}>
                       {new Date(row.created_at).toLocaleString()}
                     </div>
                   </div>
                   <Badge text={row.action} color={row.action === 'create' ? '#22c55e' : (row.action === 'delete' ? '#ef4444' : GOLD)} />
                 </div>
                 
-                <div style={{ background: 'rgba(0,0,0,0.2)', padding: 12, borderRadius: 8, border: '1px solid rgba(255,255,255,0.04)' }}>
+                <div style={{ background: 'var(--input-bg)', padding: 12, borderRadius: 8, border: '1px solid var(--border-light)' }}>
                   <div style={{ fontSize: '0.7rem', color: GOLD, textTransform: 'uppercase', marginBottom: 4 }}>
                     {row.entity_type} {row.entity_id ? `(#${row.entity_id})` : ''}
                   </div>
-                  <div style={{ fontSize: '0.85rem', color: '#fff', lineHeight: 1.4 }}>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-primary)', lineHeight: 1.4 }}>
                     {row.description || 'No description provided'}
                   </div>
                 </div>
@@ -2059,6 +2060,8 @@ function SettingsSection({ user }) {
   });
   const [savingBank, setSavingBank] = useState(false);
   const [msg, setMsg] = useState('');
+  
+  const { theme, changeTheme } = useTheme();
 
   useEffect(() => {
     db.getActiveBankConfig().then((b) => {
@@ -2078,10 +2081,32 @@ function SettingsSection({ user }) {
     <div>
       <SectionHeader title="Institute & System Settings" subtitle="Configure bank accounts, fee details, and system preferences" />
 
+      {/* Theme Selection Card */}
+      <Card style={{ maxWidth: 650, marginBottom: 24 }}>
+        <h3 style={{ color: 'var(--accent-gold)', margin: '0 0 16px 0', fontSize: '1.05rem' }}>Appearance / Theme</h3>
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 20 }}>
+          Customize the UI mode of the application.
+        </p>
+        <div style={{ display: 'flex', gap: 16 }}>
+          <Button 
+            variant={theme === 'dark' ? 'gold' : 'secondary'} 
+            onClick={() => changeTheme('dark')}
+          >
+            Dark Mode
+          </Button>
+          <Button 
+            variant={theme === 'light' ? 'gold' : 'secondary'} 
+            onClick={() => changeTheme('light')}
+          >
+            Light Mode
+          </Button>
+        </div>
+      </Card>
+
       {/* Bank Account Config Card */}
       <Card style={{ maxWidth: 650, marginBottom: 24 }}>
-        <h3 style={{ color: GOLD, margin: '0 0 16px 0', fontSize: '1.05rem' }}>Challan Bank Account Configuration</h3>
-        <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', marginBottom: 20 }}>
+        <h3 style={{ color: 'var(--accent-gold)', margin: '0 0 16px 0', fontSize: '1.05rem' }}>Challan Bank Account Configuration</h3>
+        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 20 }}>
           These bank details are automatically presented to parents when viewing and paying fee challans via TID.
         </p>
 
@@ -2093,7 +2118,7 @@ function SettingsSection({ user }) {
         </div>
         <InputField label="IBAN Number" value={bank.iban} onChange={(e) => setBank((p) => ({ ...p, iban: e.target.value }))} placeholder="PK36MEZN0001020304050607" />
 
-        {msg && <div style={{ color: '#22c55e', fontSize: '0.82rem', marginBottom: 12 }}>{msg}</div>}
+        {msg && <div style={{ color: 'var(--success-color)', fontSize: '0.82rem', marginBottom: 12 }}>{msg}</div>}
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
           <Button onClick={handleSaveBank} disabled={savingBank}>
@@ -2146,17 +2171,17 @@ function AnnouncementsSection({ user }) {
       } />
 
       <div style={{ display: 'grid', gap: 14 }}>
-        {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)' }}>Loading...</div> : (
+        {loading ? <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>Loading...</div> : (
           announcements.map((a) => (
             <Card key={a.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                  <span style={{ fontWeight: 700, color: '#fff', fontSize: '0.98rem' }}>{a.title}</span>
+                  <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.98rem' }}>{a.title}</span>
                   {a.is_pinned && <Badge text="Pinned" color={GOLD} />}
                   <Badge text={a.category} color="#3b82f6" />
                 </div>
-                <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.5, margin: 0 }}>{a.content}</p>
-                <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)', marginTop: 8 }}>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>{a.content}</p>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 8 }}>
                   {new Date(a.created_at).toLocaleDateString()} &bull; Posted by {a.author ? `${a.author.first_name} ${a.author.last_name}` : 'Administration'}
                 </div>
               </div>
@@ -2170,13 +2195,13 @@ function AnnouncementsSection({ user }) {
         <Modal title="Publish Announcement" onClose={() => setShowCreate(false)}>
           <InputField label="Title" value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} placeholder="e.g. Eid-ul-Fitr Vacation Schedule" required />
           <div style={{ marginBottom: 14 }}>
-            <label style={{ display: 'block', fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', marginBottom: 6, fontWeight: 500 }}>Content</label>
+            <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 500 }}>Content</label>
             <textarea
               value={form.content}
               onChange={(e) => setForm((p) => ({ ...p, content: e.target.value }))}
               rows={4}
               style={{
-                width: '100%', padding: '10px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, color: '#fff', fontSize: '0.85rem', outline: 'none',
+                width: '100%', padding: '10px 14px', background: 'var(--border-light)', border: '1px solid var(--border-color)', borderRadius: 10, color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none',
               }}
             />
           </div>
@@ -2247,17 +2272,17 @@ export default function AdminPortal() {
   const sidebarContent = (
     <>
       {/* Brand Header */}
-      <div style={{ padding: '24px 20px 20px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <div style={{ padding: '24px 20px 20px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid var(--card-bg-hover)' }}>
         <img src="/faiq-logo.png" alt="Al-Faiq" style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'cover' }} />
         <div>
-          <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#fff', lineHeight: 1.1 }}>Al-Faiq Institute</div>
+          <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.1 }}>Al-Faiq Institute</div>
           <div style={{ fontSize: '0.68rem', color: GOLD, fontWeight: 700, marginTop: 2 }}>Islamic Education System</div>
         </div>
       </div>
 
       {/* Active Session Selector */}
-      <div style={{ padding: '14px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 6 }}>
+      <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--card-bg-hover)' }}>
+        <div style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 6 }}>
           Active Academic Session
         </div>
         <select
@@ -2267,13 +2292,13 @@ export default function AdminPortal() {
             if (found) setActiveSession(found);
           }}
           style={{
-            width: '100%', padding: '8px 10px', background: 'rgba(255,255,255,0.06)',
+            width: '100%', padding: '8px 10px', background: 'var(--card-bg-hover)',
             border: '1px solid rgba(242,169,0,0.3)', borderRadius: 8, color: GOLD,
             fontSize: '0.82rem', fontWeight: 700, outline: 'none', cursor: 'pointer',
           }}
         >
           {sessions.map((s) => (
-            <option key={s.id} value={s.id} style={{ background: '#111625', color: '#fff' }}>
+            <option key={s.id} value={s.id} style={{ background: '#111625', color: 'var(--text-primary)' }}>
               {s.name} {s.is_active ? '' : (s.status === 'archived' ? '(Archived)' : '')}
             </option>
           ))}
@@ -2298,14 +2323,14 @@ export default function AdminPortal() {
                 border: 'none', borderRadius: 12,
                 cursor: 'pointer', marginBottom: 3,
                 transition: 'all 0.2s ease',
-                color: isActive ? GOLD : 'rgba(255,255,255,0.5)',
+                color: isActive ? GOLD : 'var(--text-secondary)',
                 fontSize: '0.84rem', fontWeight: isActive ? 700 : 500,
                 textAlign: 'left',
                 position: 'relative',
               }}
             >
               {isActive && <div style={{ position: 'absolute', left: 0, top: '20%', bottom: '20%', width: 3, borderRadius: 2, background: GOLD }} />}
-              {item.icon(18, isActive ? GOLD : 'rgba(255,255,255,0.4)')}
+              {item.icon(18, isActive ? GOLD : 'var(--text-tertiary)')}
               {item.label}
             </button>
           );
@@ -2313,8 +2338,8 @@ export default function AdminPortal() {
       </nav>
 
       {/* User & Sign Out */}
-      <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#fff' }}>{user.first_name} {user.last_name}</div>
+      <div style={{ padding: '16px 20px', borderTop: '1px solid var(--card-bg-hover)' }}>
+        <div style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--text-primary)' }}>{user.first_name} {user.last_name}</div>
         <div style={{ fontSize: '0.72rem', color: GOLD, fontWeight: 600, marginBottom: 12 }}>Administrator</div>
         <button
           onClick={() => { logout().then(() => router.push('/login')); }}
@@ -2338,13 +2363,13 @@ export default function AdminPortal() {
         <title>Admin Dashboard — Al-Faiq Islamic Education System</title>
       </Head>
 
-      <div style={{ display: 'flex', minHeight: '100vh', background: '#0a0e1a', fontFamily: "'Inter', sans-serif" }}>
+      <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-color)', fontFamily: "'Inter', sans-serif" }}>
         {/* Desktop Sidebar */}
         {!isMobile && (
           <aside style={{
             width: 270, minHeight: '100vh',
             background: '#0d111e',
-            borderRight: '1px solid rgba(255,255,255,0.06)',
+            borderRight: '1px solid var(--card-bg-hover)',
             display: 'flex', flexDirection: 'column',
             position: 'fixed', left: 0, top: 0, bottom: 0,
             zIndex: 100,
@@ -2359,7 +2384,7 @@ export default function AdminPortal() {
             <div onClick={() => setSidebarOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', zIndex: 998 }} />
             <aside style={{
               position: 'fixed', left: 0, top: 0, bottom: 0, width: 280, zIndex: 999,
-              background: '#0d111e', borderRight: '1px solid rgba(255,255,255,0.08)',
+              background: '#0d111e', borderRight: '1px solid var(--border-color)',
               display: 'flex', flexDirection: 'column',
             }}>
               {sidebarContent}
@@ -2377,15 +2402,15 @@ export default function AdminPortal() {
           {isMobile && (
             <div style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '14px 20px', background: '#0d111e', borderBottom: '1px solid rgba(255,255,255,0.06)',
+              padding: '14px 20px', background: '#0d111e', borderBottom: '1px solid var(--card-bg-hover)',
               position: 'sticky', top: 0, zIndex: 50,
             }}>
-              <button onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff', padding: 0 }}>
+              <button onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-primary)', padding: 0 }}>
                 {Icons.menu(24)}
               </button>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <img src="/faiq-logo.png" alt="" style={{ width: 28, height: 28, borderRadius: 8 }} />
-                <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#fff' }}>Al-Faiq Admin</span>
+                <span style={{ fontWeight: 800, fontSize: '0.92rem', color: 'var(--text-primary)' }}>Al-Faiq Admin</span>
               </div>
               <div style={{ width: 24 }} />
             </div>
@@ -2401,7 +2426,7 @@ export default function AdminPortal() {
           <div style={{ padding: isMobile ? '20px 16px' : '32px 40px', maxWidth: 1280 }}>
             {/* Breadcrumb */}
             <div style={{ marginBottom: 22 }}>
-              <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                 Admin Portal / {NAV_ITEMS.find((n) => n.id === activeSection)?.label || 'Dashboard'}
               </div>
             </div>
@@ -2415,7 +2440,7 @@ export default function AdminPortal() {
         @keyframes spin {
           to { transform: rotate(360deg); }
         }
-        * { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; box-sizing: border-box; }
+        * { scrollbar-width: thin; scrollbar-color: var(--border-color) transparent; box-sizing: border-box; }
         *::-webkit-scrollbar { width: 6px; }
         *::-webkit-scrollbar-track { background: transparent; }
         *::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }

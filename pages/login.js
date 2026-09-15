@@ -141,7 +141,7 @@ const InputField = ({ icon, label, type = 'text', value, onChange, placeholder, 
     <div style={{ marginBottom: 18 }}>
       {label && <label style={styles.label}>{label}</label>}
       <div style={styles.inputWrapper}>
-        <span style={{ ...styles.inputIcon, color: focused ? '#F2A900' : 'rgba(255,255,255,0.4)' }}>
+        <span style={{ ...styles.inputIcon, color: focused ? '#F2A900' : 'var(--text-tertiary)' }}>
           {icon}
         </span>
         <input
@@ -544,7 +544,7 @@ export default function LoginPage() {
         <link rel="icon" href="/faiq-logo.png" />
         <style>{`
           @keyframes spin { to { transform: rotate(360deg); } }
-          input::placeholder { color: rgba(255,255,255,0.25); }
+          input::placeholder { color: var(--text-tertiary); }
           input:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px rgba(18,26,51,0.95) inset !important; -webkit-text-fill-color: #fff !important; }
         `}</style>
       </Head>
@@ -617,7 +617,7 @@ export default function LoginPage() {
                 </div>
 
                 <button type="submit" disabled={loading} style={styles.submitBtn}>
-                  {loading ? <>{Icons.loader(18, '#0a0e1a')} Authenticating...</> : <>Sign In {Icons.arrowRight(18, '#0a0e1a')}</>}
+                  {loading ? <>{Icons.loader(18, 'var(--bg-color)')} Authenticating...</> : <>Sign In {Icons.arrowRight(18, 'var(--bg-color)')}</>}
                 </button>
               </form>
             )}
@@ -700,7 +700,7 @@ export default function LoginPage() {
                 />
 
                 <button type="submit" disabled={loading} style={styles.submitBtn}>
-                  {loading ? <>{Icons.loader(18, '#0a0e1a')} Creating Account...</> : <>Create Account {Icons.arrowRight(18, '#0a0e1a')}</>}
+                  {loading ? <>{Icons.loader(18, 'var(--bg-color)')} Creating Account...</> : <>Create Account {Icons.arrowRight(18, 'var(--bg-color)')}</>}
                 </button>
               </form>
             )}
@@ -715,7 +715,7 @@ export default function LoginPage() {
                 <OtpInput value={otpCode} onChange={setOtpCode} />
 
                 <button type="submit" disabled={loading} style={styles.submitBtn}>
-                  {loading ? <>{Icons.loader(18, '#0a0e1a')} Verifying...</> : <>Verify Code {Icons.arrowRight(18, '#0a0e1a')}</>}
+                  {loading ? <>{Icons.loader(18, 'var(--bg-color)')} Verifying...</> : <>Verify Code {Icons.arrowRight(18, 'var(--bg-color)')}</>}
                 </button>
 
                 <div style={{ textAlign: 'center', marginTop: 16 }}>
@@ -742,7 +742,7 @@ export default function LoginPage() {
                   required
                 />
                 <button type="submit" disabled={loading} style={styles.submitBtn}>
-                  {loading ? <>{Icons.loader(18, '#0a0e1a')} Sending...</> : <>Send Reset Link {Icons.arrowRight(18, '#0a0e1a')}</>}
+                  {loading ? <>{Icons.loader(18, 'var(--bg-color)')} Sending...</> : <>Send Reset Link {Icons.arrowRight(18, 'var(--bg-color)')}</>}
                 </button>
               </form>
             )}
@@ -797,27 +797,27 @@ export default function LoginPage() {
 const styles = {
   page: {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    minHeight: '100vh', padding: '24px 16px', position: 'relative', background: '#0a0e1a',
+    minHeight: '100vh', padding: '24px 16px', position: 'relative', background: 'var(--bg-color)',
   },
   container: { width: '100%', maxWidth: '430px', position: 'relative', zIndex: 1 },
   logoHeader: {
     display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '28px', textAlign: 'center',
   },
   logoBadge: {
-    width: 72, height: 72, borderRadius: 20, background: 'rgba(255,255,255,0.05)',
+    width: 72, height: 72, borderRadius: 20, background: 'var(--border-light)',
     border: '1px solid rgba(242, 169, 0, 0.3)', display: 'flex', alignItems: 'center',
-    justifyContent: 'center', marginBottom: 16, boxShadow: '0 8px 24px rgba(0,0,0,0.3)', padding: 10,
+    justifyContent: 'center', marginBottom: 16, boxShadow: '0 8px 24px var(--input-bg)', padding: 10,
   },
   logoImage: { width: '100%', height: '100%', objectFit: 'contain' },
-  title: { fontSize: '1.4rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', marginBottom: 4 },
+  title: { fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: 4 },
   subtitle: { fontSize: '0.85rem', color: 'rgba(255,255,255,0.45)', fontWeight: 500 },
   card: {
     background: 'rgba(18, 26, 51, 0.75)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-    borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', padding: '32px 28px',
+    borderRadius: 16, border: '1px solid var(--border-color)', padding: '32px 28px',
     boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
   },
   label: {
-    display: 'block', fontSize: '0.76rem', fontWeight: 600, color: 'rgba(255,255,255,0.6)',
+    display: 'block', fontSize: '0.76rem', fontWeight: 600, color: 'var(--text-secondary)',
     marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em',
   },
   inputWrapper: { position: 'relative', display: 'flex', alignItems: 'center' },
@@ -826,9 +826,9 @@ const styles = {
     justifyContent: 'center', zIndex: 1, pointerEvents: 'none',
   },
   input: {
-    width: '100%', padding: '13px 14px 13px 44px', background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, fontSize: '0.92rem',
-    color: '#ffffff', outline: 'none', boxSizing: 'border-box',
+    width: '100%', padding: '13px 14px 13px 44px', background: 'var(--border-light)',
+    border: '1px solid var(--border-color)', borderRadius: 10, fontSize: '0.92rem',
+    color: 'var(--text-primary)', outline: 'none', boxSizing: 'border-box',
   },
   inputFocus: {
     borderColor: '#F2A900', background: 'rgba(255,255,255,0.07)',
@@ -836,17 +836,17 @@ const styles = {
   },
   passwordToggle: {
     position: 'absolute', right: 12, background: 'none', border: 'none', cursor: 'pointer',
-    color: 'rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', padding: 4, borderRadius: 6,
+    color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', padding: 4, borderRadius: 6,
   },
   submitBtn: {
     width: '100%', padding: '14px 20px',
     background: 'linear-gradient(135deg, #F2A900 0%, #d99600 100%)',
-    border: 'none', borderRadius: 10, fontSize: '0.92rem', fontWeight: 700, color: '#0a0e1a',
+    border: 'none', borderRadius: 10, fontSize: '0.92rem', fontWeight: 700, color: 'var(--bg-color)',
     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
     marginTop: 8, boxShadow: '0 4px 16px rgba(242, 169, 0, 0.25)',
   },
   toggleSection: {
-    marginTop: 20, paddingTop: 18, borderTop: '1px solid rgba(255,255,255,0.06)', textAlign: 'center',
+    marginTop: 20, paddingTop: 18, borderTop: '1px solid var(--card-bg-hover)', textAlign: 'center',
   },
   toggleBtn: {
     background: 'rgba(242, 169, 0, 0.08)', border: '1px solid rgba(242, 169, 0, 0.2)',
@@ -867,11 +867,11 @@ const styles = {
     color: type === 'error' ? '#fca5a5' : '#86efac',
   }),
   inputRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
-  otpHint: { textAlign: 'center', fontSize: '0.875rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, marginBottom: 4 },
+  otpHint: { textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 4 },
   otpBox: {
     width: 48, height: 56, textAlign: 'center', fontSize: '1.4rem', fontWeight: 700,
-    background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)',
-    borderRadius: 10, color: '#ffffff', outline: 'none', caretColor: '#F2A900',
+    background: 'var(--card-bg-hover)', border: '1px solid var(--border-color)',
+    borderRadius: 10, color: 'var(--text-primary)', outline: 'none', caretColor: '#F2A900',
   },
-  footer: { textAlign: 'center', marginTop: 24, fontSize: '0.78rem', color: 'rgba(255,255,255,0.25)' },
+  footer: { textAlign: 'center', marginTop: 24, fontSize: '0.78rem', color: 'var(--text-tertiary)' },
 };

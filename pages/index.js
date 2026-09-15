@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { getCurrentUserSync, getPortalPath } from '../lib/auth';
 
-const GOLD = '#F2A900';
+const GOLD = 'var(--accent-gold)';
 const NAVY = '#002147';
 
 const Icons = {
@@ -91,13 +91,13 @@ export default function Home() {
         <meta name="description" content="Al-Faiq Education System offers Hifz Ul Quran with daily Sabaq/Manzil tracking and Dars-e-Nizami scholarship programs." />
       </Head>
 
-      <div style={{ background: '#0a0e1a', color: '#fff', fontFamily: "'Inter', sans-serif", minHeight: '100vh' }}>
+      <div style={{ background: 'var(--bg-color)', color: 'var(--text-primary)', fontFamily: "'Inter', sans-serif", minHeight: '100vh' }}>
         {/* Desktop Navigation Bar */}
         <nav className="desktop-nav" style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
           background: scrolled ? 'rgba(10, 14, 26, 0.95)' : 'transparent',
           backdropFilter: scrolled ? 'blur(12px)' : 'none',
-          borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : 'none',
+          borderBottom: scrolled ? '1px solid var(--card-bg-hover)' : 'none',
           padding: '16px 36px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           transition: 'all 0.3s ease',
@@ -105,7 +105,7 @@ export default function Home() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <img src="/faiq-logo.png" alt="Al-Faiq Logo" style={{ width: 40, height: 40, borderRadius: 12, objectFit: 'cover' }} />
             <div>
-              <div style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>Al-Faiq Institute</div>
+              <div style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>Al-Faiq Institute</div>
               <div style={{ fontSize: '0.68rem', color: GOLD, fontWeight: 700, letterSpacing: '0.08em' }}>ISLAMIC EDUCATION SYSTEM</div>
             </div>
           </div>
@@ -118,7 +118,7 @@ export default function Home() {
               onClick={() => router.push('/login')}
               style={{
                 background: `linear-gradient(135deg, ${GOLD}, #e09800)`,
-                color: '#0a0e1a', padding: '10px 22px', borderRadius: 12,
+                color: 'var(--bg-color)', padding: '10px 22px', borderRadius: 12,
                 border: 'none', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
               }}
             >
@@ -133,7 +133,7 @@ export default function Home() {
           background: scrolled ? 'rgba(10, 14, 26, 0.98)' : 'rgba(10, 14, 26, 0.92)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          borderBottom: '1px solid var(--border-color)',
           boxShadow: scrolled ? '0 10px 30px rgba(0,0,0,0.5)' : 'none',
           transition: 'all 0.3s ease',
         }}>
@@ -143,7 +143,7 @@ export default function Home() {
             padding: '12px 16px 2px',
           }}>
             <img src="/faiq-logo.png" alt="Al-Faiq Logo" style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'cover' }} />
-            <span style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>Al-Faiq Institute</span>
+            <span style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>Al-Faiq Institute</span>
           </div>
 
           {/* Islamic Education System */}
@@ -159,8 +159,8 @@ export default function Home() {
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             padding: '6px 12px 8px',
-            background: 'rgba(255, 255, 255, 0.02)',
-            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+            background: 'var(--card-bg)',
+            borderTop: '1px solid var(--border-light)',
           }}>
             <button
               onClick={() => scrollToSection('programs')}
@@ -227,7 +227,7 @@ export default function Home() {
             </h1>
 
             <p style={{
-              fontSize: '1.1rem', color: 'rgba(255,255,255,0.6)',
+              fontSize: '1.1rem', color: 'var(--text-secondary)',
               lineHeight: 1.6, maxWidth: 640, margin: '0 auto 36px',
             }}>
               Al-Faiq delivers authentic Quranic memorization with daily Surah & Ayah-level tracking, alongside the classical Dars-e-Nizami curriculum with real-time guardian visibility.
@@ -238,18 +238,18 @@ export default function Home() {
                 onClick={() => router.push('/login')}
                 style={{
                   background: `linear-gradient(135deg, ${GOLD}, #e09800)`,
-                  color: '#0a0e1a', padding: '14px 32px', borderRadius: 14,
+                  color: 'var(--bg-color)', padding: '14px 32px', borderRadius: 14,
                   border: 'none', fontWeight: 800, fontSize: '0.95rem', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', gap: 10,
                   boxShadow: '0 10px 30px rgba(242,169,0,0.3)',
                 }}
               >
-                Access Portal {Icons.arrowRight(18, '#0a0e1a')}
+                Access Portal {Icons.arrowRight(18, 'var(--bg-color)')}
               </button>
               <button
                 onClick={() => scrollToSection('programs')}
                 style={{
-                  background: 'rgba(255,255,255,0.06)', color: '#fff',
+                  background: 'var(--card-bg-hover)', color: 'var(--text-primary)',
                   border: '1px solid rgba(255,255,255,0.12)',
                   padding: '14px 28px', borderRadius: 14,
                   fontWeight: 700, fontSize: '0.95rem', cursor: 'pointer',
@@ -273,8 +273,8 @@ export default function Home() {
               <div
                 key={prog.code}
                 style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'var(--card-bg)',
+                  border: '1px solid var(--border-color)',
                   borderRadius: 20, padding: 32,
                   transition: 'all 0.3s ease',
                 }}
@@ -284,8 +284,8 @@ export default function Home() {
                 </div>
                 <div style={{ fontSize: '0.78rem', color: prog.color, fontWeight: 700 }}>{prog.duration}</div>
                 <h3 style={{ fontSize: '1.3rem', fontWeight: 800, margin: '6px 0 12px 0' }}>{prog.name}</h3>
-                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.88rem', lineHeight: 1.6, margin: '0 0 20px 0' }}>{prog.desc}</p>
-                <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 16 }}>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.6, margin: '0 0 20px 0' }}>{prog.desc}</p>
+                <div style={{ borderTop: '1px solid var(--card-bg-hover)', paddingTop: 16 }}>
                   <button
                     onClick={() => router.push('/login')}
                     style={{ background: 'none', border: 'none', color: prog.color, fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, padding: 0 }}
@@ -299,7 +299,7 @@ export default function Home() {
         </section>
 
         {/* Faculty Section */}
-        <section id="scholars" style={{ padding: '80px 24px', maxWidth: 1140, margin: '0 auto', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <section id="scholars" style={{ padding: '80px 24px', maxWidth: 1140, margin: '0 auto', borderTop: '1px solid var(--card-bg-hover)' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <div style={{ fontSize: '0.78rem', fontWeight: 700, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.1em' }}>DISTINGUISHED FACULTY</div>
             <h2 style={{ fontSize: '2.2rem', fontWeight: 800, margin: '8px 0 0 0' }}>Scholars & Instructors</h2>
@@ -307,26 +307,26 @@ export default function Home() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 20 }}>
             {SCHOLARS.map((sc, i) => (
-              <div key={i} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: 24 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: GOLD, fontWeight: 800, marginBottom: 14 }}>
+              <div key={i} style={{ background: 'var(--card-bg)', border: '1px solid var(--card-bg-hover)', borderRadius: 16, padding: 24 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: GOLD, fontWeight: 800, marginBottom: 14 }}>
                   {sc.name.split(' ')[1]?.[0] || 'S'}
                 </div>
                 <h4 style={{ fontSize: '1.05rem', fontWeight: 700, margin: '0 0 4px 0' }}>{sc.name}</h4>
                 <div style={{ fontSize: '0.78rem', color: GOLD, fontWeight: 600 }}>{sc.role}</div>
-                <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: 8 }}>{sc.qual}</div>
-                <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>Specialization: {sc.spec}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 8 }}>{sc.qual}</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: 4 }}>Specialization: {sc.spec}</div>
               </div>
             ))}
           </div>
         </section>
 
         {/* Footer */}
-        <footer id="about" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '40px 24px', textAlign: 'center' }}>
+        <footer id="about" style={{ borderTop: '1px solid var(--card-bg-hover)', padding: '40px 24px', textAlign: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 12 }}>
             <img src="/faiq-logo.png" alt="" style={{ width: 28, height: 28, borderRadius: 8 }} />
             <span style={{ fontWeight: 800, fontSize: '0.95rem' }}>Al-Faiq Islamic Institute</span>
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.78rem', margin: 0 }}>
+          <p style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem', margin: 0 }}>
             &copy; {new Date().getFullYear()} Al-Faiq Islamic Education System. All rights reserved.
           </p>
         </footer>

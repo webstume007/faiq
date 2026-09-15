@@ -297,12 +297,16 @@ export default function GuardianPortal() {
       }
     }
 
+    // Strip UI-only fields not in DB schema
+    const { docs, ...admissionPayload } = formData;
+
     const { admission, error } = await createAdmission({
-      ...formData,
+      ...admissionPayload,
       guardian_id: user.id,
       session_id: activeSession?.id || 'e0000000-0000-0000-0000-000000000001',
       profile_picture_url: picUrl,
       status: 'pending',
+      docs_checklist: docs,
     });
 
     if (error) {

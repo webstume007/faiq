@@ -211,8 +211,17 @@ export default function GuardianPortal() {
 
     let courses = [];
     if (sess && sess.id) {
-      const { data } = await supabase.from('session_courses').select('*').eq('session_id', sess.id);
+      const { data, error } = await supabase.from('session_courses').select('*').eq('session_id', sess.id);
+      console.log('Session ID:', sess.id, 'Fetched Courses:', data, 'Error:', error);
       courses = data || [];
+    } else {
+      // Fallback: load from most recent session (even if not marked active)
+      const { data: latestSession } = await supabase.from('sessions').select('id').order('created_at', { ascending: false }).limit(1).maybeSingle();
+      if (latestSession?.id) {
+        const { data } = await supabase.from('session_courses').select('*').eq('session_id', latestSession.id);
+        courses = data || [];
+        console.log('Fallback session courses:', courses.length);
+      }
     }
     setAvailableCourses(courses);
   }, []);

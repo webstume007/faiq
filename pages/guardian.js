@@ -300,13 +300,15 @@ export default function GuardianPortal() {
     // Strip UI-only fields not in DB schema
     const { docs, ...admissionPayload } = formData;
 
-    // Convert empty strings to null for optional/numeric fields to avoid DB type errors
-    const numericFields = ['father_income', 'previous_marks'];
+    // Convert empty strings to null to avoid DB type errors
     const sanitized = { ...admissionPayload };
     for (const key of Object.keys(sanitized)) {
-      if (sanitized[key] === '') {
-        sanitized[key] = numericFields.includes(key) ? null : null;
-      }
+      if (sanitized[key] === '') sanitized[key] = null;
+    }
+
+    // Map gender to lowercase enum values expected by DB
+    if (sanitized.student_gender) {
+      sanitized.student_gender = sanitized.student_gender.toLowerCase();
     }
 
     const { admission, error } = await createAdmission({
@@ -317,6 +319,7 @@ export default function GuardianPortal() {
       status: 'pending',
       docs_checklist: docs,
     });
+
 
 
     if (error) {

@@ -540,8 +540,8 @@ export default function LoginPage() {
   return (
     <>
       <Head>
-        <title>Al-Faeq Education System</title>
-        <link rel="icon" href="/faeq-logo.png" />
+        <title>Al-Faiq Education System</title>
+        <link rel="icon" href="/faiq-logo.png" />
         <style>{`
           @keyframes spin { to { transform: rotate(360deg); } }
           input::placeholder { color: rgba(255,255,255,0.25); }
@@ -556,9 +556,9 @@ export default function LoginPage() {
           {/* Logo & Header */}
           <div style={styles.logoHeader}>
             <div style={styles.logoBadge}>
-              <img src="/faeq-logo.png" alt="Al-Faeq Logo" style={styles.logoImage} />
+              <img src="/faiq-logo.png" alt="Al-Faiq Logo" style={styles.logoImage} />
             </div>
-            <h1 style={styles.title}>Al-Faeq Education System</h1>
+            <h1 style={styles.title}>Al-Faiq Education System</h1>
             <p style={styles.subtitle}>
               {mode === 'login'   && 'Portal Sign In'}
               {mode === 'signup'  && 'Create Account'}
@@ -783,7 +783,7 @@ export default function LoginPage() {
           </div>
 
           <div style={styles.footer}>
-            <p>Al-Faeq Education System © 2026</p>
+            <p>Al-Faiq Education System © 2026</p>
           </div>
         </div>
       </div>

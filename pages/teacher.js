@@ -274,7 +274,7 @@ export default function TeacherPortal() {
   return (
     <>
       <Head>
-        <title>Teacher Portal — Al-Faeq Islamic Institute</title>
+        <title>Teacher Portal — Al-Faiq Islamic Institute</title>
       </Head>
 
       <div style={{ minHeight: '100vh', background: '#0a0e1a', fontFamily: "'Inter', sans-serif", color: '#fff' }}>
@@ -286,9 +286,9 @@ export default function TeacherPortal() {
           position: 'sticky', top: 0, zIndex: 100,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <img src="/faeq-logo.png" alt="" style={{ width: 34, height: 34, borderRadius: 10 }} />
+            <img src="/faiq-logo.png" alt="" style={{ width: 34, height: 34, borderRadius: 10 }} />
             <div>
-              <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#fff' }}>Al-Faeq Portal</div>
+              <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#fff' }}>Al-Faiq Portal</div>
               <div style={{ fontSize: '0.68rem', color: GOLD, fontWeight: 700 }}>Teacher & Scholar Workstation</div>
             </div>
           </div>

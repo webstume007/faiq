@@ -1,4 +1,4 @@
-# Project Context: Al-Faeq Education System
+# Project Context: Al-Faiq Education System
 
 This document serves as a persistent memory of the project's requirements, design aesthetics, and user scenarios.
 
@@ -37,5 +37,5 @@ This document serves as a persistent memory of the project's requirements, desig
 
 1.  "add few more things in implementation plan... all login will login using CNIC... teachers portal admin will create... Admin main dashboard will have mega search bar..."
 2.  "UI of all portals will be same except admin desktop view will have bar in left while mobile view will match attached reference... the UI should moreeeeee modern, animations, svgs icons, slight round cornors (NEVER USE EMOJI)"
-3.  "remove this line from signup --dont add two button signin and signup only signin will be on that page below Create new account button... Instead School Portal Managements sytem Add Al-Faeq Education System and add logo as well..."
+3.  "remove this line from signup --dont add two button signin and signup only signin will be on that page below Create new account button... Instead School Portal Managements sytem Add Al-Faiq Education System and add logo as well..."
 4.  "Put NOtice board as in refrence repo index page has also notification icon in top right cornor Guardian Portal or Admin Portal or Teacher Portal will be in narrow sub bar under the header in mobile view... in mobile view there will be Home Button there will be notice borad... below statistics of attendance below Study_Progress statistics... in main header only institute name and logo and on right side notification icon... below there will be a card showing the picture of child1 and name and course its enrolled and attendence percentage upon clicking + button in right of card option to switch to another child will show... also save the entire my prompts and scenerio somewhere in .md like file so you can remember"

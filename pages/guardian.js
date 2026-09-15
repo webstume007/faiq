@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { getCurrentUser, getCurrentUserSync, logout } from '../lib/auth';
 import { getChildData, getAnnouncementsByRole } from '../lib/guardianData';
-import { getStudentsByGuardian, submitChallanPayment, getActiveBankConfig, createAdmission, getActiveSession } from '../lib/db';
+import { getStudentsByGuardian, submitChallanPayment, getActiveBankConfig, createAdmission, getActiveSession, supabase, updateGuardianProfile } from '../lib/db';
 import { QURAN_SURAHS, QURAN_PARAS, formatAyahRange } from '../lib/quranData';
 
 const GOLD = '#F2A900';
@@ -48,6 +48,12 @@ const Icons = {
   ),
   flag: (size = 18, color = 'currentColor') => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+  ),
+  menu: (size = 20, color = 'currentColor') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  ),
+  close: (size = 20, color = 'currentColor') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   ),
 };
 
@@ -112,6 +118,17 @@ export default function GuardianPortal() {
   const [announcements, setAnnouncements] = useState([]);
   const [bankConfig, setBankConfig] = useState(null);
   const [activeSession, setActiveSession] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Guardian Profile & Onboarding State
+  const [guardianProfile, setGuardianProfile] = useState(null);
+  const [isOnboarding, setIsOnboarding] = useState(false);
+  const [onboardingLoading, setOnboardingLoading] = useState(false);
+  const [profilePic, setProfilePic] = useState(null);
+  const [onboardingForm, setOnboardingForm] = useState({
+    firstName: '', lastName: '', cnic: '', phone: '', email: '',
+    fatherName: '', relation: 'Father', occupation: '', earning: '', address: '', childCount: 1
+  });
 
   // Challan Payment state
   const [challans, setChallans] = useState([]);
@@ -122,6 +139,9 @@ export default function GuardianPortal() {
 
   // Admission Application state
   const [showAdmissionModal, setShowAdmissionModal] = useState(false);
+  const [admissionStep, setAdmissionStep] = useState(1);
+  const [admissionPic, setAdmissionPic] = useState(null);
+  const [admissionLoading, setAdmissionLoading] = useState(false);
   const [admissionForm, setAdmissionForm] = useState({
     student_first_name: '', student_last_name: '', student_dob: '', student_gender: 'male',
     student_b_form: '', course_type: 'hifz', desired_course: 'Hifz Ul Quran', previous_school: '',
@@ -129,15 +149,51 @@ export default function GuardianPortal() {
 
   const loadData = useCallback(async (currentUser) => {
     const students = await getStudentsByGuardian(currentUser.id);
+    const childDataList = [];
     if (students && students.length > 0) {
-      const childDataList = [];
       for (const student of students) {
         const childInfo = await getChildData(student.id);
         if (childInfo) childDataList.push(childInfo);
       }
-      setChildrenList(childDataList);
-    } else {
-      setChildrenList([]);
+    }
+
+    const { data: apps } = await supabase
+      .from('admission_applications')
+      .select('*')
+      .eq('guardian_id', currentUser.id)
+      .eq('status', 'pending');
+
+    if (apps && apps.length > 0) {
+      for (const app of apps) {
+        childDataList.push({
+          id: `app_${app.id}`,
+          isPending: true,
+          studentName: `${app.student_first_name} ${app.student_last_name}`,
+          programType: app.course_type,
+          courseName: app.desired_course,
+          profilePic: app.profile_picture_url,
+          rollNo: 'TBD',
+          classSection: 'Pending Approval',
+        });
+      }
+    }
+
+    setChildrenList(childDataList);
+
+    const { data: gProfile } = await supabase.from('guardians').select('*').eq('id', currentUser.id).single();
+    setGuardianProfile(gProfile);
+    
+    if (!gProfile?.onboarding_complete) {
+      setIsOnboarding(true);
+      setOnboardingForm((prev) => ({
+        ...prev,
+        firstName: currentUser.first_name || '',
+        lastName: currentUser.last_name || '',
+        cnic: currentUser.cnic || '',
+        phone: currentUser.phone || '',
+        email: currentUser.email || '',
+        address: currentUser.current_address || '',
+      }));
     }
 
     const [anns, bank, sess] = await Promise.all([
@@ -165,7 +221,7 @@ export default function GuardianPortal() {
   // Load challans for active child
   const loadChallans = useCallback(async () => {
     if (!currentChild) return;
-    const { data } = await db.supabase
+    const { data } = await supabase
       .from('challans')
       .select('*, payment:challan_payments(*)')
       .eq('student_id', currentChild.id)
@@ -205,11 +261,28 @@ export default function GuardianPortal() {
     setTimeout(() => setToastMsg(''), 3500);
   };
 
-  const handleApplyAdmission = async () => {
+  const handleApplyAdmission = async (e) => {
+    e.preventDefault();
     if (!admissionForm.student_first_name || !admissionForm.student_last_name) {
       alert('Please enter your child\'s name.');
       return;
     }
+    setAdmissionLoading(true);
+    
+    let picUrl = null;
+    if (admissionPic) {
+      const ext = admissionPic.name.split('.').pop();
+      const fileName = `student-${user.id}-${Date.now()}.${ext}`;
+      const { data: uploadData, error: uploadErr } = await supabase.storage
+        .from('profiles')
+        .upload(fileName, admissionPic, { cacheControl: '3600', upsert: false });
+      
+      if (!uploadErr && uploadData) {
+        const { data: publicUrlData } = supabase.storage.from('profiles').getPublicUrl(fileName);
+        picUrl = publicUrlData.publicUrl;
+      }
+    }
+
     await createAdmission({
       guardian_id: user.id,
       session_id: activeSession?.id || 'e0000000-0000-0000-0000-000000000001',
@@ -228,75 +301,304 @@ export default function GuardianPortal() {
     setTimeout(() => setToastMsg(''), 3500);
   };
 
+  const handleOnboardingSubmit = async (e) => {
+    e.preventDefault();
+    setOnboardingLoading(true);
+
+    let picUrl = null;
+    if (profilePic) {
+      const ext = profilePic.name.split('.').pop();
+      const fileName = `${user.id}-${Date.now()}.${ext}`;
+      const { data: uploadData, error: uploadErr } = await supabase.storage
+        .from('profiles')
+        .upload(fileName, profilePic, { cacheControl: '3600', upsert: false });
+      
+      if (!uploadErr && uploadData) {
+        const { data: publicUrlData } = supabase.storage.from('profiles').getPublicUrl(fileName);
+        picUrl = publicUrlData.publicUrl;
+      }
+    }
+
+    const { error } = await updateGuardianProfile(
+      user.id,
+      {
+        first_name: onboardingForm.firstName,
+        last_name: onboardingForm.lastName,
+        phone: onboardingForm.phone,
+        current_address: onboardingForm.address,
+        profile_picture_url: picUrl,
+      },
+      {
+        father_name: onboardingForm.fatherName,
+        relation_to_student: onboardingForm.relation,
+        occupation: onboardingForm.occupation,
+        estimated_earning: onboardingForm.earning ? parseFloat(onboardingForm.earning) : null,
+        child_count: onboardingForm.childCount ? parseInt(onboardingForm.childCount, 10) : 1,
+      }
+    );
+
+    setOnboardingLoading(false);
+    if (error) {
+      alert(`Error updating profile: ${error}`);
+    } else {
+      setIsOnboarding(false);
+      setToastMsg('Profile setup completed successfully!');
+      setTimeout(() => setToastMsg(''), 3500);
+      loadData(user); // Reload data to get updated guardianProfile
+    }
+  };
+
   if (!user) return null;
 
   return (
     <>
       <Head>
         <title>Parent Portal — Al-Faeq Islamic Education System</title>
+        <style>{`
+          .mobile-hide { display: flex; }
+          .desktop-hide { display: none; }
+          @media (max-width: 768px) {
+            .mobile-hide { display: none !important; }
+            .desktop-hide { display: flex !important; }
+          }
+        `}</style>
       </Head>
 
-      <div style={{ minHeight: '100vh', background: '#0a0e1a', fontFamily: "'Inter', sans-serif", color: '#fff' }}>
-        {/* Global Header */}
-        <header style={{
-          padding: '16px 24px', background: '#0d111e', borderBottom: '1px solid rgba(255,255,255,0.06)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <img src="/faeq-logo.png" alt="" style={{ width: 34, height: 34, borderRadius: 10 }} />
-            <div>
-              <div style={{ fontSize: '0.92rem', fontWeight: 800 }}>Al-Faeq Education</div>
-              <div style={{ fontSize: '0.68rem', color: GOLD, fontWeight: 700 }}>Parent / Guardian Portal</div>
-            </div>
-          </div>
+      <div style={{ minHeight: '100vh', background: '#0a0e1a', fontFamily: "'Inter', sans-serif", color: '#fff', position: 'relative' }}>
+        
+        {isOnboarding ? (
+          <div style={{ padding: 24, maxWidth: 600, margin: '0 auto', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <h2 style={{ fontSize: '1.5rem', color: GOLD, marginBottom: 8, textAlign: 'center' }}>Complete Your Guardian Profile</h2>
+            <p style={{ color: 'rgba(255,255,255,0.6)', textAlign: 'center', marginBottom: 24, fontSize: '0.9rem' }}>
+              Please provide the required details before accessing the parent portal.
+            </p>
+            <form onSubmit={handleOnboardingSubmit} style={{ background: '#111625', padding: 24, borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 20 }}>
+                <div style={{ width: 80, height: 80, borderRadius: 40, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, overflow: 'hidden' }}>
+                  {profilePic ? (
+                    <img src={URL.createObjectURL(profilePic)} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    Icons.user(32, 'rgba(255,255,255,0.3)')
+                  )}
+                </div>
+                <label style={{ color: GOLD, fontSize: '0.8rem', cursor: 'pointer', fontWeight: 600 }}>
+                  Upload Photo (Optional)
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => { if(e.target.files[0]) setProfilePic(e.target.files[0]); }} />
+                </label>
+              </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '0.82rem', fontWeight: 700 }}>{user.first_name} {user.last_name}</div>
-              <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.4)' }}>CNIC: {user.cnic}</div>
-            </div>
-            <button
-              onClick={() => { logout().then(() => router.push('/login')); }}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px',
-                background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
-                borderRadius: 8, color: '#fca5a5', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600,
-              }}
-            >
-              {Icons.logOut(14, '#fca5a5')} Sign Out
-            </button>
-          </div>
-        </header>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>First Name *</label>
+                  <input required value={onboardingForm.firstName} onChange={e => setOnboardingForm(p => ({...p, firstName: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Last Name *</label>
+                  <input required value={onboardingForm.lastName} onChange={e => setOnboardingForm(p => ({...p, lastName: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                </div>
+              </div>
 
-        {/* Sub-Header Tabs */}
-        <div style={{
-          display: 'flex', gap: 4, padding: '10px 24px', background: 'rgba(255,255,255,0.02)',
-          borderBottom: '1px solid rgba(255,255,255,0.06)', overflowX: 'auto',
-        }}>
-          {[
-            { id: 'home', label: 'Home Overview', icon: Icons.home },
-            ...(currentChild?.programType === 'hifz' ? [{ id: 'hifz', label: 'Hifz Sabaq & Manzil', icon: Icons.book }] : []),
-            ...(currentChild?.programType !== 'hifz' ? [{ id: 'results', label: 'Test Results', icon: Icons.results }] : []),
-            { id: 'attendance', label: 'Attendance', icon: Icons.attendance },
-            { id: 'challans', label: 'Fee Challans', icon: Icons.challan },
-            { id: 'schedule', label: 'Classes & Scholars', icon: Icons.calendar },
-          ].map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setActiveTab(t.id)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px',
-                borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 700,
-                background: activeTab === t.id ? `${GOLD}20` : 'transparent',
-                color: activeTab === t.id ? GOLD : 'rgba(255,255,255,0.5)',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {t.icon(16, activeTab === t.id ? GOLD : 'rgba(255,255,255,0.4)')}
-              {t.label}
-            </button>
-          ))}
-        </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Father's Name *</label>
+                  <input required value={onboardingForm.fatherName} onChange={e => setOnboardingForm(p => ({...p, fatherName: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Relationship to Student *</label>
+                  <select required value={onboardingForm.relation} onChange={e => setOnboardingForm(p => ({...p, relation: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: '#111625', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }}>
+                    <option value="Father">Father</option>
+                    <option value="Mother">Mother</option>
+                    <option value="Guardian">Guardian</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>CNIC *</label>
+                  <input required value={onboardingForm.cnic} onChange={e => setOnboardingForm(p => ({...p, cnic: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Phone *</label>
+                  <input required type="tel" value={onboardingForm.phone} onChange={e => setOnboardingForm(p => ({...p, phone: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Occupation *</label>
+                  <input required value={onboardingForm.occupation} onChange={e => setOnboardingForm(p => ({...p, occupation: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Estimated Earning (PKR)</label>
+                  <input type="number" value={onboardingForm.earning} onChange={e => setOnboardingForm(p => ({...p, earning: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+                </div>
+              </div>
+
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Address *</label>
+                <textarea required value={onboardingForm.address} onChange={e => setOnboardingForm(p => ({...p, address: e.target.value}))} rows={2} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff', resize: 'none' }} />
+              </div>
+
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>Number of Children to Enroll *</label>
+                <input required type="number" min="1" max="10" value={onboardingForm.childCount} onChange={e => setOnboardingForm(p => ({...p, childCount: e.target.value}))} style={{ width: '100%', padding: '9px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+              </div>
+
+              <Button type="submit" disabled={onboardingLoading} style={{ width: '100%' }}>
+                {onboardingLoading ? 'Saving...' : 'Complete Profile Setup'}
+              </Button>
+            </form>
+          </div>
+        ) : (
+          <>
+            {/* Global Header */}
+            <header style={{
+              padding: '16px 24px', background: '#0d111e', borderBottom: '1px solid rgba(255,255,255,0.06)',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <img src="/faeq-logo.png" alt="" style={{ width: 34, height: 34, borderRadius: 10 }} />
+                <div>
+                  <div style={{ fontSize: '0.92rem', fontWeight: 800 }}>Al-Faeq Education</div>
+                  <div style={{ fontSize: '0.68rem', color: GOLD, fontWeight: 700 }}>Parent / Guardian Portal</div>
+                </div>
+              </div>
+
+              {/* Desktop User Info & Logout */}
+              <div className="mobile-hide" style={{ alignItems: 'center', gap: 14 }}>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 700 }}>{user.first_name} {user.last_name}</div>
+                  <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.4)' }}>CNIC: {user.cnic}</div>
+                </div>
+                {guardianProfile?.profile_picture_url ? (
+                  <img src={guardianProfile.profile_picture_url} style={{ width: 36, height: 36, borderRadius: 18, objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ width: 36, height: 36, borderRadius: 18, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {Icons.user(18, 'rgba(255,255,255,0.6)')}
+                  </div>
+                )}
+                <button
+                  onClick={() => { logout().then(() => router.push('/login')); }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', marginLeft: 10,
+                    background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
+                    borderRadius: 8, color: '#fca5a5', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600,
+                  }}
+                >
+                  {Icons.logOut(14, '#fca5a5')} Sign Out
+                </button>
+              </div>
+
+              {/* Mobile Hamburger Menu Icon */}
+              <button 
+                className="desktop-hide" 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}
+              >
+                {Icons.menu(28)}
+              </button>
+            </header>
+
+            {/* Mobile Sidebar Overlay */}
+            {isMobileMenuOpen && (
+              <div style={{
+                position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', justifyContent: 'flex-end'
+              }} onClick={() => setIsMobileMenuOpen(false)}>
+                <div style={{
+                  width: 280, background: '#0d111e', height: '100%', borderLeft: '1px solid rgba(255,255,255,0.1)',
+                  padding: 24, display: 'flex', flexDirection: 'column'
+                }} onClick={(e) => e.stopPropagation()}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      {guardianProfile?.profile_picture_url ? (
+                        <img src={guardianProfile.profile_picture_url} style={{ width: 44, height: 44, borderRadius: 22, objectFit: 'cover' }} />
+                      ) : (
+                        <div style={{ width: 44, height: 44, borderRadius: 22, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {Icons.user(24, 'rgba(255,255,255,0.6)')}
+                        </div>
+                      )}
+                      <div>
+                        <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>{user.first_name} {user.last_name}</div>
+                        <div style={{ fontSize: '0.7rem', color: GOLD }}>Edit Profile</div>
+                      </div>
+                    </div>
+                    <button onClick={() => setIsMobileMenuOpen(false)} style={{ background: 'transparent', border: 'none', color: '#fff' }}>
+                      {Icons.close(24)}
+                    </button>
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+                    {[
+                      { id: 'home', label: 'Home Overview', icon: Icons.home },
+                      ...(currentChild?.programType === 'hifz' ? [{ id: 'hifz', label: 'Hifz Sabaq & Manzil', icon: Icons.book }] : []),
+                      ...(currentChild?.programType !== 'hifz' ? [{ id: 'results', label: 'Test Results', icon: Icons.results }] : []),
+                      { id: 'attendance', label: 'Attendance', icon: Icons.attendance },
+                      { id: 'challans', label: 'Fee Challans', icon: Icons.challan },
+                      { id: 'schedule', label: 'Classes & Scholars', icon: Icons.calendar },
+                    ].map((t) => (
+                      <button
+                        key={t.id}
+                        onClick={() => { setActiveTab(t.id); setIsMobileMenuOpen(false); }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
+                          borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700,
+                          background: activeTab === t.id ? `${GOLD}20` : 'transparent',
+                          color: activeTab === t.id ? GOLD : '#fff',
+                          textAlign: 'left'
+                        }}
+                      >
+                        {t.icon(18, activeTab === t.id ? GOLD : 'rgba(255,255,255,0.6)')}
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => { logout().then(() => router.push('/login')); }}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px',
+                      background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
+                      borderRadius: 10, color: '#fca5a5', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700,
+                      marginTop: 'auto'
+                    }}
+                  >
+                    {Icons.logOut(18, '#fca5a5')} Sign Out
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Desktop Sub-Header Tabs */}
+            <div className="mobile-hide" style={{
+              display: 'flex', gap: 4, padding: '10px 24px', background: 'rgba(255,255,255,0.02)',
+              borderBottom: '1px solid rgba(255,255,255,0.06)', overflowX: 'auto',
+            }}>
+              {[
+                { id: 'home', label: 'Home Overview', icon: Icons.home },
+                ...(currentChild?.programType === 'hifz' ? [{ id: 'hifz', label: 'Hifz Sabaq & Manzil', icon: Icons.book }] : []),
+                ...(currentChild?.programType !== 'hifz' ? [{ id: 'results', label: 'Test Results', icon: Icons.results }] : []),
+                { id: 'attendance', label: 'Attendance', icon: Icons.attendance },
+                { id: 'challans', label: 'Fee Challans', icon: Icons.challan },
+                { id: 'schedule', label: 'Classes & Scholars', icon: Icons.calendar },
+              ].map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setActiveTab(t.id)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px',
+                    borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 700,
+                    background: activeTab === t.id ? `${GOLD}20` : 'transparent',
+                    color: activeTab === t.id ? GOLD : 'rgba(255,255,255,0.5)',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {t.icon(16, activeTab === t.id ? GOLD : 'rgba(255,255,255,0.4)')}
+                  {t.label}
+                </button>
+              ))}
+            </div>
 
         {/* Toast */}
         {toastMsg && (
@@ -749,6 +1051,8 @@ export default function GuardianPortal() {
               </div>
             </div>
           </div>
+        )}
+        </>
         )}
       </div>
     </>

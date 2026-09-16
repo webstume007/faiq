@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { getCurrentUserSync, getPortalPath } from '../lib/auth';
+import { useTheme } from './_app';
 
 const GOLD = 'var(--accent-gold)';
 const NAVY = 'var(--bg-sidebar)';
@@ -37,6 +38,24 @@ const Icons = {
   mapPin: (s = 20, c = 'currentColor') => (
     <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
   ),
+  sun: (s = 18, c = 'currentColor') => (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="5" />
+      <line x1="12" y1="1" x2="12" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="1" y1="12" x2="3" y2="12" />
+      <line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </svg>
+  ),
+  moon: (s = 18, c = 'currentColor') => (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  ),
 };
 
 const PROGRAMS = [
@@ -68,6 +87,10 @@ const SCHOLARS = [
 export default function Home() {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
+  const { theme, changeTheme } = useTheme();
+  const isDark = theme === 'dark';
+
+  const toggleTheme = () => changeTheme(isDark ? 'light' : 'dark');
 
   useEffect(() => {
     const user = getCurrentUserSync();
@@ -120,9 +143,28 @@ export default function Home() {
                 background: `linear-gradient(135deg, ${GOLD}, #e09800)`,
                 color: '#ffffff', padding: '10px 22px', borderRadius: 12,
                 border: 'none', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 8,
               }}
             >
               Sign In to Portal &rarr;
+            </button>
+
+            {/* Desktop Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              style={{
+                width: 38, height: 38, borderRadius: 10,
+                background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)'}`,
+                color: isDark ? 'rgba(255,255,255,0.7)' : 'var(--text-secondary)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.25s ease',
+                flexShrink: 0,
+              }}
+            >
+              {isDark ? Icons.sun(16, '#F2A900') : Icons.moon(16, 'var(--text-secondary)')}
             </button>
           </div>
         </nav>
@@ -325,9 +367,45 @@ export default function Home() {
             <img src="/faiq-logo.png" alt="" style={{ width: 28, height: 28, borderRadius: 8 }} />
             <span style={{ fontWeight: 800, fontSize: '0.95rem' }}>Al-Faiq Islamic Institute</span>
           </div>
-          <p style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem', margin: 0 }}>
+          <p style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem', margin: '0 0 20px 0' }}>
             &copy; {new Date().getFullYear()} Al-Faiq Islamic Education System. All rights reserved.
           </p>
+
+          {/* Mobile-only theme toggle pill */}
+          <div className="mobile-theme-toggle">
+            <button
+              onClick={toggleTheme}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '10px 20px', borderRadius: 50,
+                background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)'}`,
+                color: 'var(--text-secondary)', cursor: 'pointer',
+                fontSize: '0.82rem', fontWeight: 600,
+                transition: 'all 0.25s ease',
+              }}
+            >
+              {/* Track with sliding knob */}
+              <span style={{
+                position: 'relative', width: 36, height: 20, borderRadius: 10,
+                background: isDark ? 'rgba(242,169,0,0.25)' : 'rgba(0,0,0,0.12)',
+                border: `1px solid ${isDark ? 'rgba(242,169,0,0.4)' : 'rgba(0,0,0,0.15)'}`,
+                display: 'inline-block', flexShrink: 0,
+                transition: 'background 0.25s ease',
+              }}>
+                <span style={{
+                  position: 'absolute', top: 2, left: isDark ? 'calc(100% - 18px)' : 2,
+                  width: 14, height: 14, borderRadius: '50%',
+                  background: isDark ? GOLD : '#94a3b8',
+                  transition: 'left 0.25s ease, background 0.25s ease',
+                  boxShadow: isDark ? '0 0 6px rgba(242,169,0,0.6)' : 'none',
+                }} />
+              </span>
+              {isDark ? Icons.moon(15, GOLD) : Icons.sun(15, 'var(--text-secondary)')}
+              <span>{isDark ? 'Dark Mode' : 'Light Mode'}</span>
+              {isDark ? Icons.sun(15, 'var(--text-tertiary)') : Icons.moon(15, 'var(--text-tertiary)')}
+            </button>
+          </div>
         </footer>
       </div>
 
@@ -338,6 +416,9 @@ export default function Home() {
         .mobile-nav {
           display: none !important;
         }
+        .mobile-theme-toggle {
+          display: none !important;
+        }
 
         @media (max-width: 768px) {
           .desktop-nav {
@@ -346,6 +427,9 @@ export default function Home() {
           .mobile-nav {
             display: flex !important;
             flex-direction: column !important;
+          }
+          .mobile-theme-toggle {
+            display: block !important;
           }
         }
       `}</style>

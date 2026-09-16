@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { getCurrentUser, getCurrentUserSync, logout } from '../lib/auth';
@@ -6,6 +6,7 @@ import { getChildData, getAnnouncementsByRole } from '../lib/guardianData';
 import { getStudentsByGuardian, submitChallanPayment, getActiveBankConfig, createAdmission, getActiveSession, supabase, updateGuardianProfile } from '../lib/db';
 import { QURAN_SURAHS, QURAN_PARAS, formatAyahRange } from '../lib/quranData';
 import AdmissionWizard from '../components/AdmissionWizard';
+import { useTheme } from './_app';
 
 const GOLD = 'var(--accent-gold)';
 const NAVY = 'var(--bg-sidebar)';
@@ -65,6 +66,18 @@ const Icons = {
   close: (size = 20, color = 'currentColor') => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   ),
+  sun: (size = 18, color = 'currentColor') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  ),
+  moon: (size = 18, color = 'currentColor') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  ),
+  edit: (size = 16, color = 'currentColor') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+  ),
+  camera: (size = 18, color = 'currentColor') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+  ),
 };
 
 const Card = ({ children, style, onClick }) => (
@@ -120,6 +133,7 @@ const Button = ({ children, onClick, variant = 'primary', style, disabled }) => 
 
 export default function GuardianPortal() {
   const router = useRouter();
+  const { theme, changeTheme } = useTheme();
   const [user, setUser] = useState(null);
   const [childrenList, setChildrenList] = useState([]);
   const [selectedChildIndex, setSelectedChildIndex] = useState(0);
@@ -130,6 +144,8 @@ export default function GuardianPortal() {
   const [activeSession, setActiveSession] = useState(null);
   const [availableCourses, setAvailableCourses] = useState([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const profileDropdownRef = useRef(null);
 
   // Guardian Profile & Onboarding State
   const [guardianProfile, setGuardianProfile] = useState(null);
@@ -139,6 +155,16 @@ export default function GuardianPortal() {
   const [onboardingForm, setOnboardingForm] = useState({
     firstName: '', lastName: '', cnic: '', phone: '', email: '',
     fatherName: '', relation: 'Father', occupation: '', earning: '', address: '', childCount: 1
+  });
+
+  // Edit Profile Modal State
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [editProfilePic, setEditProfilePic] = useState(null);
+  const [editProfilePicPreview, setEditProfilePicPreview] = useState(null);
+  const [editProfileLoading, setEditProfileLoading] = useState(false);
+  const [editForm, setEditForm] = useState({
+    firstName: '', lastName: '', phone: '', address: '',
+    fatherName: '', relation: 'Father', occupation: '', earning: ''
   });
 
   // Challan Payment state
@@ -235,6 +261,81 @@ export default function GuardianPortal() {
     setUser(currentUser);
     loadData(currentUser);
   }, [router, loadData]);
+
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(e.target)) {
+        setShowProfileDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const openEditProfile = () => {
+    setEditForm({
+      firstName: user?.first_name || '',
+      lastName: user?.last_name || '',
+      phone: user?.phone || '',
+      address: user?.current_address || '',
+      fatherName: guardianProfile?.father_name || '',
+      relation: guardianProfile?.relation_to_student || 'Father',
+      occupation: guardianProfile?.occupation || '',
+      earning: guardianProfile?.estimated_earning || '',
+    });
+    setEditProfilePic(null);
+    setEditProfilePicPreview(guardianProfile?.profile_picture_url || null);
+    setIsEditProfileOpen(true);
+    setShowProfileDropdown(false);
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleEditProfileSubmit = async (e) => {
+    e.preventDefault();
+    setEditProfileLoading(true);
+
+    let picUrl = guardianProfile?.profile_picture_url || null;
+    if (editProfilePic) {
+      const ext = editProfilePic.name.split('.').pop();
+      const fileName = `guardian-${user.id}-${Date.now()}.${ext}`;
+      const { data: uploadData, error: uploadErr } = await supabase.storage
+        .from('profiles')
+        .upload(fileName, editProfilePic, { cacheControl: '3600', upsert: false });
+      if (!uploadErr && uploadData) {
+        const { data: publicUrlData } = supabase.storage.from('profiles').getPublicUrl(fileName);
+        picUrl = publicUrlData.publicUrl;
+      }
+    }
+
+    const { error } = await updateGuardianProfile(
+      user.id,
+      {
+        first_name: editForm.firstName,
+        last_name: editForm.lastName,
+        phone: editForm.phone,
+        current_address: editForm.address,
+        profile_picture_url: picUrl,
+      },
+      {
+        father_name: editForm.fatherName,
+        relation_to_student: editForm.relation,
+        occupation: editForm.occupation,
+        estimated_earning: editForm.earning ? parseFloat(editForm.earning) : null,
+        child_count: guardianProfile?.child_count || 1,
+      }
+    );
+
+    setEditProfileLoading(false);
+    if (error) {
+      alert(`Error updating profile: ${error}`);
+    } else {
+      setIsEditProfileOpen(false);
+      setToastMsg('Profile updated successfully!');
+      setTimeout(() => setToastMsg(''), 3500);
+      loadData(user);
+    }
+  };
 
   const currentChild = childrenList[selectedChildIndex] || null;
 
@@ -498,36 +599,99 @@ export default function GuardianPortal() {
                 </div>
               </div>
 
-              {/* Desktop User Info & Logout */}
-              <div className="mobile-hide" style={{ alignItems: 'center', gap: 14 }}>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '0.82rem', fontWeight: 700 }}>{user.first_name} {user.last_name}</div>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)' }}>CNIC: {user.cnic}</div>
-                </div>
-                {guardianProfile?.profile_picture_url ? (
-                  <img src={guardianProfile.profile_picture_url} style={{ width: 36, height: 36, borderRadius: 18, objectFit: 'cover' }} />
-                ) : (
-                  <div style={{ width: 36, height: 36, borderRadius: 18, background: 'var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {Icons.user(18, 'var(--text-secondary)')}
-                  </div>
-                )}
+              {/* Desktop Right: Theme Toggle + Profile Dropdown */}
+              <div className="mobile-hide" style={{ alignItems: 'center', gap: 10 }}>
+                {/* Theme Toggle Button */}
                 <button
-                  onClick={() => { logout().then(() => router.push('/login')); }}
+                  onClick={() => changeTheme(theme === 'dark' ? 'light' : 'dark')}
+                  title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', marginLeft: 10,
-                    background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
-                    borderRadius: 8, color: 'var(--text-danger)', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: 36, height: 36, borderRadius: 10,
+                    background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+                    color: 'var(--text-secondary)', cursor: 'pointer',
+                    transition: 'all 0.2s ease',
                   }}
                 >
-                  {Icons.logOut(14, 'var(--text-danger)')} Sign Out
+                  {theme === 'dark' ? Icons.sun(17, 'var(--accent-gold)') : Icons.moon(17, 'var(--text-primary)')}
                 </button>
+
+                {/* Profile Clickable Dropdown */}
+                <div ref={profileDropdownRef} style={{ position: 'relative' }}>
+                  <button
+                    onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+                      borderRadius: 12, padding: '6px 12px 6px 6px',
+                      cursor: 'pointer', transition: 'all 0.2s ease',
+                    }}
+                  >
+                    {guardianProfile?.profile_picture_url ? (
+                      <img src={guardianProfile.profile_picture_url} style={{ width: 32, height: 32, borderRadius: 10, objectFit: 'cover' }} alt="Profile" />
+                    ) : (
+                      <div style={{ width: 32, height: 32, borderRadius: 10, background: `${GOLD}25`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {Icons.user(16, GOLD)}
+                      </div>
+                    )}
+                    <div style={{ textAlign: 'left' }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>{user.first_name} {user.last_name}</div>
+                      <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', lineHeight: 1.2 }}>Guardian</div>
+                    </div>
+                    <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                      style={{ transform: showProfileDropdown ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>
+                      <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {showProfileDropdown && (
+                    <div style={{
+                      position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+                      background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)',
+                      borderRadius: 14, minWidth: 180, boxShadow: '0 12px 40px rgba(0,0,0,0.3)',
+                      overflow: 'hidden', animation: 'scaleIn 0.15s ease',
+                      transformOrigin: 'top right', zIndex: 200,
+                    }}>
+                      <button
+                        onClick={openEditProfile}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+                          padding: '12px 16px', background: 'transparent', border: 'none',
+                          color: 'var(--text-primary)', cursor: 'pointer', fontSize: '0.85rem',
+                          fontWeight: 600, borderBottom: '1px solid var(--border-color)',
+                          textAlign: 'left', transition: 'background 0.15s',
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'var(--card-bg-hover)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                      >
+                        {Icons.edit(16, GOLD)}
+                        Edit Profile
+                      </button>
+                      <button
+                        onClick={() => { logout().then(() => router.push('/login')); }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+                          padding: '12px 16px', background: 'transparent', border: 'none',
+                          color: 'var(--text-danger)', cursor: 'pointer', fontSize: '0.85rem',
+                          fontWeight: 600, textAlign: 'left', transition: 'background 0.15s',
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.08)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                      >
+                        {Icons.logOut(16, 'var(--text-danger)')}
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Mobile Hamburger Menu Icon */}
               <button 
                 className="desktop-hide" 
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', cursor: 'pointer' }}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', padding: 4 }}
               >
                 {Icons.menu(28)}
               </button>
@@ -539,29 +703,41 @@ export default function GuardianPortal() {
                 position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', justifyContent: 'flex-end'
               }} onClick={() => setIsMobileMenuOpen(false)}>
                 <div style={{
-                  width: 280, background: 'var(--bg-sidebar)', height: '100%', borderLeft: '1px solid var(--border-color)',
-                  padding: 24, display: 'flex', flexDirection: 'column'
+                  width: 290, background: 'var(--bg-sidebar)', height: '100%', borderLeft: '1px solid var(--border-color)',
+                  padding: 24, display: 'flex', flexDirection: 'column', animation: 'slideInRight 0.25s ease',
                 }} onClick={(e) => e.stopPropagation()}>
+
+                  {/* Mobile: Profile Header */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       {guardianProfile?.profile_picture_url ? (
-                        <img src={guardianProfile.profile_picture_url} style={{ width: 44, height: 44, borderRadius: 22, objectFit: 'cover' }} />
+                        <img src={guardianProfile.profile_picture_url} style={{ width: 46, height: 46, borderRadius: 14, objectFit: 'cover', border: `2px solid ${GOLD}` }} alt="Profile" />
                       ) : (
-                        <div style={{ width: 44, height: 44, borderRadius: 22, background: 'var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          {Icons.user(24, 'var(--text-secondary)')}
+                        <div style={{ width: 46, height: 46, borderRadius: 14, background: `${GOLD}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {Icons.user(24, GOLD)}
                         </div>
                       )}
                       <div>
-                        <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>{user.first_name} {user.last_name}</div>
-                        <div style={{ fontSize: '0.7rem', color: GOLD }}>Edit Profile</div>
+                        <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)' }}>{user.first_name} {user.last_name}</div>
+                        <button
+                          onClick={openEditProfile}
+                          style={{
+                            background: 'transparent', border: 'none', padding: 0,
+                            color: GOLD, fontSize: '0.72rem', fontWeight: 700,
+                            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2,
+                          }}
+                        >
+                          {Icons.edit(11, GOLD)} Edit Profile
+                        </button>
                       </div>
                     </div>
-                    <button onClick={() => setIsMobileMenuOpen(false)} style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)' }}>
-                      {Icons.close(24)}
+                    <button onClick={() => setIsMobileMenuOpen(false)} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 4 }}>
+                      {Icons.close(22)}
                     </button>
                   </div>
-                  
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+
+                  {/* Mobile: Nav Links */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
                     {[
                       { id: 'home', label: 'Home Overview', icon: Icons.home },
                       { id: 'admissions', label: 'Admissions & Enrollment', icon: Icons.admission },
@@ -575,11 +751,11 @@ export default function GuardianPortal() {
                         key={t.id}
                         onClick={() => { setActiveTab(t.id); setIsMobileMenuOpen(false); }}
                         style={{
-                          display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
-                          borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700,
-                          background: activeTab === t.id ? `${GOLD}20` : 'transparent',
+                          display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px',
+                          borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: '0.88rem', fontWeight: 600,
+                          background: activeTab === t.id ? `${GOLD}18` : 'transparent',
                           color: activeTab === t.id ? GOLD : 'var(--text-primary)',
-                          textAlign: 'left'
+                          textAlign: 'left', transition: 'background 0.15s',
                         }}
                       >
                         {t.icon(18, activeTab === t.id ? GOLD : 'var(--text-secondary)')}
@@ -588,17 +764,37 @@ export default function GuardianPortal() {
                     ))}
                   </div>
 
-                  <button
-                    onClick={() => { logout().then(() => router.push('/login')); }}
-                    style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px',
-                      background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
-                      borderRadius: 10, color: 'var(--text-danger)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700,
-                      marginTop: 'auto'
-                    }}
-                  >
-                    {Icons.logOut(18, 'var(--text-danger)')} Sign Out
-                  </button>
+                  {/* Mobile: Bottom Actions — Theme Toggle + Logout */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 16 }}>
+                    {/* Theme Toggle */}
+                    <button
+                      onClick={() => changeTheme(theme === 'dark' ? 'light' : 'dark')}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px',
+                        background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+                        borderRadius: 10, color: 'var(--text-primary)', cursor: 'pointer',
+                        fontSize: '0.88rem', fontWeight: 600, transition: 'all 0.2s',
+                      }}
+                    >
+                      {theme === 'dark'
+                        ? Icons.sun(18, 'var(--accent-gold)')
+                        : Icons.moon(18, 'var(--text-primary)')
+                      }
+                      {theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                    </button>
+
+                    {/* Sign Out */}
+                    <button
+                      onClick={() => { logout().then(() => router.push('/login')); }}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px',
+                        background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
+                        borderRadius: 10, color: 'var(--text-danger)', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700,
+                      }}
+                    >
+                      {Icons.logOut(18, 'var(--text-danger)')} Sign Out
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -1053,6 +1249,274 @@ export default function GuardianPortal() {
           </div>
         )}
 
+        {/* ─────────── Edit Profile Modal ─────────── */}
+        {isEditProfileOpen && (
+          <div style={{
+            position: 'fixed', inset: 0, zIndex: 2000,
+            background: 'rgba(0,0,0,0.75)',
+            backdropFilter: 'blur(10px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '16px', animation: 'fadeIn 0.2s ease',
+          }}>
+            <div style={{
+              background: 'var(--bg-dropdown)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 24, width: '100%', maxWidth: 560,
+              maxHeight: '92vh', overflowY: 'auto',
+              boxShadow: '0 30px 80px rgba(0,0,0,0.5)',
+              animation: 'scaleIn 0.2s ease',
+            }}>
+              {/* Modal Header */}
+              <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '20px 24px', borderBottom: '1px solid var(--border-color)',
+                background: `linear-gradient(135deg, ${GOLD}10, transparent)`,
+                borderRadius: '24px 24px 0 0',
+              }}>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: GOLD }}>Edit Profile</h2>
+                  <p style={{ margin: '2px 0 0', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Update your guardian information</p>
+                </div>
+                <button
+                  onClick={() => setIsEditProfileOpen(false)}
+                  style={{
+                    background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+                    borderRadius: 10, width: 34, height: 34, display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', cursor: 'pointer', color: 'var(--text-secondary)',
+                  }}
+                >
+                  {Icons.close(18)}
+                </button>
+              </div>
+
+              <form onSubmit={handleEditProfileSubmit} style={{ padding: '24px' }}>
+                {/* Profile Photo Upload */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24 }}>
+                  <div style={{ position: 'relative', marginBottom: 10 }}>
+                    <div style={{
+                      width: 90, height: 90, borderRadius: 22,
+                      background: `${GOLD}15`,
+                      border: `2px solid ${GOLD}50`,
+                      overflow: 'hidden',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {editProfilePicPreview ? (
+                        <img src={editProfilePicPreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        Icons.user(36, GOLD)
+                      )}
+                    </div>
+                    <label style={{
+                      position: 'absolute', bottom: -6, right: -6,
+                      width: 28, height: 28, borderRadius: 10,
+                      background: GOLD, display: 'flex', alignItems: 'center',
+                      justifyContent: 'center', cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(242,169,0,0.4)',
+                    }}>
+                      {Icons.camera(14, '#000')}
+                      <input
+                        type="file" accept="image/*" style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            setEditProfilePic(file);
+                            setEditProfilePicPreview(URL.createObjectURL(file));
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+                  <p style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', margin: 0 }}>Tap camera to change photo</p>
+                </div>
+
+                {/* Form Fields */}
+                <div style={{ display: 'grid', gap: 14 }}>
+                  {/* Name Row */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>First Name</label>
+                      <input
+                        required
+                        value={editForm.firstName}
+                        onChange={e => setEditForm(p => ({ ...p, firstName: e.target.value }))}
+                        style={{
+                          width: '100%', padding: '10px 14px',
+                          background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+                          borderRadius: 10, color: 'var(--text-primary)', fontSize: '0.88rem',
+                          outline: 'none', transition: 'border-color 0.2s',
+                        }}
+                        onFocus={e => e.target.style.borderColor = `${GOLD}80`}
+                        onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Last Name</label>
+                      <input
+                        required
+                        value={editForm.lastName}
+                        onChange={e => setEditForm(p => ({ ...p, lastName: e.target.value }))}
+                        style={{
+                          width: '100%', padding: '10px 14px',
+                          background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+                          borderRadius: 10, color: 'var(--text-primary)', fontSize: '0.88rem',
+                          outline: 'none', transition: 'border-color 0.2s',
+                        }}
+                        onFocus={e => e.target.style.borderColor = `${GOLD}80`}
+                        onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Phone */}
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Phone Number</label>
+                    <input
+                      type="tel"
+                      value={editForm.phone}
+                      onChange={e => setEditForm(p => ({ ...p, phone: e.target.value }))}
+                      style={{
+                        width: '100%', padding: '10px 14px',
+                        background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+                        borderRadius: 10, color: 'var(--text-primary)', fontSize: '0.88rem',
+                        outline: 'none', transition: 'border-color 0.2s',
+                      }}
+                      onFocus={e => e.target.style.borderColor = `${GOLD}80`}
+                      onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
+                    />
+                  </div>
+
+                  {/* Father Name + Relation */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Father's Name</label>
+                      <input
+                        value={editForm.fatherName}
+                        onChange={e => setEditForm(p => ({ ...p, fatherName: e.target.value }))}
+                        style={{
+                          width: '100%', padding: '10px 14px',
+                          background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+                          borderRadius: 10, color: 'var(--text-primary)', fontSize: '0.88rem',
+                          outline: 'none', transition: 'border-color 0.2s',
+                        }}
+                        onFocus={e => e.target.style.borderColor = `${GOLD}80`}
+                        onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Relation to Student</label>
+                      <select
+                        value={editForm.relation}
+                        onChange={e => setEditForm(p => ({ ...p, relation: e.target.value }))}
+                        style={{
+                          width: '100%', padding: '10px 14px',
+                          background: 'var(--bg-dropdown)', border: '1px solid var(--border-color)',
+                          borderRadius: 10, color: 'var(--text-primary)', fontSize: '0.88rem',
+                          outline: 'none',
+                        }}
+                      >
+                        <option value="Father">Father</option>
+                        <option value="Mother">Mother</option>
+                        <option value="Guardian">Guardian</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Occupation + Earning */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Occupation</label>
+                      <input
+                        value={editForm.occupation}
+                        onChange={e => setEditForm(p => ({ ...p, occupation: e.target.value }))}
+                        style={{
+                          width: '100%', padding: '10px 14px',
+                          background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+                          borderRadius: 10, color: 'var(--text-primary)', fontSize: '0.88rem',
+                          outline: 'none', transition: 'border-color 0.2s',
+                        }}
+                        onFocus={e => e.target.style.borderColor = `${GOLD}80`}
+                        onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Monthly Earning (PKR)</label>
+                      <input
+                        type="number"
+                        value={editForm.earning}
+                        onChange={e => setEditForm(p => ({ ...p, earning: e.target.value }))}
+                        style={{
+                          width: '100%', padding: '10px 14px',
+                          background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+                          borderRadius: 10, color: 'var(--text-primary)', fontSize: '0.88rem',
+                          outline: 'none', transition: 'border-color 0.2s',
+                        }}
+                        onFocus={e => e.target.style.borderColor = `${GOLD}80`}
+                        onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Address */}
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Home Address</label>
+                    <textarea
+                      value={editForm.address}
+                      onChange={e => setEditForm(p => ({ ...p, address: e.target.value }))}
+                      rows={3}
+                      style={{
+                        width: '100%', padding: '10px 14px',
+                        background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+                        borderRadius: 10, color: 'var(--text-primary)', fontSize: '0.88rem',
+                        outline: 'none', resize: 'none', transition: 'border-color 0.2s',
+                        lineHeight: 1.5,
+                      }}
+                      onFocus={e => e.target.style.borderColor = `${GOLD}80`}
+                      onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{ display: 'flex', gap: 12, marginTop: 24, justifyContent: 'flex-end' }}>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditProfileOpen(false)}
+                    style={{
+                      padding: '10px 20px', borderRadius: 10,
+                      background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+                      color: 'var(--text-secondary)', cursor: 'pointer',
+                      fontSize: '0.85rem', fontWeight: 600,
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={editProfileLoading}
+                    style={{
+                      padding: '10px 24px', borderRadius: 10,
+                      background: `linear-gradient(135deg, ${GOLD}, #e09800)`,
+                      border: 'none', color: '#000',
+                      cursor: editProfileLoading ? 'not-allowed' : 'pointer',
+                      fontSize: '0.85rem', fontWeight: 700,
+                      opacity: editProfileLoading ? 0.7 : 1,
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      transition: 'opacity 0.2s',
+                    }}
+                  >
+                    {editProfileLoading ? (
+                      <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round"
+                        style={{ animation: 'spin 0.8s linear infinite' }}>
+                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                      </svg>
+                    ) : Icons.check(16, '#000')}
+                    {editProfileLoading ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
         </>
         )}

@@ -120,12 +120,12 @@ const ParticleBackground = memo(() => (
   <div style={{ position: 'fixed', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
     <div style={{
       position: 'absolute', width: 350, height: 350, top: '15%', left: '10%',
-      borderRadius: '50%', background: 'radial-gradient(circle, rgba(242,169,0,0.12) 0%, transparent 70%)',
+      borderRadius: '50%', background: 'radial-gradient(circle, rgba(242,169,0,0.1) 0%, transparent 70%)',
       filter: 'blur(50px)',
     }} />
     <div style={{
       position: 'absolute', width: 450, height: 450, bottom: '10%', right: '10%',
-      borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,33,71,0.5) 0%, transparent 70%)',
+      borderRadius: '50%', background: 'radial-gradient(circle, var(--accent-gold-transparent) 0%, transparent 70%)',
       filter: 'blur(60px)',
     }} />
   </div>
@@ -545,7 +545,13 @@ export default function LoginPage() {
         <style>{`
           @keyframes spin { to { transform: rotate(360deg); } }
           input::placeholder { color: var(--text-tertiary); }
-          input:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px rgba(18,26,51,0.95) inset !important; -webkit-text-fill-color: #fff !important; }
+          input:-webkit-autofill,
+          input:-webkit-autofill:hover,
+          input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 1000px var(--card-bg) inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
+            caret-color: var(--text-primary) !important;
+          }
         `}</style>
       </Head>
 
@@ -555,7 +561,13 @@ export default function LoginPage() {
 
           {/* Logo & Header */}
           <div style={styles.logoHeader}>
-            <div style={styles.logoBadge}>
+            <div
+              style={{ ...styles.logoBadge, cursor: 'pointer', transition: 'transform 0.2s ease', }}
+              onClick={() => router.push('/')}
+              title="Back to Home"
+              onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.08)'}
+              onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+            >
               <img src="/faiq-logo.png" alt="Al-Faiq Logo" style={styles.logoImage} />
             </div>
             <h1 style={styles.title}>Al-Faiq Education System</h1>
@@ -810,11 +822,11 @@ const styles = {
   },
   logoImage: { width: '100%', height: '100%', objectFit: 'contain' },
   title: { fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: 4 },
-  subtitle: { fontSize: '0.85rem', color: 'rgba(255,255,255,0.45)', fontWeight: 500 },
+  subtitle: { fontSize: '0.85rem', color: 'var(--text-tertiary)', fontWeight: 500 },
   card: {
-    background: 'rgba(18, 26, 51, 0.75)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+    background: 'var(--bg-dropdown)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
     borderRadius: 16, border: '1px solid var(--border-color)', padding: '32px 28px',
-    boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+    boxShadow: '0 20px 50px var(--shadow-color)',
   },
   label: {
     display: 'block', fontSize: '0.76rem', fontWeight: 600, color: 'var(--text-secondary)',
@@ -831,7 +843,7 @@ const styles = {
     color: 'var(--text-primary)', outline: 'none', boxSizing: 'border-box',
   },
   inputFocus: {
-    borderColor: '#F2A900', background: 'rgba(255,255,255,0.07)',
+    borderColor: '#F2A900', background: 'var(--card-bg)',
     boxShadow: '0 0 0 3px rgba(242, 169, 0, 0.15)',
   },
   passwordToggle: {

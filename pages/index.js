@@ -87,6 +87,7 @@ const SCHOLARS = [
 export default function Home() {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState(null);
   const { theme, changeTheme } = useTheme();
   const isDark = theme === 'dark';
 
@@ -95,8 +96,7 @@ export default function Home() {
   useEffect(() => {
     const user = getCurrentUserSync();
     if (user) {
-      router.replace(getPortalPath(user.role));
-      return;
+      setLoggedInUser(user);
     }
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
@@ -115,6 +115,7 @@ export default function Home() {
       </Head>
 
       <div style={{ background: 'var(--bg-color)', color: 'var(--text-primary)', fontFamily: "'Inter', sans-serif", minHeight: '100vh' }}>
+
         {/* Desktop Navigation Bar */}
         <nav className="desktop-nav" style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,

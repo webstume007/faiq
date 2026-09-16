@@ -62,6 +62,7 @@ export default function App({ Component, pageProps }) {
           --accent-gold: #F2A900;
           --accent-gold-transparent: rgba(242, 169, 0, 0.22);
           --shadow-color: rgba(0,0,0,0.5);
+          --nav-scrolled-bg: rgba(10, 14, 26, 0.95);
 
           /* Semantic Status Colors */
           --color-danger: #ef4444;
@@ -95,6 +96,7 @@ export default function App({ Component, pageProps }) {
           --accent-gold: #D48F00;
           --accent-gold-transparent: rgba(212, 143, 0, 0.15);
           --shadow-color: rgba(0,0,0,0.1);
+          --nav-scrolled-bg: rgba(255, 255, 255, 0.95);
 
           /* Semantic Status Colors */
           --color-danger: #ef4444;

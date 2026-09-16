@@ -95,9 +95,9 @@ export default function Home() {
         {/* Desktop Navigation Bar */}
         <nav className="desktop-nav" style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
-          background: scrolled ? 'rgba(10, 14, 26, 0.95)' : 'transparent',
+          background: scrolled ? 'var(--nav-scrolled-bg)' : 'transparent',
           backdropFilter: scrolled ? 'blur(12px)' : 'none',
-          borderBottom: scrolled ? '1px solid var(--card-bg-hover)' : 'none',
+          borderBottom: scrolled ? '1px solid var(--border-color)' : 'none',
           padding: '16px 36px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           transition: 'all 0.3s ease',
@@ -111,14 +111,14 @@ export default function Home() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-            <button onClick={() => scrollToSection('programs')} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>Programs</button>
-            <button onClick={() => scrollToSection('scholars')} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>Faculty</button>
-            <button onClick={() => scrollToSection('about')} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>About</button>
+            <button onClick={() => scrollToSection('programs')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>Programs</button>
+            <button onClick={() => scrollToSection('scholars')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>Faculty</button>
+            <button onClick={() => scrollToSection('about')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>About</button>
             <button
               onClick={() => router.push('/login')}
               style={{
                 background: `linear-gradient(135deg, ${GOLD}, #e09800)`,
-                color: 'var(--bg-color)', padding: '10px 22px', borderRadius: 12,
+                color: '#ffffff', padding: '10px 22px', borderRadius: 12,
                 border: 'none', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
               }}
             >
@@ -130,11 +130,11 @@ export default function Home() {
         {/* Mobile Navigation Bar (Mobile View Only) */}
         <nav className="mobile-nav" style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
-          background: scrolled ? 'rgba(10, 14, 26, 0.98)' : 'rgba(10, 14, 26, 0.92)',
+          background: 'var(--nav-scrolled-bg)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
           borderBottom: '1px solid var(--border-color)',
-          boxShadow: scrolled ? '0 10px 30px rgba(0,0,0,0.5)' : 'none',
+          boxShadow: scrolled ? '0 10px 30px var(--shadow-color)' : 'none',
           transition: 'all 0.3s ease',
         }}>
           {/* Main Title Section */}
@@ -165,29 +165,29 @@ export default function Home() {
             <button
               onClick={() => scrollToSection('programs')}
               style={{
-                background: 'none', border: 'none', color: 'rgba(255,255,255,0.85)',
+                background: 'none', border: 'none', color: 'var(--text-secondary)',
                 fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', padding: '4px 10px',
                 borderRadius: 8,
               }}
             >
               Program
             </button>
-            <span style={{ color: 'rgba(242, 169, 0, 0.4)', fontSize: '0.75rem' }}>&bull;</span>
+            <span style={{ color: GOLD, opacity: 0.4, fontSize: '0.75rem' }}>&bull;</span>
             <button
               onClick={() => scrollToSection('scholars')}
               style={{
-                background: 'none', border: 'none', color: 'rgba(255,255,255,0.85)',
+                background: 'none', border: 'none', color: 'var(--text-secondary)',
                 fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', padding: '4px 10px',
                 borderRadius: 8,
               }}
             >
               Faculty
             </button>
-            <span style={{ color: 'rgba(242, 169, 0, 0.4)', fontSize: '0.75rem' }}>&bull;</span>
+            <span style={{ color: GOLD, opacity: 0.4, fontSize: '0.75rem' }}>&bull;</span>
             <button
               onClick={() => scrollToSection('about')}
               style={{
-                background: 'none', border: 'none', color: 'rgba(255,255,255,0.85)',
+                background: 'none', border: 'none', color: 'var(--text-secondary)',
                 fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', padding: '4px 10px',
                 borderRadius: 8,
               }}
@@ -220,10 +220,9 @@ export default function Home() {
             <h1 style={{
               fontSize: 'clamp(2.2rem, 5.5vw, 3.2rem)', fontWeight: 900, lineHeight: 1.15,
               margin: '0 0 20px 0', letterSpacing: '-0.03em',
-              background: 'linear-gradient(180deg, #ffffff 40%, rgba(255,255,255,0.7) 100%)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              color: 'var(--text-primary)',
             }}>
-              Islam and the <span style={{ color: GOLD, WebkitTextFillColor: GOLD }}>Science together</span>
+              Islam and the <span style={{ color: GOLD }}>Science together</span>
             </h1>
 
             <p style={{
@@ -250,7 +249,7 @@ export default function Home() {
                 onClick={() => scrollToSection('programs')}
                 style={{
                   background: 'var(--card-bg-hover)', color: 'var(--text-primary)',
-                  border: '1px solid rgba(255,255,255,0.12)',
+                  border: '1px solid var(--border-color)',
                   padding: '14px 28px', borderRadius: 14,
                   fontWeight: 700, fontSize: '0.95rem', cursor: 'pointer',
                 }}
